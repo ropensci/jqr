@@ -3,3 +3,5 @@
 ^jq-1.4.tar.gz$
 ^jqr_.*.tar.gz$
 ^\.travis\.yml$
+^.*\.Rproj$
+^\.Rproj\.user$
