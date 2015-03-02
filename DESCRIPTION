@@ -1,0 +1,11 @@
+Package: jqr
+Title: jqr
+Version: 0.1.0
+Description: jqr
+Depends: R (>= 3.1.2)
+License: MIT + file LICENSE
+LazyData: true
+Author: Rich FitzJohn
+Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
+LinkingTo: Rcpp
+Imports: Rcpp
