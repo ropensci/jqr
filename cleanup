@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "Cleaning up"
+cd src/jq-1.4 && make clean

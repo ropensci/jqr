@@ -5,7 +5,3 @@ jqr <- function(json, program) {
     .Call('jqr_jqr', PACKAGE = 'jqr', json, program)
 }
 
-test <- function() {
-    invisible(.Call('jqr_test', PACKAGE = 'jqr'))
-}
-

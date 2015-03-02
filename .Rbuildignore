@@ -1,1 +1,4 @@
-Makefile
+^Makefile$
+^bootstrap.R$
+^jq-1.4.tar.gz$
+^jqr_.*.tar.gz$

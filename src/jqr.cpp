@@ -3,68 +3,82 @@ extern "C" {
 #include <jq.h>
 }
 
-// Looks like, based on the Ruby version, running a RcppR6 thing
-// around the source might be sensible.
+#include <memory> // std::make_shared, std::shared_ptr
 
-// The way that the Ruby version works is this.
+// The jv objects haven't been done with RAII yet because the free
+// semantics are unclear from main.c and the ruby interface.  Probably
+// things are not actually being free'd enough, based on the code I
+// see.  But I think we're safe, exception wise.
 
-// 1: create a JQ object with some source as an attribute `src` and
-//    optionally an argument `parse_json` (default: true)
-// 2: main method is `search` which takes argument `program` and a
-//    block argument that I don't yet understand
-// 3: on search, we create a jq object with the `program` argument.
-//    that calls to `rb_jq_initialize`.  There is considerable effort
-//    taken to ensure that this does close on exit with
-//    `rb_jq_close`.
-// 4: Then call `rb_jq_update` with the `src` attribute.
+typedef std::shared_ptr<jq_state>  jq_state_ptr;
+typedef std::shared_ptr<jv_parser> jv_parser_ptr;
 
-// #include <memory> // shared_ptr
-// Eventually I want an object that holds jq_state and jv_parser
-// together as either:
-//
-// A C++ class with a destructor that we pass around a smart pointer
-// A pair of smart pointers that call the destructors
-//    http://stackoverflow.com/questions/12340810/using-custom-deleter-with-stdshared-ptr
-// Probably need same for jv_result
+void jqr_err_cb(void *, jv x) {
+  const char *msg = jv_string_value(x);
+  jv_free(x); // I think this is our responsibility.
+  Rcpp::stop(msg);
+}
 
-// I really have no idea when we're meant to hit this function
-// repeatedly.  It's not things of the form '. | . |'
-Rcpp::CharacterVector jqr_process(jq_state *state, jv value) {
-  Rprintf("process\n");
-  Rcpp::CharacterVector ret;
-  jq_start(state, value, 0);
+void delete_jq_state(jq_state* state) {
+  // Rprintf("deleting state\n");
+  jq_teardown(&state);
+}
 
-  jv result = jq_next(state);
+void delete_jv_parser(jv_parser* parser) {
+  // Rprintf("deleting parser\n");
+  jv_parser_free(parser);
+}
+
+jq_state_ptr make_jq_state() {
+  jq_state_ptr state(jq_init(), delete_jq_state);
+  // TODO: should do this via the jv_nomem_handler?
+  if (state == NULL) {
+    Rcpp::stop("Error allocating jq");
+  }
+  jq_set_error_cb(state.get(), jqr_err_cb, NULL);
+  return state;
+}
+
+jv_parser_ptr make_jv_parser() {
+  return jv_parser_ptr(jv_parser_new(0), delete_jv_parser);
+}
+
+std::string jqr_process(jq_state_ptr state, jv value) {
+  std::string ret;
+  jq_start(state.get(), value, 0);
+
+  jv result = jq_next(state.get());
 
   while (jv_is_valid(result)) {
     jv dumped = jv_dump_string(result, 0);
     // A lot of unnecessary copying here (char* to string to R - read
     // how one is *meant* to do this).
     const char *str = jv_string_value(dumped);
-    std::string tmp(str);
-    ret.push_back(tmp);
+    std::string str_cpp(str);
+    ret = str_cpp;
 
-    result = jq_next(state);
+    result = jq_next(state.get());
   }
-  // TODO: This will not get free'd if the above fails!
+
   jv_free(result);
   return ret;
 }
 
-Rcpp::CharacterVector jqr_parse(jq_state *state, struct jv_parser *parser) {
-  jv value = jv_parser_next(parser);
-  Rcpp::CharacterVector ret;
+std::string jqr_parse(jq_state_ptr state, jv_parser_ptr parser) {
+  jv value = jv_parser_next(parser.get());
+  std::string ret;
 
   while (jv_is_valid(value)) {
     ret = jqr_process(state, value);
-    value = jv_parser_next(parser);
+    value = jv_parser_next(parser.get());
   }
 
   if (jv_invalid_has_msg(jv_copy(value))) {
     jv msg = jv_invalid_get_msg(value);
+    const char * msg_str = jv_string_value(msg);
     jv_free(msg);
     jv_free(value);
-    Rcpp::stop(jv_string_value(msg));
+    Rcpp::stop(msg_str);
   } else {
     jv_free(value);
   }
@@ -72,31 +86,19 @@ Rcpp::CharacterVector jqr_parse(jq_state *state, struct jv_parser *parser) {
 }
 
 // [[Rcpp::export]]
-Rcpp::CharacterVector jqr(std::string json, std::string program) {
-  jq_state *state = jq_init();
-  if (state == NULL) {
-    Rcpp::stop("Error allocating jq");
-  }
+std::string jqr(std::string json, std::string program) {
+  jq_state_ptr state = make_jq_state();
 
-  const char * program_c = program.c_str();
-  int compiled = jq_compile(state, program_c);
+  int compiled = jq_compile(state.get(), program.c_str());
+  // This doesn't get here because it's picked up in the callback, but
+  // serves as an extra check.
   if (!compiled) {
-    jq_teardown(&state);
-    Rcpp::stop("compile error");
+    Rcpp::stop("compile error [should never be seen]");
   }
-  // parser = NULL;
-  // closed = 0;
 
   int is_partial = 0;
-  jv_parser *parser = jv_parser_new(0);
-  jv_parser_set_buf(parser, json.c_str(), json.size(), is_partial);
-  Rcpp::CharacterVector ret = jqr_parse(state, parser);
-  jv_parser_free(parser);
+  jv_parser_ptr parser = make_jv_parser();
+  jv_parser_set_buf(parser.get(), json.c_str(), json.size(), is_partial);
 
-  // On exit:
-  jq_teardown(&state);
-  // parser = NULL;
-  // closed = 1;
-
-  return ret;
+  return jqr_parse(state, parser);
 }
