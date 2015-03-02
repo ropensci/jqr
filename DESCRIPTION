@@ -9,3 +9,4 @@ Author: Rich FitzJohn
 Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
 LinkingTo: Rcpp
 Imports: Rcpp
+Suggests: testthat, jsonlite

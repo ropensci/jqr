@@ -43,8 +43,9 @@ jv_parser_ptr make_jv_parser() {
   return jv_parser_ptr(jv_parser_new(0), delete_jv_parser);
 }
 
-std::string jqr_process(jq_state_ptr state, jv value) {
-  std::string ret;
+// when is this called >1 time?
+std::vector<std::string> jqr_process(jq_state_ptr state, jv value) {
+  std::vector<std::string> ret;
   jq_start(state.get(), value, 0);
 
   jv result = jq_next(state.get());
@@ -55,7 +56,7 @@ std::string jqr_process(jq_state_ptr state, jv value) {
     // how one is *meant* to do this).
     const char *str = jv_string_value(dumped);
     std::string str_cpp(str);
-    ret = str_cpp;
+    ret.push_back(str_cpp);
 
     result = jq_next(state.get());
   }
@@ -64,10 +65,11 @@ std::string jqr_process(jq_state_ptr state, jv value) {
   return ret;
 }
 
-std::string jqr_parse(jq_state_ptr state, jv_parser_ptr parser) {
+std::vector<std::string> jqr_parse(jq_state_ptr state, jv_parser_ptr parser) {
   jv value = jv_parser_next(parser.get());
-  std::string ret;
+  std::vector<std::string> ret;
 
+  // This loop is not dealt with properly yet; will just take last.
   while (jv_is_valid(value)) {
     ret = jqr_process(state, value);
     value = jv_parser_next(parser.get());
@@ -86,7 +88,7 @@ std::string jqr_parse(jq_state_ptr state, jv_parser_ptr parser) {
 }
 
 // [[Rcpp::export]]
-std::string jqr(std::string json, std::string program) {
+std::vector<std::string> jqr(std::string json, std::string program) {
   jq_state_ptr state = make_jq_state();
 
   int compiled = jq_compile(state.get(), program.c_str());
