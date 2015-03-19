@@ -2,14 +2,27 @@
 % Please edit documentation in R/jqr.R
 \name{jq}
 \alias{jq}
+\alias{jq_}
 \alias{show}
-\title{jqr execute function}
+\title{Execute a query with jq}
 \usage{
 jq(.data)
 
+jq_(data, query)
+
 show(.data)
 }
+\arguments{
+\item{.data}{(list) input, using higher level interface}
+
+\item{data}{(character) JSON data}
+
+\item{query}{(character) A query string}
+}
 \description{
-jqr execute function
+\code{jq} is meant to work with the high level interface in this package. \code{jq_}
+provides access to the low level interface in which you can use jq query strings just
+as you would on the command line. \code{show} prints the query resulting from \code{jq}
+all in one character string just as you would execute it on the command line.
 }
 
