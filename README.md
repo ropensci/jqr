@@ -18,10 +18,26 @@ which will download the 1.4 release of [jq](http://stedolan.github.io/jq/).  Thi
 library("jqr")
 ```
 
-
+Index
 
 ```r
+x <- '[{"message": "hello", "name": "jenn"}, {"message": "world", "name": "beth"}]'
+x %>% index() %>% jq
+#> [1] "{\"message\":\"hello\",\"name\":\"jenn\"}" "{\"message\":\"world\",\"name\":\"beth\"}"
+```
 
+Sort
+
+```r
+'[8,3,null,6]' %>% sort %>% jq
+#> [1] "[null,3,6,8]"
+```
+
+reverse order
+
+```r
+'[1,2,3,4]' %>%  reverse %>% jq
+#> [1] "[4,3,2,1]"
 ```
 
 ## Meta
