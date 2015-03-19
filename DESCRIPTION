@@ -1,12 +1,19 @@
 Package: jqr
 Title: jqr
-Version: 0.1.0
+Version: 0.1.0.99
 Description: jqr
 Depends: R (>= 3.1.2)
 License: MIT + file LICENSE
 LazyData: true
-Author: Rich FitzJohn
-Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
+Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
+    email = "rich.fitzjohn@gmail.com"),
+    person("Scott", "Chamberlain", role = "aut",
+    email = "myrmecocystus@gmail.com"))
+URL: https://github.com/ropensci/jqr
+BugReports: https://github.com/ropensci/jqr/issues
 LinkingTo: Rcpp
-Imports: Rcpp
+Imports:
+    Rcpp,
+    magrittr,
+    lazyeval
 Suggests: testthat, jsonlite
