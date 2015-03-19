@@ -1,16 +1,60 @@
 #' Math operations
 #'
 #' @name maths
-#' @param .data input
-#' @param dots dots
+#' @template args
 #' @export
-length <- function(.data) {
-  length_(.data, dots = "length")
+#' @examples \dontrun{
+#' # do math
+#' jqr('{"a": 7}', '.a + 1')
+#' '{"a": 7}' %>%  do(.a + 1) %>% jq
+#' '{"a": [1,2], "b": [3,4]}' %>%  do(.a + .b) %>% jq
+#' '{"a": [1,2], "b": [3,4]}' %>%  do(.a - .b) %>% jq
+#' '{"a": 3}' %>%  do(4 - .a) %>% jq
+#' '["xml", "yaml", "json"]' %>%  do('. - ["xml", "yaml"]') %>% jq
+#' '5' %>%  do(10 / . * 3) %>% jq
+#'
+#' # length
+#' '[[1,2], "string", {"a":2}, null]' %>% index %>% length %>% jq
+#'
+#' # sqrt
+#' '9' %>% sqrt %>% jq
+#'
+#' # floor
+#' '3.14159' %>% floor %>% jq
+#' }
+
+#' @export
+#' @rdname maths
+do <- function(.data, ...) {
+  do_(.data, .dots = lazyeval::lazy_dots(...))
 }
 
 #' @export
 #' @rdname maths
-length_ <- function(.data, dots) {
-  dots <- comb(tryargs(.data), structure(dots, type="length"))
+do_ <- function(.data, ..., .dots) {
+  tmp <- lazyeval::all_dots(.dots, ...)
+  z <- paste0(unlist(lapply(tmp, function(x) deparse(x$expr))), collapse = " ")
+  dots <- comb(tryargs(.data), structure(z, type="do"))
+  structure(list(data=getdata(.data), args=dots), class="jqr")
+}
+
+#' @export
+#' @rdname maths
+length <- function(.data) {
+  dots <- comb(tryargs(.data), structure('length', type="length"))
+  structure(list(data=getdata(.data), args=dots), class="jqr")
+}
+
+#' @export
+#' @rdname maths
+sqrt <- function(.data) {
+  dots <- comb(tryargs(.data), structure("sqrt", type="sqrt"))
+  structure(list(data=getdata(.data), args=dots), class="jqr")
+}
+
+#' @export
+#' @rdname maths
+floor <- function(.data) {
+  dots <- comb(tryargs(.data), structure('floor', type="floor"))
   structure(list(data=getdata(.data), args=dots), class="jqr")
 }

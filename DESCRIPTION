@@ -16,4 +16,6 @@ Imports:
     Rcpp,
     magrittr,
     lazyeval
-Suggests: testthat, jsonlite
+Suggests:
+    testthat,
+    jsonlite
