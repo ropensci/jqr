@@ -14,6 +14,16 @@ To install, after cloning the repo the first time, run (from the command line)
 
 which will download the 1.4 release of [jq](http://stedolan.github.io/jq/).  This does not need to be run on subsequent runs, and will stop being required once [this issue](https://github.com/ropensci/jqr/issues/1) is resolved.
 
+```r
+library("jqr")
+```
+
+
+
+```r
+
+```
+
 ## Meta
 
 * Please [report any issues or bugs](https://github.com/ropensci/jqr/issues).
