@@ -15,6 +15,8 @@ select_(.data, ..., .dots)
 \item{...}{Comma separated list of unquoted variable names}
 
 \item{.dots}{Used to work around non-standard evaluation}
+
+\item{dots}{dots}
 }
 \description{
 select variables

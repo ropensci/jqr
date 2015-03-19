@@ -14,5 +14,6 @@ BugReports: https://github.com/ropensci/jqr/issues
 LinkingTo: Rcpp
 Imports:
     Rcpp,
-    magrittr
+    magrittr,
+    lazyeval
 Suggests: testthat, jsonlite

@@ -1,7 +1,8 @@
 #' index and related functions
 #'
 #' @export
-#' @template args
+#' @param .data input
+#' @param dots dots
 #' @param x What to index to
 index <- function(.data, x = "") {
   index_(.data, dots = paste0(".[", x, "]"))

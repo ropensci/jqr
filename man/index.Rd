@@ -20,9 +20,7 @@ indexif_(.data, dots)
 
 \item{x}{What to index to}
 
-\item{...}{Comma separated list of unquoted variable names}
-
-\item{.dots}{Used to work around non-standard evaluation}
+\item{dots}{dots}
 }
 \description{
 index and related functions

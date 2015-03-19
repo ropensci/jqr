@@ -1,5 +1,6 @@
 #' select variables
 #'
+#' @import lazyeval
 #' @export
 #' @template args
 select <- function(.data, ...) {

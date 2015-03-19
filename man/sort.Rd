@@ -18,16 +18,20 @@ reverse(.data)
 \item{...}{Comma separated list of unquoted variable names}
 
 \item{.dots}{Used to work around non-standard evaluation}
+
+\item{dots}{dots}
 }
 \description{
 Sort and related
 }
 \examples{
+\dontrun{
 # sort
 '[8,3,null,6]' \%>\% sort \%>\% jq
 '[{"foo":4, "bar":10}, {"foo":3, "bar":100}, {"foo":2, "bar":1}]' \%>\% sort(foo) \%>\% jq
 
 # reverse order
 '[1,2,3,4]' \%>\%  reverse \%>\% jq
+}
 }
 

@@ -1,7 +1,8 @@
 #' Math operations
 #'
 #' @name maths
-#' @template args
+#' @param .data input
+#' @param dots dots
 #' @export
 length <- function(.data) {
   length_(.data, dots = "length")

@@ -13,9 +13,7 @@ length_(.data, dots)
 \arguments{
 \item{.data}{input}
 
-\item{...}{Comma separated list of unquoted variable names}
-
-\item{.dots}{Used to work around non-standard evaluation}
+\item{dots}{dots}
 }
 \description{
 Math operations
