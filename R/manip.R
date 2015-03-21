@@ -29,7 +29,7 @@
 #' # endswith
 #' jqr('["fo", "foo", "barfoo", "foobar", "barfoob"]', '[.[]|endswith("foo")]')
 #' '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% endswith(foo) %>% jq
-#' '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% endswith(foo) %>% jq
+#' '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% endswith(bar) %>% jq
 #'
 #' # get index (location) of a character
 #' ## these don't seem to work right now
