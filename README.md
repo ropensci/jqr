@@ -8,7 +8,16 @@ jqr
 
 R interface to jq http://stedolan.github.io/jq/
 
-To install, after cloning the repo the first time, run (from the command line)
+## Install
+
+Get dependencies not on CRAN
+
+
+```r
+devtools::install_github("vsbuffalo/rivr")
+```
+
+To install `jqr`, after cloning the repo the first time, run (from the command line)
 
 ```
 ./bootstrap.R
