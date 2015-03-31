@@ -18,4 +18,5 @@ Imports:
     lazyeval
 Suggests:
     testthat,
-    jsonlite
+    jsonlite,
+    rivr
