@@ -64,9 +64,9 @@ jq_(str, "[.[] | {name: .foo} | keys]")
 #> [1] "[[\"name\"],[\"name\"],[\"name\"]]"
 ```
 
-### high level 
+### high level
 
-The other is higher level, and uses a suite of functions to construct queries. Queries are constucted, then excuted with the function `jq()`. 
+The other is higher level, and uses a suite of functions to construct queries. Queries are constucted, then excuted with the function `jq()`.
 
 Examples:
 
@@ -224,6 +224,29 @@ str3 %>% haskey(2) %>% jq
 #> [false,true]
 str3 %>% haskey(1,2) %>% jq
 #> [true,false,true,true]
+```
+
+Select variables by name, and rename
+
+
+```r
+'{"foo": 5, "bar": 7}' %>% select(a = .foo) %>% jq
+#> {"a":5}
+```
+
+More complicated `select()`, using the included dataset `githubcommits`
+
+
+```r
+githubcommits %>%
+  index() %>% 
+  select(sha = .sha, name = .commit.committer.name) %>% 
+  jq(TRUE)
+#> {"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]}
+#> {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]}
+#> {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]}
+#> {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]}
+#> {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}
 ```
 
 #### Maths
