@@ -27,6 +27,6 @@ the console for easier viewing. The \code{jqr} doesn't do pretty printing.
 '[8,3,null,6]' \%>\% sort \%>\% jq
 }
 \seealso{
-\code{\link{show}}
+\code{\link{peek}}
 }
 

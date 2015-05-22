@@ -7,7 +7,7 @@ x %>%
   index() %>%
   select(message = .message, name = .name)
 
-x %>% index() %>% dotstr("name") %>% show
+x %>% index() %>% dotstr("name") %>% peek
 x %>% index() %>% dotstr("name") %>% jq
 x %>% indexif() %>% jq
 x %>% index() %>% length() %>% jq

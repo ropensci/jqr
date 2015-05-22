@@ -1,4 +1,4 @@
-#' Show a query
+#' Peek at a query
 #'
 #' Prints the query resulting from \code{jq} all in one character string just
 #' as you would execute it on the command line. Output gets class of json,
@@ -9,9 +9,9 @@
 #' @param .data (list) input, using higher level interface
 #' @seealso \code{\link{jq}}, \code{\link{jq_}}
 #' @examples
-#' '{"a": 7}' %>%  do(.a + 1) %>% show
-#' '[8,3,null,6]' %>% sort %>% show
-show <- function(.data) {
+#' '{"a": 7}' %>%  do(.a + 1) %>% peek
+#' '[8,3,null,6]' %>% sort %>% peek
+peek <- function(.data) {
   if (!is(.data, "jqr")) stop("must be of class jqr", call. = FALSE)
   structure(make_query(.data), class = "jq_query")
 }

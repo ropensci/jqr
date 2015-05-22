@@ -9,7 +9,7 @@
 #' @param .data (list) input, using higher level interface
 #' @param data (character) JSON data
 #' @param query (character) A query string
-#' @seealso \code{\link{show}}
+#' @seealso \code{\link{peek}}
 #' @examples
 #' '{"a": 7}' %>%  do(.a + 1) %>% jq
 #' '[8,3,null,6]' %>% sort %>% jq
