@@ -120,3 +120,37 @@ test_that("unique", {
   expect_is(str2 %>% unique(length) %>% jq, 'json')
   expect_equal(ac(str2 %>% unique(length) %>% jq), '[\"bacon\",\"chunky\",\"asparagus\"]')
 })
+
+test_that("maths", {
+  # do math
+  expect_equal(jqr('{"a": 7}', '.a + 1'), "8")
+  expect_equal(jqr('{"a": 7}', '.a += 1'), '{\"a\":8}')
+  expect_is('{"a": 7}' %>%  do(.a + 1), "jqr")
+  expect_is('{"a": 7}' %>%  do(.a + 1) %>% jq, "json")
+  expect_equal(ac('{"a": 7}' %>%  do(.a + 1) %>% jq), "8")
+
+  # add two elements together
+  expect_equal(ac('{"a": [1,2], "b": [3,4]}' %>%  do(.a + .b) %>% jq), "[1,2,3,4]")
+  expect_equal(ac('{"a": [1,2], "b": [3,4]}' %>%  do(.a - .b) %>% jq), "[1,2]")
+
+  # comparisons
+  expect_equal(ac('[5,4,2,7]' %>% index() %>% do(. < 4) %>% jq), c("false","false","true","false"))
+
+  # length
+  expect_equal(ac('[[1,2], "string", {"a":2}, null]' %>% index %>% length %>% jq), c("2","6","1","0"))
+
+  # sqrt
+  expect_equal(ac('9' %>% sqrt %>% jq), "3")
+
+  # floor
+  expect_equal(ac('3.14159' %>% floor %>% jq), "3")
+
+  # find minimum
+  expect_equal(ac('[5,4,2,7]' %>% min %>% jq), "2")
+
+  # find maximum
+  expect_equal(ac('[5,4,2,7]' %>% max %>% jq), "7")
+
+  # increment values
+  expect_equal(ac('{"foo": 1}' %>% do(.foo %+=% 1) %>% jq), '{\"foo\":2}')
+})

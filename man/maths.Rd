@@ -55,7 +55,8 @@ jqr('{"a": 7}', '.a += 1')
 '{"a": 3}' \%>\%  do(4 - .a) \%>\% jq
 '["xml", "yaml", "json"]' \%>\%  do('. - ["xml", "yaml"]') \%>\% jq
 '5' \%>\%  do(10 / . * 3) \%>\% jq
-## comparisons
+
+# comparisons
 '[5,4,2,7]' \%>\% index() \%>\% do(. < 4) \%>\% jq
 '[5,4,2,7]' \%>\% index() \%>\% do(. > 4) \%>\% jq
 '[5,4,2,7]' \%>\% index() \%>\% do(. <= 4) \%>\% jq
@@ -83,6 +84,16 @@ jqr('{"a": 7}', '.a += 1')
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% max \%>\% jq
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% max(foo) \%>\% jq
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% max(bar) \%>\% jq
+
+# increment values
+## requires special \% operators, they get escaped internally
+'{"foo": 1}' \%>\% do(.foo \%+=\% 1) \%>\% jq
+'{"foo": 1}' \%>\% do(.foo \%-=\% 1) \%>\% jq
+'{"foo": 1}' \%>\% do(.foo \%*=\% 4) \%>\% jq
+'{"foo": 1}' \%>\% do(.foo \%/=\% 10) \%>\% jq
+'{"foo": 1}' \%>\% do(.foo \%//=\% 10) \%>\% jq
+### fix me - \%= doesn't work
+# '{"foo": 1}' \%>\% do(.foo \%\%=\% 10) \%>\% jq
 }
 }
 
