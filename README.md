@@ -95,6 +95,15 @@ reverse order
 #> [4,3,2,1]
 ```
 
+Show the query to be used using `peek()`
+
+
+```r
+'[1,2,3,4]' %>%  reverse %>% peek
+#> <jq query>
+#>   query:  reverse
+```
+
 #### string operations
 
 join
@@ -304,6 +313,34 @@ find maximum
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max(bar) %>% jq
 #> {"foo":1,"bar":14}
 ```
+
+#### Streaming
+
+Write `mtcars` to a temporary file
+
+
+```r
+writeLines(jsonlite::toJSON(mtcars, collapse = FALSE),
+             tmp <- tempfile())
+```
+
+Build a file iterator
+
+
+```r
+it_f <- rivr::file_iterator(tmp)
+it_j <- jq_iterator(it_f, '{cyl: ."cyl"}')
+replicate(NROW(mtcars), it_j$yield())
+#>  [1] "{\"cyl\":6}" "{\"cyl\":6}" "{\"cyl\":4}" "{\"cyl\":6}" "{\"cyl\":8}"
+#>  [6] "{\"cyl\":6}" "{\"cyl\":8}" "{\"cyl\":4}" "{\"cyl\":4}" "{\"cyl\":6}"
+#> [11] "{\"cyl\":6}" "{\"cyl\":8}" "{\"cyl\":8}" "{\"cyl\":8}" "{\"cyl\":8}"
+#> [16] "{\"cyl\":8}" "{\"cyl\":8}" "{\"cyl\":4}" "{\"cyl\":4}" "{\"cyl\":4}"
+#> [21] "{\"cyl\":4}" "{\"cyl\":8}" "{\"cyl\":8}" "{\"cyl\":8}" "{\"cyl\":8}"
+#> [26] "{\"cyl\":4}" "{\"cyl\":4}" "{\"cyl\":4}" "{\"cyl\":8}" "{\"cyl\":6}"
+#> [31] "{\"cyl\":8}" "{\"cyl\":4}"
+```
+
+> the streaming bit is a [work in progress](https://github.com/ropensci/jqr/issues/8)
 
 ## Meta
 
