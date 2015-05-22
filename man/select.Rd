@@ -38,6 +38,6 @@ x \%>\%
    select(message = .commit.message, name = .commit.committer.name) \%>\% jq
 ## pretty (newline after each element)
 x \%>\%
-   select(message = .commit.message, name = .commit.committer.name) \%>\% jq(TRUE)
+ select(sha = .sha, name = .commit.committer.name) \%>\% jq(TRUE)
 }
 

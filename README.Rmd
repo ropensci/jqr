@@ -259,6 +259,26 @@ find maximum
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max(bar) %>% jq
 ```
 
+#### Combine into valid JSON
+
+`jq` sometimes creates pieces of JSON that are valid in themselves, but together are not. 
+`combine()` is a way to make valid JSON.
+
+This outputs a few pieces of JSON
+
+```{r}
+(x <- githubcommits %>% 
+  index() %>%
+  select(sha = .sha, name = .commit.committer.name) %>% 
+  jq(TRUE))
+```
+
+Use `combine()` to put them together.
+
+```{r}
+combine(x)
+```
+
 #### Streaming
 
 Write `mtcars` to a temporary file

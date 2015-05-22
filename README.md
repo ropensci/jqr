@@ -337,6 +337,34 @@ find maximum
 #> {"foo":1,"bar":14}
 ```
 
+#### Combine into valid JSON
+
+`jq` sometimes creates pieces of JSON that are valid in themselves, but together are not. 
+`combine()` is a way to make valid JSON.
+
+This outputs a few pieces of JSON
+
+
+```r
+(x <- githubcommits %>% 
+  index() %>%
+  select(sha = .sha, name = .commit.committer.name) %>% 
+  jq(TRUE))
+#> {"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]}
+#> {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]}
+#> {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]}
+#> {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]}
+#> {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}
+```
+
+Use `combine()` to put them together.
+
+
+```r
+combine(x)
+#> [{"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]}, {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]}, {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]}, {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]}, {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}]
+```
+
 #### Streaming
 
 Write `mtcars` to a temporary file

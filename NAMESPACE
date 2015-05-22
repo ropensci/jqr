@@ -3,6 +3,7 @@
 S3method(print,jq_query)
 S3method(print,json)
 export("%>%")
+export(combine)
 export(contains)
 export(contains_)
 export(del)
