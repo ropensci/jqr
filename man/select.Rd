@@ -3,7 +3,7 @@
 \name{select}
 \alias{select}
 \alias{select_}
-\title{select variables}
+\title{Select variables}
 \usage{
 select(.data, ...)
 
@@ -19,6 +19,25 @@ select_(.data, ..., .dots)
 \item{dots}{dots}
 }
 \description{
-select variables
+Select variables
+}
+\examples{
+'{"foo": 5, "bar": 7}' \%>\% select(a = .foo) \%>\% peek
+'{"foo": 5, "bar": 7}' \%>\% select(a = .foo) \%>\% jq
+
+# using json dataset, just first element
+x <- githubcommits \%>\% index(0)
+x \%>\%
+   select(message = .commit.message, name = .commit.committer.name) \%>\% jq
+x \%>\%
+   select(sha = .commit.tree.sha, author = .author.login) \%>\% jq
+
+# using json dataset, all elements
+x <- githubcommits \%>\% index()
+x \%>\%
+   select(message = .commit.message, name = .commit.committer.name) \%>\% jq
+## pretty (newline after each element)
+x \%>\%
+   select(message = .commit.message, name = .commit.committer.name) \%>\% jq(TRUE)
 }
 

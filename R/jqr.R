@@ -9,12 +9,13 @@
 #' @param .data (list) input, using higher level interface
 #' @param data (character) JSON data
 #' @param query (character) A query string
+#' @param pretty (logical) Add newlines when printed. Default: FALSE
 #' @seealso \code{\link{peek}}
 #' @examples
 #' '{"a": 7}' %>%  do(.a + 1) %>% jq
 #' '[8,3,null,6]' %>% sort %>% jq
-jq <- function(.data) {
-  structure(jqr(.data$data, make_query(.data)), class = "json")
+jq <- function(.data, pretty = FALSE) {
+  structure(jqr(.data$data, make_query(.data)), class = "json", pretty = pretty)
 }
 
 #' @export
@@ -25,5 +26,9 @@ jq_ <- function(data, query) {
 
 #' @export
 print.json <- function(x, ...){
-  cat(x, "\n")
+  if (attr(x, "pretty")) {
+    cat(x, sep = "\n")
+  } else {
+    cat(x, "\n")
+  }
 }

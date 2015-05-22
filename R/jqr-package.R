@@ -10,3 +10,11 @@
 #' @aliases jqr-package
 #' @name jqr
 NULL
+
+#' GitHub Commits Data
+#'
+#' @docType data
+#' @keywords datasets
+#' @name githubcommits
+#' @format A character string of json github commits data for the jq repo.
+NULL

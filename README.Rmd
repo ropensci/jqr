@@ -5,7 +5,7 @@ jqr
 knitr::opts_chunk$set(
   comment = "#>",
   collapse = TRUE,
-  warning = FALSE, 
+  warning = FALSE,
   message = FALSE
 )
 ```
@@ -64,9 +64,9 @@ jq_(str, ".[]")
 jq_(str, "[.[] | {name: .foo} | keys]")
 ```
 
-### high level 
+### high level
 
-The other is higher level, and uses a suite of functions to construct queries. Queries are constucted, then excuted with the function `jq()`. 
+The other is higher level, and uses a suite of functions to construct queries. Queries are constucted, then excuted with the function `jq()`.
 
 Examples:
 
@@ -184,6 +184,21 @@ check for key existence
 str3 <- '[[0,1], ["a","b","c"]]'
 str3 %>% haskey(2) %>% jq
 str3 %>% haskey(1,2) %>% jq
+```
+
+Select variables by name, and rename
+
+```{r}
+'{"foo": 5, "bar": 7}' %>% select(a = .foo) %>% jq
+```
+
+More complicated `select()`, using the included dataset `githubcommits`
+
+```{r}
+githubcommits %>%
+  index() %>% 
+  select(sha = .sha, name = .commit.committer.name) %>% 
+  jq(TRUE)
 ```
 
 #### Maths
