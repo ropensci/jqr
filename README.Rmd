@@ -80,7 +80,7 @@ x %>% index() %>% jq
 Sort
 
 ```{r}
-'[8,3,null,6]' %>% sort %>% jq
+'[8,3,null,6]' %>% sortj %>% jq
 ```
 
 reverse order
@@ -145,7 +145,7 @@ contains
 unique
 
 ```{r}
-'[1,2,5,3,5,3,1,3]' %>% unique %>% jq
+'[1,2,5,3,5,3,1,3]' %>% uniquej %>% jq
 ```
 
 #### types
@@ -226,37 +226,37 @@ comparisons
 length
 
 ```{r}
-'[[1,2], "string", {"a":2}, null]' %>% index %>% length %>% jq
+'[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj %>% jq
 ```
 
 sqrt
 
 ```{r}
-'9' %>% sqrt %>% jq
+'9' %>% sqrtj %>% jq
 ```
 
 floor
 
 ```{r}
-'3.14159' %>% floor %>% jq
+'3.14159' %>% floorj %>% jq
 ```
 
 find minimum
 
 ```{r}
-'[5,4,2,7]' %>% min %>% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% min %>% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% min(foo) %>% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% min(bar) %>% jq
+'[5,4,2,7]' %>% minj %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(foo) %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(bar) %>% jq
 ```
 
 find maximum
 
 ```{r}
-'[5,4,2,7]' %>% max %>% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max %>% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max(foo) %>% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max(bar) %>% jq
+'[5,4,2,7]' %>% maxj %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(foo) %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(bar) %>% jq
 ```
 
 #### Combine into valid JSON

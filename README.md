@@ -6,7 +6,7 @@ jqr
 [![Build Status](https://travis-ci.org/ropensci/jqr.png?branch=master)](https://travis-ci.org/ropensci/jqr)
 [![Coverage Status](https://coveralls.io/repos/ropensci/jqr/badge.svg?branch=master)](https://coveralls.io/r/ropensci/jqr?branch=master)
 
-R interface to jq http://stedolan.github.io/jq/
+R interface to jq, a JSON processor  http://stedolan.github.io/jq/
 
 ## Install
 
@@ -83,7 +83,7 @@ Sort
 
 
 ```r
-'[8,3,null,6]' %>% sort %>% jq
+'[8,3,null,6]' %>% sortj %>% jq
 #> [null,3,6,8]
 ```
 
@@ -172,7 +172,7 @@ unique
 
 
 ```r
-'[1,2,5,3,5,3,1,3]' %>% unique %>% jq
+'[1,2,5,3,5,3,1,3]' %>% uniquej %>% jq
 #> [1,2,3,5]
 ```
 
@@ -289,7 +289,7 @@ length
 
 
 ```r
-'[[1,2], "string", {"a":2}, null]' %>% index %>% length %>% jq
+'[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj %>% jq
 #> 2 6 1 0
 ```
 
@@ -297,7 +297,7 @@ sqrt
 
 
 ```r
-'9' %>% sqrt %>% jq
+'9' %>% sqrtj %>% jq
 #> 3
 ```
 
@@ -305,7 +305,7 @@ floor
 
 
 ```r
-'3.14159' %>% floor %>% jq
+'3.14159' %>% floorj %>% jq
 #> 3
 ```
 
@@ -313,13 +313,13 @@ find minimum
 
 
 ```r
-'[5,4,2,7]' %>% min %>% jq
+'[5,4,2,7]' %>% minj %>% jq
 #> 2
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% min %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj %>% jq
 #> {"foo":2,"bar":3}
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% min(foo) %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(foo) %>% jq
 #> {"foo":1,"bar":14}
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% min(bar) %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(bar) %>% jq
 #> {"foo":2,"bar":3}
 ```
 
@@ -327,13 +327,13 @@ find maximum
 
 
 ```r
-'[5,4,2,7]' %>% max %>% jq
+'[5,4,2,7]' %>% maxj %>% jq
 #> 7
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj %>% jq
 #> {"foo":1,"bar":14}
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max(foo) %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(foo) %>% jq
 #> {"foo":2,"bar":3}
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max(bar) %>% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(bar) %>% jq
 #> {"foo":1,"bar":14}
 ```
 
