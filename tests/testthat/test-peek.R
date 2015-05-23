@@ -1,11 +1,11 @@
 context("peek")
 
 test_that("peek works as expected", {
-  a <- '[1,2,5,3,5,3,1,3]' %>% unique %>% peek
+  a <- '[1,2,5,3,5,3,1,3]' %>% uniquej %>% peek
   expect_is(a, "jq_query")
   expect_equal(a[[1]], "unique")
 
-  b <- str %>% unique(foo) %>% peek
+  b <- str %>% uniquej(foo) %>% peek
   expect_is(b, 'jq_query')
   expect_equal(b[[1]], 'unique_by(.foo)')
 
@@ -17,7 +17,7 @@ test_that("peek works as expected", {
   expect_is(e, 'jq_query')
   expect_equal(e[[1]], ".[] | . < 4")
 
-  f <- '[[1,2], "string", {"a":2}, null]' %>% index %>% length %>% peek
+  f <- '[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj %>% peek
   expect_is(f, 'jq_query')
   expect_equal(f[[1]], ".[] | length")
 

@@ -110,15 +110,15 @@ test_that("unique", {
   str <- '[{"foo": 1, "bar": 2}, {"foo": 1, "bar": 3}, {"foo": 4, "bar": 5}]'
   str2 <- '["chunky", "bacon", "kitten", "cicada", "asparagus"]'
 
-  expect_is('[1,2,5,3,5,3,1,3]' %>% unique %>% jq, "json")
-  expect_equal(ac('[1,2,5,3,5,3,1,3]' %>% unique %>% jq), '[1,2,3,5]')
+  expect_is('[1,2,5,3,5,3,1,3]' %>% uniquej %>% jq, "json")
+  expect_equal(ac('[1,2,5,3,5,3,1,3]' %>% uniquej %>% jq), '[1,2,3,5]')
 
-  expect_is(str %>% unique(foo) %>% jq, 'json')
-  expect_is(ac(str %>% unique(foo) %>% jq), 'character')
-  expect_equal(ac(str %>% unique(foo) %>% jq), '[{\"foo\":1,\"bar\":2},{\"foo\":4,\"bar\":5}]')
+  expect_is(str %>% uniquej(foo) %>% jq, 'json')
+  expect_is(ac(str %>% uniquej(foo) %>% jq), 'character')
+  expect_equal(ac(str %>% uniquej(foo) %>% jq), '[{\"foo\":1,\"bar\":2},{\"foo\":4,\"bar\":5}]')
 
-  expect_is(str2 %>% unique(length) %>% jq, 'json')
-  expect_equal(ac(str2 %>% unique(length) %>% jq), '[\"bacon\",\"chunky\",\"asparagus\"]')
+  expect_is(str2 %>% uniquej(length) %>% jq, 'json')
+  expect_equal(ac(str2 %>% uniquej(length) %>% jq), '[\"bacon\",\"chunky\",\"asparagus\"]')
 })
 
 test_that("maths", {
@@ -137,19 +137,19 @@ test_that("maths", {
   expect_equal(ac('[5,4,2,7]' %>% index() %>% do(. < 4) %>% jq), c("false","false","true","false"))
 
   # length
-  expect_equal(ac('[[1,2], "string", {"a":2}, null]' %>% index %>% length %>% jq), c("2","6","1","0"))
+  expect_equal(ac('[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj %>% jq), c("2","6","1","0"))
 
   # sqrt
-  expect_equal(ac('9' %>% sqrt %>% jq), "3")
+  expect_equal(ac('9' %>% sqrtj %>% jq), "3")
 
   # floor
-  expect_equal(ac('3.14159' %>% floor %>% jq), "3")
+  expect_equal(ac('3.14159' %>% floorj %>% jq), "3")
 
   # find minimum
-  expect_equal(ac('[5,4,2,7]' %>% min %>% jq), "2")
+  expect_equal(ac('[5,4,2,7]' %>% minj %>% jq), "2")
 
   # find maximum
-  expect_equal(ac('[5,4,2,7]' %>% max %>% jq), "7")
+  expect_equal(ac('[5,4,2,7]' %>% maxj %>% jq), "7")
 
   # increment values
   expect_equal(ac('{"foo": 1}' %>% do(.foo %+=% 1) %>% jq), '{\"foo\":2}')

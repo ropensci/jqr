@@ -47,10 +47,10 @@
 #' str %>% contains(`{foo: 12, bar: [{barp: 15}]}`) %>% jq
 #'
 #' # unique
-#' '[1,2,5,3,5,3,1,3]' %>% unique %>% jq
+#' '[1,2,5,3,5,3,1,3]' %>% uniquej %>% jq
 #' str <- '[{"foo": 1, "bar": 2}, {"foo": 1, "bar": 3}, {"foo": 4, "bar": 5}]'
-#' str %>% unique(foo) %>% jq
-#' '["chunky", "bacon", "kitten", "cicada", "asparagus"]' %>% unique(length) %>% jq
+#' str %>% uniquej(foo) %>% jq
+#' '["chunky", "bacon", "kitten", "cicada", "asparagus"]' %>% uniquej(length) %>% jq
 
 #' @export
 #' @rdname manip
@@ -68,13 +68,13 @@ join_ <- function(.data, ..., .dots) {
 
 #' @export
 #' @rdname manip
-split <- function(.data, ...) {
-  split_(.data, .dots = lazyeval::lazy_dots(...))
+splitj <- function(.data, ...) {
+  splitj_(.data, .dots = lazyeval::lazy_dots(...))
 }
 
 #' @export
 #' @rdname manip
-split_ <- function(.data, ..., .dots) {
+splitj_ <- function(.data, ..., .dots) {
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("split(\"%s \")", setdef(tmp, ",")), type = "split"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -201,13 +201,13 @@ contains_ <- function(.data, ..., .dots) {
 
 #' @export
 #' @rdname manip
-unique <- function(.data, ...) {
-  unique_(.data, .dots = lazyeval::lazy_dots(...))
+uniquej <- function(.data, ...) {
+  uniquej_(.data, .dots = lazyeval::lazy_dots(...))
 }
 
 #' @export
 #' @rdname manip
-unique_ <- function(.data, ..., .dots) {
+uniquej_ <- function(.data, ..., .dots) {
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "unique"

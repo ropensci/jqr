@@ -24,25 +24,25 @@
 #' '[5,4,2,7]' %>% index() %>% do(. != 4) %>% jq
 #'
 #' # length
-#' '[[1,2], "string", {"a":2}, null]' %>% index %>% length %>% jq
+#' '[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj %>% jq
 #'
 #' # sqrt
-#' '9' %>% sqrt %>% jq
+#' '9' %>% sqrtj %>% jq
 #'
 #' # floor
-#' '3.14159' %>% floor %>% jq
+#' '3.14159' %>% floorj %>% jq
 #'
 #' # find minimum
-#' '[5,4,2,7]' %>% min %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% min %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% min(foo) %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% min(bar) %>% jq
+#' '[5,4,2,7]' %>% minj %>% jq
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj %>% jq
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(foo) %>% jq
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(bar) %>% jq
 #'
 #' # find maximum
-#' '[5,4,2,7]' %>% max %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max(foo) %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% max(bar) %>% jq
+#' '[5,4,2,7]' %>% maxj %>% jq
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj %>% jq
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(foo) %>% jq
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(bar) %>% jq
 #'
 #' # increment values
 #' ## requires special % operators, they get escaped internally
@@ -85,34 +85,34 @@ sub_ops <- function(x) {
 
 #' @export
 #' @rdname maths
-length <- function(.data) {
+lengthj <- function(.data) {
   dots <- comb(tryargs(.data), structure('length', type = "length"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
 #' @export
 #' @rdname maths
-sqrt <- function(.data) {
+sqrtj <- function(.data) {
   dots <- comb(tryargs(.data), structure("sqrt", type = "sqrt"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
 #' @export
 #' @rdname maths
-floor <- function(.data) {
+floorj <- function(.data) {
   dots <- comb(tryargs(.data), structure('floor', type = "floor"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
 #' @export
 #' @rdname maths
-min <- function(.data, ...) {
-  min_(.data, .dots = lazyeval::lazy_dots(...))
+minj <- function(.data, ...) {
+  minj_(.data, .dots = lazyeval::lazy_dots(...))
 }
 
 #' @export
 #' @rdname maths
-min_ <- function(.data, ..., .dots) {
+minj_ <- function(.data, ..., .dots) {
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "min"
@@ -125,13 +125,13 @@ min_ <- function(.data, ..., .dots) {
 
 #' @export
 #' @rdname maths
-max <- function(.data, ...) {
-  max_(.data, .dots = lazyeval::lazy_dots(...))
+maxj <- function(.data, ...) {
+  maxj_(.data, .dots = lazyeval::lazy_dots(...))
 }
 
 #' @export
 #' @rdname maths
-max_ <- function(.data, ..., .dots) {
+maxj_ <- function(.data, ..., .dots) {
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "max"

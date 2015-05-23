@@ -3,33 +3,33 @@
 \name{maths}
 \alias{do}
 \alias{do_}
-\alias{floor}
-\alias{length}
+\alias{floorj}
+\alias{lengthj}
 \alias{maths}
-\alias{max}
-\alias{max_}
-\alias{min}
-\alias{min_}
-\alias{sqrt}
+\alias{maxj}
+\alias{maxj_}
+\alias{minj}
+\alias{minj_}
+\alias{sqrtj}
 \title{Math operations}
 \usage{
 do(.data, ...)
 
 do_(.data, ..., .dots)
 
-length(.data)
+lengthj(.data)
 
-sqrt(.data)
+sqrtj(.data)
 
-floor(.data)
+floorj(.data)
 
-min(.data, ...)
+minj(.data, ...)
 
-min_(.data, ..., .dots)
+minj_(.data, ..., .dots)
 
-max(.data, ...)
+maxj(.data, ...)
 
-max_(.data, ..., .dots)
+maxj_(.data, ..., .dots)
 }
 \arguments{
 \item{.data}{input}
@@ -64,25 +64,25 @@ jq_('{"a": 7}', '.a += 1')
 '[5,4,2,7]' \%>\% index() \%>\% do(. != 4) \%>\% jq
 
 # length
-'[[1,2], "string", {"a":2}, null]' \%>\% index \%>\% length \%>\% jq
+'[[1,2], "string", {"a":2}, null]' \%>\% index \%>\% lengthj \%>\% jq
 
 # sqrt
-'9' \%>\% sqrt \%>\% jq
+'9' \%>\% sqrtj \%>\% jq
 
 # floor
-'3.14159' \%>\% floor \%>\% jq
+'3.14159' \%>\% floorj \%>\% jq
 
 # find minimum
-'[5,4,2,7]' \%>\% min \%>\% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% min \%>\% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% min(foo) \%>\% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% min(bar) \%>\% jq
+'[5,4,2,7]' \%>\% minj \%>\% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% minj \%>\% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% minj(foo) \%>\% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% minj(bar) \%>\% jq
 
 # find maximum
-'[5,4,2,7]' \%>\% max \%>\% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% max \%>\% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% max(foo) \%>\% jq
-'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% max(bar) \%>\% jq
+'[5,4,2,7]' \%>\% maxj \%>\% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% maxj \%>\% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% maxj(foo) \%>\% jq
+'[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' \%>\% maxj(bar) \%>\% jq
 
 # increment values
 ## requires special \% operators, they get escaped internally

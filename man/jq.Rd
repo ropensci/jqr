@@ -26,7 +26,7 @@ the console for easier viewing. The \code{jqr} doesn't do pretty printing.
 }
 \examples{
 '{"a": 7}' \%>\%  do(.a + 1) \%>\% jq
-'[8,3,null,6]' \%>\% sort \%>\% jq
+'[8,3,null,6]' \%>\% sortj \%>\% jq
 }
 \seealso{
 \code{\link{peek}}

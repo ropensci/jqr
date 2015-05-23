@@ -17,7 +17,7 @@ doesn't do pretty printing.
 }
 \examples{
 '{"a": 7}' \%>\%  do(.a + 1) \%>\% peek
-'[8,3,null,6]' \%>\% sort \%>\% peek
+'[8,3,null,6]' \%>\% sortj \%>\% peek
 }
 \seealso{
 \code{\link{jq}}, \code{\link{jq_}}

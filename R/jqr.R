@@ -13,7 +13,7 @@
 #' @seealso \code{\link{peek}}
 #' @examples
 #' '{"a": 7}' %>%  do(.a + 1) %>% jq
-#' '[8,3,null,6]' %>% sort %>% jq
+#' '[8,3,null,6]' %>% sortj %>% jq
 jq <- function(.data, pretty = FALSE) {
   structure(jqr(.data$data, make_query(.data)), class = "json", pretty = pretty)
 }

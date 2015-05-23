@@ -17,23 +17,23 @@
 \alias{rindex_loc_}
 \alias{rtrimstr}
 \alias{rtrimstr_}
-\alias{split}
-\alias{split_}
+\alias{splitj}
+\alias{splitj_}
 \alias{startswith}
 \alias{startswith_}
 \alias{tojson}
 \alias{tostring}
-\alias{unique}
-\alias{unique_}
+\alias{uniquej}
+\alias{uniquej_}
 \title{Manipulation operations}
 \usage{
 join(.data, ...)
 
 join_(.data, ..., .dots)
 
-split(.data, ...)
+splitj(.data, ...)
 
-split_(.data, ..., .dots)
+splitj_(.data, ..., .dots)
 
 ltrimstr(.data, ...)
 
@@ -69,9 +69,9 @@ contains(.data, ...)
 
 contains_(.data, ..., .dots)
 
-unique(.data, ...)
+uniquej(.data, ...)
 
-unique_(.data, ..., .dots)
+uniquej_(.data, ..., .dots)
 }
 \arguments{
 \item{.data}{input}
@@ -129,9 +129,9 @@ str \%>\% contains(`{foo: 12, bar: [{barp: 12}]}`) \%>\% jq
 str \%>\% contains(`{foo: 12, bar: [{barp: 15}]}`) \%>\% jq
 
 # unique
-'[1,2,5,3,5,3,1,3]' \%>\% unique \%>\% jq
+'[1,2,5,3,5,3,1,3]' \%>\% uniquej \%>\% jq
 str <- '[{"foo": 1, "bar": 2}, {"foo": 1, "bar": 3}, {"foo": 4, "bar": 5}]'
-str \%>\% unique(foo) \%>\% jq
-'["chunky", "bacon", "kitten", "cicada", "asparagus"]' \%>\% unique(length) \%>\% jq
+str \%>\% uniquej(foo) \%>\% jq
+'["chunky", "bacon", "kitten", "cicada", "asparagus"]' \%>\% uniquej(length) \%>\% jq
 }
 
