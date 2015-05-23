@@ -2,14 +2,13 @@
 #'
 #' @export
 #' @template args
-#' @examples \dontrun{
+#' @examples
 #' # sort
 #' '[8,3,null,6]' %>% sort %>% jq
 #' '[{"foo":4, "bar":10}, {"foo":3, "bar":100}, {"foo":2, "bar":1}]' %>% sort(foo) %>% jq
 #'
 #' # reverse order
 #' '[1,2,3,4]' %>%  reverse %>% jq
-#' }
 sort <- function(.data, ...) {
   sort_(.data, .dots = lazyeval::lazy_dots(...))
 }

@@ -86,31 +86,29 @@ unique_(.data, ..., .dots)
 Manipulation operations
 }
 \examples{
-\dontrun{
 # join
-jqr('["a","b,c,d","e"]', 'join(", ")')
+jq_('["a","b,c,d","e"]', 'join(", ")')
 '["a","b,c,d","e"]' \%>\% join \%>\% jq
 '["a","b,c,d","e"]' \%>\% join(`;`) \%>\% jq
 '["a","b,c,d","e"]' \%>\% join(`yep`) \%>\% jq
 
 # split
-jqr('"a, b,c,d, e"', 'split(", ")')
-"a, b,c,d, e" \%>\% split \%>\% jq
+jq_('"a, b,c,d, e"', 'split(", ")')
 
 # ltrimstr
-jqr('["fo", "foo", "barfoo", "foobar", "afoo"]', '[.[]|ltrimstr("foo")]')
+jq_('["fo", "foo", "barfoo", "foobar", "afoo"]', '[.[]|ltrimstr("foo")]')
 '["fo", "foo", "barfoo", "foobar", "afoo"]' \%>\% index() \%>\% ltrimstr(foo) \%>\% jq
 
 # rtrimstr
-jqr('["fo", "foo", "barfoo", "foobar", "foob"]', '[.[]|rtrimstr("foo")]')
+jq_('["fo", "foo", "barfoo", "foobar", "foob"]', '[.[]|rtrimstr("foo")]')
 '["fo", "foo", "barfoo", "foobar", "foob"]' \%>\% index() \%>\% rtrimstr(foo) \%>\% jq
 
 # startswith
-jqr('["fo", "foo", "barfoo", "foobar", "barfoob"]', '[.[]|startswith("foo")]')
+jq_('["fo", "foo", "barfoo", "foobar", "barfoob"]', '[.[]|startswith("foo")]')
 '["fo", "foo", "barfoo", "foobar", "barfoob"]' \%>\% index \%>\% startswith(foo) \%>\% jq
 
 # endswith
-jqr('["fo", "foo", "barfoo", "foobar", "barfoob"]', '[.[]|endswith("foo")]')
+jq_('["fo", "foo", "barfoo", "foobar", "barfoob"]', '[.[]|endswith("foo")]')
 '["fo", "foo", "barfoo", "foobar", "barfoob"]' \%>\% index \%>\% endswith(foo) \%>\% jq
 '["fo", "foo", "barfoo", "foobar", "barfoob"]' \%>\% index \%>\% endswith(bar) \%>\% jq
 
@@ -135,6 +133,5 @@ str \%>\% contains(`{foo: 12, bar: [{barp: 15}]}`) \%>\% jq
 str <- '[{"foo": 1, "bar": 2}, {"foo": 1, "bar": 3}, {"foo": 4, "bar": 5}]'
 str \%>\% unique(foo) \%>\% jq
 '["chunky", "bacon", "kitten", "cicada", "asparagus"]' \%>\% unique(length) \%>\% jq
-}
 }
 

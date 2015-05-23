@@ -10,7 +10,6 @@
 #'  select(sha = .sha, name = .commit.committer.name) %>% jq(TRUE)
 #' x
 #' combine(x)
-#' jsonlite::prettify(combine(x))
 combine <- function(x) {
   if (!is(x, "json")) stop("Must be class json", call. = FALSE)
   if (!jsonlite::validate(x)) {

@@ -3,16 +3,15 @@
 #' @name types
 #' @template args
 #' @export
-#' @examples \dontrun{
+#' @examples
 #' # get type information for each element
-#' jqr('[0, false, [], {}, null, "hello"]', 'map(type)')
+#' jq_('[0, false, [], {}, null, "hello"]', 'map(type)')
 #' '[0, false, [], {}, null, "hello"]' %>% types %>% jq
 #' '[0, false, [], {}, null, "hello", true, [1,2,3]]' %>% types %>% jq
 #'
 #' # select elements by type
-#' jqr('[0, false, [], {}, null, "hello"]', '.[] | numbers,booleans')
+#' jq_('[0, false, [], {}, null, "hello"]', '.[] | numbers,booleans')
 #' '[0, false, [], {}, null, "hello"]' %>% index() %>% type(booleans) %>% jq
-#' }
 types <- function(.data) {
   dots <- comb(tryargs(.data), structure("map(type)", type="types"))
   structure(list(data=getdata(.data), args=dots), class="jqr")

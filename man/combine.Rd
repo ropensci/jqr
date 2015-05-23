@@ -20,6 +20,5 @@ x <- githubcommits \%>\% index() \%>\%
  select(sha = .sha, name = .commit.committer.name) \%>\% jq(TRUE)
 x
 combine(x)
-jsonlite::prettify(combine(x))
 }
 

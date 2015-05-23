@@ -44,10 +44,9 @@ max_(.data, ..., .dots)
 Math operations
 }
 \examples{
-\dontrun{
 # do math
-jqr('{"a": 7}', '.a + 1')
-jqr('{"a": 7}', '.a += 1')
+jq_('{"a": 7}', '.a + 1')
+jq_('{"a": 7}', '.a += 1')
 '{"a": 7}' \%>\%  do(.a + 1) \%>\% jq
 # '{"a": 7}' \%>\%  do(.a += 1) \%>\% jq # this doesn't work quite yet
 '{"a": [1,2], "b": [3,4]}' \%>\%  do(.a + .b) \%>\% jq
@@ -94,6 +93,5 @@ jqr('{"a": 7}', '.a += 1')
 '{"foo": 1}' \%>\% do(.foo \%//=\% 10) \%>\% jq
 ### fix me - \%= doesn't work
 # '{"foo": 1}' \%>\% do(.foo \%\%=\% 10) \%>\% jq
-}
 }
 

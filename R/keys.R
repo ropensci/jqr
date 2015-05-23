@@ -5,23 +5,22 @@
 #'
 #' @export
 #' @template args
-#' @examples \dontrun{
+#' @examples
 #' # get keys
 #' str <- '{"foo": 5, "bar": 7}'
-#' jqr(str, "keys")
+#' jq_(str, "keys")
 #' str %>% keys() %>% jq
 #'
 #' # delete by key name
-#' jqr(str, "del(.bar)")
+#' jq_(str, "del(.bar)")
 #' str %>% del(bar) %>% jq
 #'
 #' # check for key existence
 #' str3 <- '[[0,1], ["a","b","c"]]'
-#' jqr(str3, "map(has(2))")
+#' jq_(str3, "map(has(2))")
 #' str3 %>% haskey(2) %>% jq
-#' jqr(str3, "map(has(1,2))")
+#' jq_(str3, "map(has(1,2))")
 #' str3 %>% haskey(1,2) %>% jq
-#' }
 keys <- function(.data) {
   dots <- comb(tryargs(.data), structure("keys", type="keys"))
   structure(list(data=.data, args=dots), class="jqr")
