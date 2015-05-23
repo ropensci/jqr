@@ -89,8 +89,7 @@ test_that("each value", {
 })
 
 test_that("compile error", {
-  expect_that(jqr("{}", "..."),
-              throws_error("Invalid numeric literal"))
+  expect_error(jqr("{}", "..."))
 })
 
 test_that("runtime error", {
