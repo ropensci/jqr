@@ -5,6 +5,6 @@
 ^\.travis\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-README.Rmd
+^README\.Rmd$
 man-roxygen
-
+^notes\.md$

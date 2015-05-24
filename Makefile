@@ -28,6 +28,11 @@ check: build
 check_all:
 	REMAKE_TEST_INSTALL_PACKAGES=true make check
 
+clean:
+	rm -f src/*.o src/*.so
+	rm -f src/jq-1.4/autom4te.cache
+	make -C src/jq-1.4 distclean
+
 attributes:
 	${RSCRIPT} -e 'library(methods); Rcpp::compileAttributes()'
 

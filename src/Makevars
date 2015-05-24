@@ -10,7 +10,7 @@ JQ_DIR = jq-1.4
 LIBJQ = $(JQ_DIR)/.libs/libjq.a
 
 ## So that we can do #include <jq.h>
-PKG_CPPFLAGS += -I$(JQ_DIR)
+PKG_CPPFLAGS = -I$(JQ_DIR)
 
 # This forces the compilation to include the static library; no dynaic
 # linking, which is needed as we're not installing this anywhere on

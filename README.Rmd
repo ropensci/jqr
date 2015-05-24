@@ -13,7 +13,11 @@ knitr::opts_chunk$set(
 [![Build Status](https://travis-ci.org/ropensci/jqr.png?branch=master)](https://travis-ci.org/ropensci/jqr)
 [![Coverage Status](https://coveralls.io/repos/ropensci/jqr/badge.svg?branch=master)](https://coveralls.io/r/ropensci/jqr?branch=master)
 
-R interface to jq, a JSON processor  http://stedolan.github.io/jq/
+R interface to jq, a JSON processor http://stedolan.github.io/jq/
+
+`jqr` makes it easy to process large amounts of json without having to
+convert from json to R, or without using regular expressions.  This
+means that the eventual loading into R can be quicker.
 
 ## Install
 
@@ -23,13 +27,11 @@ Get dependencies not on CRAN
 devtools::install_github("vsbuffalo/rivr")
 ```
 
-To install `jqr`, after cloning the repo the first time, run (from the command line)
+and install `jqr` the same way:
 
+```{r eval=FALSE}
+devtools::install_github("ropensci/jqr")
 ```
-./bootstrap.R
-```
-
-which will download the 1.4 release of [jq](http://stedolan.github.io/jq/).  This does not need to be run on subsequent runs, and will stop being required once [this issue](https://github.com/ropensci/jqr/issues/1) is resolved.
 
 ```{r}
 library("jqr")
