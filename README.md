@@ -14,14 +14,8 @@ means that the eventual loading into R can be quicker.
 
 ## Install
 
-Get dependencies not on CRAN
 
-
-```r
-devtools::install_github("vsbuffalo/rivr")
-```
-
-and install `jqr` the same way:
+Install `jqr` via devtools:
 
 
 ```r
@@ -369,6 +363,14 @@ combine(x)
 ```
 
 #### Streaming
+
+Install the `rivr` package (not on CRAN and still in a state of flux):
+
+
+
+```r
+devtools::install_github("vsbuffalo/rivr")
+```
 
 Write `mtcars` to a temporary file
 
