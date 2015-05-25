@@ -3,6 +3,7 @@
 #' @name manip
 #' @template args
 #' @export
+#' @seealso \code{\link{add}}
 #' @examples
 #' # join
 #' jq_('["a","b,c,d","e"]', 'join(", ")')
@@ -31,7 +32,12 @@
 #' '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% endswith(bar) %>% jq
 #'
 #' # get index (location) of a character
-#' ## these don't seem to work right now
+#' ## input has to be quoted
+#' '"a,b, cd, efg, hijk"' %>% index_loc(", ") %>% jq
+#' '"a,b, cd, efg, hijk"' %>% index_loc(",") %>% jq
+#' '"a,b, cd, efg, hijk"' %>% index_loc("j") %>% jq
+#' '"a,b, cd, efg, hijk"' %>% rindex_loc(", ") %>% jq
+#' '"a,b, cd, efg, hijk"' %>% indices(", ") %>% jq
 #'
 #' # tojson, fromjson, tostring
 #' '[1, "foo", ["foo"]]' %>% index %>% tostring %>% jq
@@ -51,6 +57,11 @@
 #' str <- '[{"foo": 1, "bar": 2}, {"foo": 1, "bar": 3}, {"foo": 4, "bar": 5}]'
 #' str %>% uniquej(foo) %>% jq
 #' '["chunky", "bacon", "kitten", "cicada", "asparagus"]' %>% uniquej(length) %>% jq
+#'
+#' # group
+#' x <- '[{"foo":1, "bar":10}, {"foo":3, "bar":100}, {"foo":1, "bar":1}]'
+#' x %>% group(foo)
+#' x %>% group(foo) %>% jq
 
 #' @export
 #' @rdname manip
@@ -146,7 +157,7 @@ index_loc <- function(.data, ...) {
 #' @rdname manip
 index_loc_ <- function(.data, ..., .dots) {
   tmp <- lazyeval::all_dots(.dots, ...)
-  dots <- comb(tryargs(.data), structure(sprintf("index(\"%s\")", deparse(tmp[[1]]$expr)), type = "index_loc"))
+  dots <- comb(tryargs(.data), structure(sprintf("index(%s)", deparse(tmp[[1]]$expr)), type = "index_loc"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
@@ -160,7 +171,21 @@ rindex_loc <- function(.data, ...) {
 #' @rdname manip
 rindex_loc_ <- function(.data, ..., .dots) {
   tmp <- lazyeval::all_dots(.dots, ...)
-  dots <- comb(tryargs(.data), structure(sprintf("rindex(\"%s\")", deparse(tmp[[1]]$expr)), type = "rindex_loc"))
+  dots <- comb(tryargs(.data), structure(sprintf("rindex(%s)", deparse(tmp[[1]]$expr)), type = "rindex_loc"))
+  structure(list(data = getdata(.data), args = dots), class = "jqr")
+}
+
+#' @export
+#' @rdname manip
+indices <- function(.data, ...) {
+  indices_(.data, .dots = lazyeval::lazy_dots(...))
+}
+
+#' @export
+#' @rdname manip
+indices_ <- function(.data, ..., .dots) {
+  tmp <- lazyeval::all_dots(.dots, ...)
+  dots <- comb(tryargs(.data), structure(sprintf("indices(%s)", deparse(tmp[[1]]$expr)), type = "rindex_loc"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
@@ -220,6 +245,20 @@ uniquej_ <- function(.data, ..., .dots) {
     }
   }
   dots <- comb(tryargs(.data), structure(z, type = "unique"))
+  structure(list(data = getdata(.data), args = dots), class = "jqr")
+}
+
+#' @export
+#' @rdname manip
+group <- function(.data, ...) {
+  group_(.data, .dots = lazyeval::lazy_dots(...))
+}
+
+#' @export
+#' @rdname manip
+group_ <- function(.data, ..., .dots) {
+  tmp <- lazyeval::all_dots(.dots, ...)
+  dots <- comb(tryargs(.data), structure(sprintf("group_by(.%s)", deparse(tmp[[1]]$expr)), type = "group"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 

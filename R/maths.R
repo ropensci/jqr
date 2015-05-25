@@ -53,6 +53,16 @@
 #' '{"foo": 1}' %>% do(.foo %//=% 10) %>% jq
 #' ### fix me - %= doesn't work
 #' # '{"foo": 1}' %>% do(.foo %%=% 10) %>% jq
+#'
+#' # add
+#' '["a","b","c"]' %>% add %>% jq
+#' '[1, 2, 3]' %>% add %>% jq
+#' '[]' %>% add %>% jq
+#'
+#' # map
+#' ## as far as I know, this only works with numbers, thus it's
+#' ## in the maths section
+#' '[1, 2, 3]' %>% map %>% jq
 
 #' @export
 #' @rdname maths
@@ -140,6 +150,28 @@ maxj_ <- function(.data, ..., .dots) {
   }
   dots <- comb(tryargs(.data), structure(z, type = "max"))
   structure(list(data = .data, args = dots), class = "jqr")
+}
+
+#' @export
+#' @rdname maths
+add <- function(.data) {
+  dots <- comb(tryargs(.data), structure('add', type = "add"))
+  structure(list(data = getdata(.data), args = dots), class = "jqr")
+}
+
+#' @export
+#' @rdname maths
+map <- function(.data, ...) {
+  map_(.data, .dots = lazyeval::lazy_dots(...))
+}
+
+  #' @export
+#' @rdname maths
+map_ <- function(.data, ..., .dots) {
+  tmp <- lazyeval::all_dots(.dots, ...)
+  tmp <- sprintf("map(%s)", deparse(tmp[[1]]$expr))
+  dots <- comb(tryargs(.data), structure(tmp, type = "map"))
+  structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
 # special operators

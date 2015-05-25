@@ -6,8 +6,12 @@
 \alias{endswith}
 \alias{endswith_}
 \alias{fromjson}
+\alias{group}
+\alias{group_}
 \alias{index_loc}
 \alias{index_loc_}
+\alias{indices}
+\alias{indices_}
 \alias{join}
 \alias{join_}
 \alias{ltrimstr}
@@ -59,6 +63,10 @@ rindex_loc(.data, ...)
 
 rindex_loc_(.data, ..., .dots)
 
+indices(.data, ...)
+
+indices_(.data, ..., .dots)
+
 tojson(.data)
 
 fromjson(.data)
@@ -72,6 +80,10 @@ contains_(.data, ..., .dots)
 uniquej(.data, ...)
 
 uniquej_(.data, ..., .dots)
+
+group(.data, ...)
+
+group_(.data, ..., .dots)
 }
 \arguments{
 \item{.data}{input}
@@ -113,7 +125,12 @@ jq_('["fo", "foo", "barfoo", "foobar", "barfoob"]', '[.[]|endswith("foo")]')
 '["fo", "foo", "barfoo", "foobar", "barfoob"]' \%>\% index \%>\% endswith(bar) \%>\% jq
 
 # get index (location) of a character
-## these don't seem to work right now
+## input has to be quoted
+'"a,b, cd, efg, hijk"' \%>\% index_loc(", ") \%>\% jq
+'"a,b, cd, efg, hijk"' \%>\% index_loc(",") \%>\% jq
+'"a,b, cd, efg, hijk"' \%>\% index_loc("j") \%>\% jq
+'"a,b, cd, efg, hijk"' \%>\% rindex_loc(", ") \%>\% jq
+'"a,b, cd, efg, hijk"' \%>\% indices(", ") \%>\% jq
 
 # tojson, fromjson, tostring
 '[1, "foo", ["foo"]]' \%>\% index \%>\% tostring \%>\% jq
@@ -133,5 +150,13 @@ str \%>\% contains(`{foo: 12, bar: [{barp: 15}]}`) \%>\% jq
 str <- '[{"foo": 1, "bar": 2}, {"foo": 1, "bar": 3}, {"foo": 4, "bar": 5}]'
 str \%>\% uniquej(foo) \%>\% jq
 '["chunky", "bacon", "kitten", "cicada", "asparagus"]' \%>\% uniquej(length) \%>\% jq
+
+# group
+x <- '[{"foo":1, "bar":10}, {"foo":3, "bar":100}, {"foo":1, "bar":1}]'
+x \%>\% group(foo)
+x \%>\% group(foo) \%>\% jq
+}
+\seealso{
+\code{\link{add}}
 }
 
