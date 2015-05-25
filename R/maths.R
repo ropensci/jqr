@@ -81,7 +81,7 @@ do_ <- function(.data, ..., .dots) {
 
 sub_ops <- function(x) {
   ops <- c("-=", "+=", "*=", "/=", "%=", "//=")
-  if (any(vapply(ops, grepl, logical(1), x = x))) {
+  if (base::any(vapply(ops, grepl, logical(1), x = x))) {
     for (i in seq_along(ops)) {
       x <- if (grepl(ops[[i]], x)) {
         gsub("%", "", x)
