@@ -111,6 +111,8 @@ jq_('{"a": 7}', '.a += 1')
 # map
 ## as far as I know, this only works with numbers, thus it's
 ## in the maths section
-'[1, 2, 3]' \%>\% map \%>\% jq
+'[1, 2, 3]' \%>\% map(.+1) \%>\% jq
+'[1, 2, 3]' \%>\% map(./1) \%>\% jq
+'[1, 2, 3]' \%>\% map(.*4) \%>\% jq
 }
 

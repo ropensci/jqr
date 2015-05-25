@@ -7,7 +7,7 @@
 rangej(x, array = FALSE)
 }
 \arguments{
-\item{x}{}
+\item{x}{Input, single number or number range.}
 
 \item{array}{(logical) Create array. Deafult: FALSE}
 }

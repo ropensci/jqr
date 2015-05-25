@@ -2,28 +2,28 @@
 #'
 #' @export
 #' @name logicaltests
-#' @template args
+#' @param .data input
 #' @examples
 #' # any
-#' '[true, false]' %>% any %>% jq
-#' '[false, false]' %>% any %>% jq
-#' '[]' %>% any %>% jq
+#' '[true, false]' %>% anyj %>% jq
+#' '[false, false]' %>% anyj %>% jq
+#' '[]' %>% anyj %>% jq
 #'
 #' # all
-#' '[true, false]' %>% all %>% jq
-#' '[true, true]' %>% all %>% jq
-#' '[]' %>% add %>% jq
+#' '[true, false]' %>% allj %>% jq
+#' '[true, true]' %>% allj %>% jq
+#' '[]' %>% allj %>% jq
 
 #' @export
 #' @rdname logicaltests
-all <- function(.data) {
+allj <- function(.data) {
   dots <- comb(tryargs(.data), structure('all', type = "all"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
 #' @export
 #' @rdname logicaltests
-any <- function(.data) {
+anyj <- function(.data) {
   dots <- comb(tryargs(.data), structure('any', type = "any"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }

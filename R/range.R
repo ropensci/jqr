@@ -1,7 +1,7 @@
 #' Produce range of numbers
 #'
 #' @export
-#' @param x
+#' @param x Input, single number or number range.
 #' @param array (logical) Create array. Deafult: FALSE
 #' @examples
 #' rangej(2:4)
