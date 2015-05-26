@@ -88,7 +88,7 @@ reverse order
 
 
 ```r
-'[1,2,3,4]' %>%  reverse %>% jq
+'[1,2,3,4]' %>% reverse %>% jq
 #> [4,3,2,1]
 ```
 
@@ -236,8 +236,8 @@ More complicated `select()`, using the included dataset `githubcommits`
 
 ```r
 githubcommits %>%
-  index() %>%
-  select(sha = .sha, name = .commit.committer.name) %>%
+  index() %>% 
+  select(sha = .sha, name = .commit.committer.name) %>% 
   jq(TRUE)
 #> {"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]}
 #> {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]}
@@ -336,16 +336,16 @@ find maximum
 
 #### Combine into valid JSON
 
-`jq` sometimes creates pieces of JSON that are valid in themselves, but together are not.
+`jq` sometimes creates pieces of JSON that are valid in themselves, but together are not. 
 `combine()` is a way to make valid JSON.
 
 This outputs a few pieces of JSON
 
 
 ```r
-(x <- githubcommits %>%
+(x <- githubcommits %>% 
   index() %>%
-  select(sha = .sha, name = .commit.committer.name) %>%
+  select(sha = .sha, name = .commit.committer.name) %>% 
   jq(TRUE))
 #> {"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]}
 #> {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]}
