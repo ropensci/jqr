@@ -25,4 +25,15 @@ indexif_(.data, dots)
 \description{
 index and related functions
 }
+\examples{
+'[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\% index \%>\% jq(TRUE)
+'{"a": 1, "b": 1}' \%>\% index \%>\% jq
+'[]' \%>\% index \%>\% jq
+'[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\% index(0) \%>\% jq
+'["a","b","c","d","e"]' \%>\% index(2) \%>\% jq
+'["a","b","c","d","e"]' \%>\% index(2:4) \%>\% jq
+'["a","b","c","d","e"]' \%>\% index(2:5) \%>\% jq
+'["a","b","c","d","e"]' \%>\% index(":3") \%>\% jq
+'["a","b","c","d","e"]' \%>\% index("-2:") \%>\% jq
+}
 

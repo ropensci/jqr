@@ -26,6 +26,7 @@
 \alias{startswith}
 \alias{startswith_}
 \alias{tojson}
+\alias{tonumber}
 \alias{tostring}
 \alias{uniquej}
 \alias{uniquej_}
@@ -72,6 +73,8 @@ tojson(.data)
 fromjson(.data)
 
 tostring(.data)
+
+tonumber(.data)
 
 contains(.data, ...)
 
@@ -132,8 +135,9 @@ jq_('["fo", "foo", "barfoo", "foobar", "barfoob"]', '[.[]|endswith("foo")]')
 '"a,b, cd, efg, hijk"' \%>\% rindex_loc(", ") \%>\% jq
 '"a,b, cd, efg, hijk"' \%>\% indices(", ") \%>\% jq
 
-# tojson, fromjson, tostring
+# tojson, fromjson, tostring, tonumber
 '[1, "foo", ["foo"]]' \%>\% index \%>\% tostring \%>\% jq
+'[1, "1"]' \%>\% index \%>\% tonumber \%>\% jq
 '[1, "foo", ["foo"]]' \%>\% index \%>\% tojson \%>\% jq
 '[1, "foo", ["foo"]]' \%>\% index \%>\% tojson \%>\% fromjson \%>\% jq
 

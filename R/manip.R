@@ -39,8 +39,9 @@
 #' '"a,b, cd, efg, hijk"' %>% rindex_loc(", ") %>% jq
 #' '"a,b, cd, efg, hijk"' %>% indices(", ") %>% jq
 #'
-#' # tojson, fromjson, tostring
+#' # tojson, fromjson, tostring, tonumber
 #' '[1, "foo", ["foo"]]' %>% index %>% tostring %>% jq
+#' '[1, "1"]' %>% index %>% tonumber %>% jq
 #' '[1, "foo", ["foo"]]' %>% index %>% tojson %>% jq
 #' '[1, "foo", ["foo"]]' %>% index %>% tojson %>% fromjson %>% jq
 #'
@@ -207,6 +208,13 @@ fromjson <- function(.data) {
 #' @rdname manip
 tostring <- function(.data) {
   dots <- comb(tryargs(.data), structure('tostring', type = "tostring"))
+  structure(list(data = getdata(.data), args = dots), class = "jqr")
+}
+
+#' @export
+#' @rdname manip
+tonumber <- function(.data) {
+  dots <- comb(tryargs(.data), structure('tonumber', type = "tonumber"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
