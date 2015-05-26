@@ -80,11 +80,14 @@ test_that("endswith", {
   expect_equal(ac(str %>% index %>% endswith(bar) %>% jq), c("false","false","false","true","false"))
 })
 
-test_that("tojson, fromjson, tostring", {
+test_that("tojson, fromjson, tostring, tonumber", {
   str <- '[1, "foo", ["foo"]]'
 
   expect_is(str %>% index %>% tostring %>% jq, "json")
   expect_equal(ac(str %>% index %>% tostring %>% jq)[1], '\"1\"')
+
+  expect_is('[1, "1"]' %>% index %>% tonumber %>% jq, "json")
+  expect_equal(ac('[1, "1"]' %>% index %>% tonumber %>% jq)[1], '1')
 
   expect_is(str %>% index %>% tojson %>% jq, "json")
   expect_equal(ac(str %>% index %>% tojson %>% jq)[2], '\"\\\"foo\\\"\"')
@@ -171,4 +174,32 @@ test_that("select variables", {
      select(message = .commit.message, name = .commit.committer.name) %>% jq
   expect_is(zz, "json")
   expect_equal(base::length(zz), 5)
+})
+
+test_that("paths", {
+  str1 <- '[1,[[],{"a":2}]]'
+  str2 <- '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]'
+
+  expect_is(str1 %>% paths %>% jq, 'json')
+  expect_equal(ac(str1 %>% paths %>% jq), c("[0]", "[1]", "[1,0]", "[1,1]", "[1,1,\"a\"]"))
+  expect_is(str1 %>% paths %>% jq(TRUE), 'json')
+
+  expect_is(str2 %>% paths %>% jq, 'json')
+  expect_equal(ac(str2 %>% paths %>% jq), c("[0]", "[0,\"name\"]", "[0,\"good\"]", "[1]", "[1,\"name\"]", "[1,\"good\"]"))
+  expect_is(str2 %>% paths %>% jq(TRUE), 'json')
+})
+
+test_that("recurse", {
+  x <- '{"foo":[{"foo": []}, {"foo":[{"foo":[]}]}]}'
+
+  expect_is(x %>% recurse(.foo[]) %>% jq, 'json')
+  expect_equal(ac(x %>% recurse(.foo[]) %>% jq),
+               c("{\"foo\":[{\"foo\":[]},{\"foo\":[{\"foo\":[]}]}]}",
+                 "{\"foo\":[]}", "{\"foo\":[{\"foo\":[]}]}", "{\"foo\":[]}"))
+  expect_is(x %>% recurse(.foo[]) %>% jq(TRUE), 'json')
+
+  expect_is('{"a":0, "b":[1]}' %>% recurse, "jqr")
+  expect_equal('{"a":0, "b":[1]}' %>% recurse %>% .$data, '{"a":0, "b":[1]}')
+
+  expect_equal(x %>% recurse(.foo[]) %>% jq(TRUE), x %>% recurse_(".foo[]") %>% jq(TRUE))
 })
