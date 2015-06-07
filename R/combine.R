@@ -6,9 +6,8 @@
 #' x <- '{"foo": 5, "bar": 7}' %>% select(a = .foo) %>% jq
 #' combine(x)
 #'
-#' x <- githubcommits %>% index() %>%
-#'  select(sha = .sha, name = .commit.committer.name) %>% jq(TRUE)
-#' x
+#' (x <- githubcommits %>% index() %>%
+#'  select(sha = .sha, name = .commit.committer.name) %>% jq(TRUE))
 #' combine(x)
 combine <- function(x) {
   if (!is(x, "json")) stop("Must be class json", call. = FALSE)

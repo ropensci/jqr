@@ -89,7 +89,18 @@ reverse order
 Show the query to be used using `peek()`
 
 ```{r}
-'[1,2,3,4]' %>%  reverse %>% peek
+'[1,2,3,4]' %>% reverse %>% peek
+```
+
+#### get multiple outputs for array w/ > 1 element
+
+```{r}
+x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
+jq_(x, '{user, title: .titles[]}')
+x %>% index() %>% jq
+x %>% select(user, title = `.titles[]`) %>% jq
+x %>% select(user, title = `.titles[]`) %>% jq %>% combine
+x %>% select(user, title = `.titles[]`) %>% jq %>% combine %>% jsonlite::validate()
 ```
 
 #### string operations

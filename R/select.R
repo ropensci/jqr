@@ -30,7 +30,11 @@ select <- function(.data, ...) {
 select_ <- function(.data, ..., .dots) {
   tmp <- lazyeval::all_dots(.dots, ...)
   vals <- unname(Map(function(x,y) {
-    sprintf("%s: %s", x, as.character(y$expr))
+    if (nchar(x) == 0) {
+      as.character(y$expr)
+    } else {
+      sprintf("%s: %s", x, as.character(y$expr))
+    }
   }, names(tmp), tmp))
   z <- paste0("{", paste0(vals, collapse = ", "), "}")
   dots <- comb(tryargs(.data), structure(z, type = "select"))

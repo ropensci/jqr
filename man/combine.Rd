@@ -16,9 +16,8 @@ Combine json pieces
 x <- '{"foo": 5, "bar": 7}' \%>\% select(a = .foo) \%>\% jq
 combine(x)
 
-x <- githubcommits \%>\% index() \%>\%
- select(sha = .sha, name = .commit.committer.name) \%>\% jq(TRUE)
-x
+(x <- githubcommits \%>\% index() \%>\%
+ select(sha = .sha, name = .commit.committer.name) \%>\% jq(TRUE))
 combine(x)
 }
 

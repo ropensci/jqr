@@ -6,6 +6,8 @@
 #' @examples
 #' # do math
 #' jq_('{"a": 7}', '.a + 1')
+#' # adding null gives back same result
+#' jq_('{"a": 7}', '.a + null')
 #' jq_('{"a": 7}', '.a += 1')
 #' '{"a": 7}' %>%  do(.a + 1) %>% jq
 #' # '{"a": 7}' %>%  do(.a += 1) %>% jq # this doesn't work quite yet
