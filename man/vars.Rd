@@ -2,9 +2,12 @@
 % Please edit documentation in R/vars.R
 \name{vars}
 \alias{vars}
+\alias{vars_}
 \title{Variables}
 \usage{
 vars(.data, ...)
+
+vars_(.data, ..., .dots)
 }
 \arguments{
 \item{.data}{input}

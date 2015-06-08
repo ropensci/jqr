@@ -21,7 +21,7 @@ vars <- function(.data, ...) {
 }
 
 #' @export
-#' @rdname at
+#' @rdname vars
 vars_ <- function(.data, ..., .dots) {
   tmp <- lazyeval::all_dots(.dots, ...)
   vals <- unlist(unname(Map(function(x,y) {
