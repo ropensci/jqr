@@ -10,7 +10,7 @@ before_install:
 install:
   - ./bootstrap.R
   - ./travis-tool.sh install_deps
-  - ./travis-tool.sh github_package jimhester/covr
+  - ./travis-tool.sh r_install jimhester/covr
   - ./travis-tool.sh github_package vsbuffalo/rivr
 
 script: ./travis-tool.sh run_tests
