@@ -1,3 +1,43 @@
 #!/bin/sh
-echo "Cleaning up"
-cd src/jq-1.4 && make clean
+set -ex
+echo "*** Cleaning up"
+
+## This approach is much nicer but requires bash rather than sh
+# JQ_FILES=$(comm -12 <(ls src) <(ls src/jq-1.4))
+
+# JQ_FILES=`ls src/jq-1.4`
+# SRC_FILES=`ls src`
+# echo `ls src/jq-1.4 src` | uniq -d
+
+JQ_FILES="builtin.c builtin.h bytecode.c \
+          bytecode.h \
+          compile.c \
+          compile.h \
+          exec_stack.h \
+          execute.c \
+          jq.h \
+          jq_parser.h \
+          jq_test.c \
+          jv.c \
+          jv.h \
+          jv_alloc.c \
+          jv_alloc.h \
+          jv_aux.c \
+          jv_dtoa.c \
+          jv_dtoa.h \
+          jv_file.c \
+          jv_parse.c \
+          jv_print.c \
+          jv_unicode.c \
+          jv_unicode.h \
+          jv_utf8_tables.h \
+          lexer.c \
+          lexer.h \
+          libm.h \
+          locfile.c \
+          locfile.h \
+          opcode_list.h \
+          parser.c \
+          parser.h"
+
+(cd src && rm -f ${JQ_FILES})

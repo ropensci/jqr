@@ -11,3 +11,22 @@ src/jq-1.4/.libs
 src/jq-1.4/Makefile
 src/jq-1.4/*.lo
 src/jq-1.4/
+
+## jq sources
+src/builtin.c
+src/bytecode.c
+src/compile.c
+src/execute.c
+src/jq/
+src/jq_test.c
+src/jv.c
+src/jv_alloc.c
+src/jv_aux.c
+src/jv_dtoa.c
+src/jv_file.c
+src/jv_parse.c
+src/jv_print.c
+src/jv_unicode.c
+src/lexer.c
+src/locfile.c
+src/parser.c

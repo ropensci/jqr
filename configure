@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "*** Copying sources"
+JQ=src/jq-1.4/
+cp ${JQ}/*.c src
+rm -f src/main.c src/jq_test.c

@@ -30,8 +30,7 @@ check_all:
 
 clean:
 	rm -f src/*.o src/*.so
-	rm -f src/jq-1.4/autom4te.cache
-	make -C src/jq-1.4 distclean
+	./cleanup
 
 attributes:
 	${RSCRIPT} -e 'library(methods); Rcpp::compileAttributes()'

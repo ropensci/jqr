@@ -32,8 +32,8 @@ void delete_jv_parser(jv_parser* parser) {
 jq_state_ptr make_jq_state() {
   jq_state_ptr state(jq_init(), delete_jq_state);
   // TODO: should do this via the jv_nomem_handler?
-  if (state == NULL) {
-    Rcpp::stop("Error allocating jq");
+  if (state.get() == NULL) {
+     Rcpp::stop("Error allocating jq");
   }
   jq_set_error_cb(state.get(), jqr_err_cb, NULL);
   return state;
