@@ -4,7 +4,7 @@ CXX_STD = CXX11
 ## Change this to upgrade jq.  Alternatively we could drop the
 ## versioned directory name and go with jq/, though that makes
 ## unpacking the archive a slightly more complicated manoeuver.
-JQ_DIR = jq-1.4
+JQ_DIR = jq-1.5
 
 ## This is what we need.
 LIBJQ = $(JQ_DIR)/.libs/libjq.a
@@ -26,5 +26,5 @@ PKG_LIBS = $(LIBJQ)
 ## confuses configure.
 $(SHLIB): $(LIBJQ)
 $(LIBJQ):
-	(cd $(JQ_DIR) && YACC=/bin/sh ./configure && $(MAKE) \
+	(cd $(JQ_DIR) && ./configure --disable-maintainer-mode && $(MAKE) \
 	  CC="$(CC)" CFLAGS="$(CFLAGS) $(CPICFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)")

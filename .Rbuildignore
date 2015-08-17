@@ -1,6 +1,6 @@
 ^Makefile$
 ^bootstrap.R$
-^jq-1.4.tar.gz$
+^jq-1.5.tar.gz$
 ^jqr_.*.tar.gz$
 ^\.travis\.yml$
 ^.*\.Rproj$
