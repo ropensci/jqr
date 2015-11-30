@@ -13,7 +13,7 @@ Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
 SystemRequirements: GNU make
 URL: https://github.com/ropensci/jqr
 BugReports: https://github.com/ropensci/jqr/issues
-LinkingTo: Rcpp
+LinkingTo: BH, Rcpp
 Imports:
     Rcpp,
     magrittr,

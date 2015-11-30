@@ -3,15 +3,18 @@ extern "C" {
 #include <jq.h>
 }
 
-#include <memory> // std::make_shared, std::shared_ptr
-
 // The jv objects haven't been done with RAII yet because the free
 // semantics are unclear from main.c and the ruby interface.  Probably
 // things are not actually being free'd enough, based on the code I
 // see.  But I think we're safe, exception wise.
+#include <boost/shared_ptr.hpp>
+typedef boost::shared_ptr<jq_state>  jq_state_ptr;
+typedef boost::shared_ptr<jv_parser> jv_parser_ptr;
 
-typedef std::shared_ptr<jq_state>  jq_state_ptr;
-typedef std::shared_ptr<jv_parser> jv_parser_ptr;
+// Once we can rely on C++11 (i.e., new windows toolchain) this should work:
+// #include <memory> // std::make_shared, std::shared_ptr
+// typedef std::shared_ptr<jq_state>  jq_state_ptr;
+// typedef std::shared_ptr<jv_parser> jv_parser_ptr;
 
 void jqr_err_cb(void *, jv x) {
   const char *msg = jv_string_value(x);
