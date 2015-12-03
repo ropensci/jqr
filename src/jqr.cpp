@@ -3,15 +3,19 @@ extern "C" {
 #include <jq.h>
 }
 
-#include <memory> // std::make_shared, std::shared_ptr
-
 // The jv objects haven't been done with RAII yet because the free
 // semantics are unclear from main.c and the ruby interface.  Probably
 // things are not actually being free'd enough, based on the code I
 // see.  But I think we're safe, exception wise.
 
-typedef std::shared_ptr<jq_state>  jq_state_ptr;
-typedef std::shared_ptr<jv_parser> jv_parser_ptr;
+#include <boost/shared_ptr.hpp>
+typedef boost::shared_ptr<jq_state>  jq_state_ptr;
+typedef boost::shared_ptr<jv_parser> jv_parser_ptr;
+
+// Once we can rely on C++11 (i.e., new windows toolchain) this should work:
+// #include <memory> // std::make_shared, std::shared_ptr
+// typedef std::shared_ptr<jq_state>  jq_state_ptr;
+// typedef std::shared_ptr<jv_parser> jv_parser_ptr;
 
 void jqr_err_cb(void *, jv x) {
   const char *msg = jv_string_value(x);
@@ -20,19 +24,16 @@ void jqr_err_cb(void *, jv x) {
 }
 
 void delete_jq_state(jq_state* state) {
-  // Rprintf("deleting state\n");
   jq_teardown(&state);
 }
 
 void delete_jv_parser(jv_parser* parser) {
-  // Rprintf("deleting parser\n");
   jv_parser_free(parser);
 }
 
 jq_state_ptr make_jq_state() {
   jq_state_ptr state(jq_init(), delete_jq_state);
-  // TODO: should do this via the jv_nomem_handler?
-  if (state == NULL) {
+  if (state.get() == NULL) {
     Rcpp::stop("Error allocating jq");
   }
   jq_set_error_cb(state.get(), jqr_err_cb, NULL);

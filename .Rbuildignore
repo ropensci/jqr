@@ -1,10 +1,11 @@
 ^Makefile$
 ^bootstrap.R$
-^jq-1.5.tar.gz$
-^jqr_.*.tar.gz$
+^jq-.*\.tar\.gz$
+^jqr_.*\.tar\.gz$
 ^\.travis\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
 man-roxygen
 ^notes\.md$
+^appveryor\.yml$
