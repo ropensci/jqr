@@ -42,9 +42,6 @@ struct lexer_param;
 "!=" { return NEQ; }
 "==" { return EQ; }
 "as" { return AS; }
-"import" { return IMPORT; }
-"include" { return INCLUDE; }
-"module" { return MODULE; }
 "def" { return DEF; }
 "if" { return IF; }
 "then" { return THEN; }
@@ -54,13 +51,7 @@ struct lexer_param;
 "or" { return OR; }
 "end" { return END; }
 "reduce" { return REDUCE; }
-"foreach" { return FOREACH; }
 "//" { return DEFINEDOR; }
-"try" { return TRY; }
-"catch" { return CATCH; }
-"label" { return LABEL; }
-"break" { return BREAK; }
-"__loc__" { return LOC; }
 "|=" { return SETPIPE; }
 "+=" { return SETPLUS; }
 "-=" { return SETMINUS; }
@@ -104,7 +95,7 @@ struct lexer_param;
   }
   (\\[^u(]|\\u[a-zA-Z0-9]{0,4})+ {
     /* pass escapes to the json parser */
-    jv escapes = jv_string_fmt("\"%.*s\"", (int)yyleng, yytext);
+    jv escapes = jv_string_fmt("\"%.*s\"", yyleng, yytext);
     yylval->literal = jv_parse_sized(jv_string_value(escapes), jv_string_length_bytes(jv_copy(escapes)));
     jv_free(escapes);
     return QQSTRING_TEXT;
@@ -119,7 +110,7 @@ struct lexer_param;
 }
   
 
-([a-zA-Z_][a-zA-Z_0-9]*::)*[a-zA-Z_][a-zA-Z_0-9]*  { yylval->literal = jv_string(yytext); return IDENT;}
+[a-zA-Z_][a-zA-Z_0-9]*  { yylval->literal = jv_string(yytext); return IDENT;}
 \.[a-zA-Z_][a-zA-Z_0-9]*  { yylval->literal = jv_string(yytext+1); return FIELD;}
 
 [ \n\t]+  {}

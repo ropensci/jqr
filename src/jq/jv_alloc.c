@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include "jv_alloc.h"
 
 struct nomem_handler {
@@ -130,30 +129,6 @@ void* jv_mem_alloc_unguarded(size_t sz) {
   return malloc(sz);
 }
 
-void* jv_mem_calloc(size_t nemb, size_t sz) {
-  void* p = calloc(nemb, sz);
-  if (!p) {
-    memory_exhausted();
-  }
-  return p;
-}
-
-void* jv_mem_calloc_unguarded(size_t nemb, size_t sz) {
-  return calloc(nemb, sz);
-}
-
-char* jv_mem_strdup(const char *s) {
-  char *p = strdup(s);
-  if (!p) {
-    memory_exhausted();
-  }
-  return p;
-}
-
-char* jv_mem_strdup_unguarded(const char *s) {
-  return strdup(s);
-}
-
 void jv_mem_free(void* p) {
   free(p);
 }
@@ -169,11 +144,8 @@ void* jv_mem_realloc(void* p, size_t sz) {
 #ifndef NDEBUG
 volatile char jv_mem_uninitialised;
 __attribute__((constructor)) void jv_mem_uninit_setup(){
-  // ignore warning that this reads uninitialized memory - that's the point!
-#ifndef __clang_analyzer__
   char* p = malloc(1);
   jv_mem_uninitialised = *p;
   free(p);
-#endif
 }
 #endif

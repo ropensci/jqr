@@ -9,7 +9,9 @@ jq_version <- readLines("inst/jq_version")
 jq_tar <- sprintf("jq-%s.tar.gz", jq_version)
 jq_path <- "src/jq"
 
-url <- sprintf("https://github.com/stedolan/jq/archive/%s", jq_tar)
+url <- sprintf("https://github.com/stedolan/jq/releases/download/jq-%s/jq-%s.tar.gz",
+        jq_version, jq_version)
+
 if (!file.exists(jq_tar)) {
   downloader::download(url, jq_tar)
 }
@@ -22,7 +24,8 @@ if (file.exists(jq_path)) {
 
 untar(jq_tar, compressed=TRUE, exdir="src")
 ## Heh - the download goes into the wrong directory :(
-invisible(file.rename(sprintf("src/jq-jq-%s", jq_version), jq_path))
+##   invisible(file.rename(sprintf("src/jq-jq-%s", jq_version), jq_path))
+invisible(file.rename(sprintf("src/jq-%s", jq_version), jq_path))
 
 header <-
   c("The following license applies to code from the jq library which will",
@@ -41,7 +44,7 @@ drop <- c("autom4te.cache", "build", "config", "docs", "m4",
 ######################################################################
           "aclocal.m4", "ChangeLog", "compile-ios.sh",
           "configure", "configure.ac", "Dockerfile", "jq.1.default",
-          "jq.1.prebuilt", "Makefile.am", "Makefile.in", "NEWS",
+          "jq.1.prebuilt", "jq.1", "Makefile.am", "Makefile.in", "NEWS",
           "README", "README.md", "setup.sh", ".travis.yml")
 unlink(file.path(jq_path, drop), recursive=TRUE)
 

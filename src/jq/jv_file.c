@@ -30,17 +30,14 @@ jv jv_load_file(const char* filename, int raw) {
       jv value;
       while (jv_is_valid((value = jv_parser_next(parser))))
         data = jv_array_append(data, value);
-      if (jv_invalid_has_msg(jv_copy(value))) {
-        jv_free(data);
-        data = value;
-        break;
-      }
+      jv_free(value);
     }
   }
   if (!raw)
       jv_parser_free(parser);
   int badread = ferror(file);
-  if (fclose(file) != 0 || badread) {
+  fclose(file);
+  if (badread) {
     jv_free(data);
     return jv_invalid_with_msg(jv_string_fmt("Error reading from %s",
                                              filename));

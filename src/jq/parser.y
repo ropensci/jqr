@@ -1,8 +1,7 @@
 %{
-#include <assert.h>
-#include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "compile.h"
 #include "jv_alloc.h"
 #define YYMALLOC jv_mem_alloc
@@ -23,7 +22,7 @@ struct lexer_param;
       (Loc).end = YYRHSLOC(Rhs, 0).end;         \
     }                                           \
   } while (0)
-}
+ }
 
 %locations
 %error-verbose
@@ -51,6 +50,7 @@ struct lexer_param;
 %token <literal> FIELD
 %token <literal> LITERAL
 %token <literal> FORMAT
+%token Q "?"
 %token REC ".."
 %token SETMOD "%="
 %token EQ "=="
@@ -58,23 +58,14 @@ struct lexer_param;
 %token DEFINEDOR "//"
 %token AS "as"
 %token DEF "def"
-%token MODULE "module"
-%token IMPORT "import"
-%token INCLUDE "include"
 %token IF "if"
 %token THEN "then"
 %token ELSE "else"
 %token ELSE_IF "elif"
 %token REDUCE "reduce"
-%token FOREACH "foreach"
 %token END "end"
 %token AND "and"
 %token OR "or"
-%token TRY "try"
-%token CATCH "catch"
-%token LABEL "label"
-%token BREAK "break"
-%token LOC "__loc__"
 %token SETPIPE "|="
 %token SETPLUS "+="
 %token SETMINUS "-="
@@ -90,11 +81,8 @@ struct lexer_param;
 %token QQSTRING_INTERP_END
 %token QQSTRING_END
 
-/* Instead of raising this, find a way to use precedence to resolve
- * shift-reduce conflicts. */
-%expect 0
-
-%precedence FUNCDEF
+ /* revolting hack */
+%left ';'
 %right '|'
 %left ','
 %right "//"
@@ -104,17 +92,9 @@ struct lexer_param;
 %nonassoc NEQ EQ '<' '>' LESSEQ GREATEREQ
 %left '+' '-'
 %left '*' '/' '%'
-%precedence NONOPT /* non-optional; rules for which a specialized
-                      '?' rule should be preferred over Exp '?' */
-%precedence '?'
-%precedence "try"
-%precedence "catch"
 
 
-%type <blk> Exp Term MkDict MkDictPair ExpD ElseBody QQString
-%type <blk> FuncDef FuncDefs String Import Imports Param Params
-%type <blk> Arg Args Module Pattern ArrayPats ObjPats ObjPat
-%type <literal> Keyword
+%type <blk> Exp Term MkDict MkDictPair ExpD ElseBody QQString FuncDef FuncDefs String
 %{
 #include "lexer.h"
 struct lexer_param {
@@ -127,21 +107,13 @@ struct lexer_param {
     /*YYERROR*/;                                                   \
   } while (0)
 
-void yyerror(YYLTYPE* loc, block* answer, int* errors,
+void yyerror(YYLTYPE* loc, block* answer, int* errors, 
              struct locfile* locations, struct lexer_param* lexer_param_ptr, const char *s){
   (*errors)++;
-  if (strstr(s, "unexpected")) {
-#ifdef WIN32
-      locfile_locate(locations, *loc, "jq: error: %s (Windows cmd shell quoting issues?)", s);
-#else
-      locfile_locate(locations, *loc, "jq: error: %s (Unix shell quoting issues?)", s);
-#endif
-  } else {
-      locfile_locate(locations, *loc, "jq: error: %s", s);
-  }
+  locfile_locate(locations, *loc, "error: %s", s);
 }
 
-int yylex(YYSTYPE* yylval, YYLTYPE* yylloc, block* answer, int* errors,
+int yylex(YYSTYPE* yylval, YYLTYPE* yylloc, block* answer, int* errors, 
           struct locfile* locations, struct lexer_param* lexer_param_ptr) {
   yyscan_t lexer = lexer_param_ptr->lexer;
   int tok = jq_yylex(yylval, yylloc, lexer);
@@ -182,50 +154,7 @@ static block gen_slice_index(block obj, block start, block end, opcode idx_op) {
   return BLOCK(key, obj, gen_op_simple(idx_op));
 }
 
-static block constant_fold(block a, block b, int op) {
-  if (!block_is_single(a) || !block_is_const(a) ||
-      !block_is_single(b) || !block_is_const(b))
-    return gen_noop();
-  if (block_const_kind(a) != block_const_kind(b))
-    return gen_noop();
-
-  jv res = jv_invalid();
-
-  if (block_const_kind(a) == JV_KIND_NUMBER) {
-    double na = jv_number_value(block_const(a));
-    double nb = jv_number_value(block_const(b));
-    switch (op) {
-    case '+': res = jv_number(na + nb); break;
-    case '-': res = jv_number(na - nb); break;
-    case '*': res = jv_number(na * nb); break;
-    case '/': res = jv_number(na / nb); break;
-    case EQ:  res = (na == nb ? jv_true() : jv_false()); break;
-    case NEQ: res = (na != nb ? jv_true() : jv_false()); break;
-    case '<': res = (na < nb ? jv_true() : jv_false()); break;
-    case '>': res = (na > nb ? jv_true() : jv_false()); break;
-    case LESSEQ: res = (na <= nb ? jv_true() : jv_false()); break;
-    case GREATEREQ: res = (na >= nb ? jv_true() : jv_false()); break;
-    default: break;
-    }
-  } else if (op == '+' && block_const_kind(a) == JV_KIND_STRING) {
-    res = jv_string_concat(block_const(a),  block_const(b));
-  } else {
-    return gen_noop();
-  }
-
-  if (jv_get_kind(res) == JV_KIND_INVALID)
-    return gen_noop();
-
-  block_free(a);
-  block_free(b);
-  return gen_const(res);
-}
-
 static block gen_binop(block a, block b, int op) {
-  block folded = constant_fold(a, b, op);
-  if (!block_is_noop(folded))
-    return folded;
-
   const char* funcname = 0;
   switch (op) {
   case '+': funcname = "_plus"; break;
@@ -254,16 +183,16 @@ static block gen_definedor_assign(block object, block val) {
   return BLOCK(gen_op_simple(DUP),
                val, tmp,
                gen_call("_modify", BLOCK(gen_lambda(object),
-                                         gen_lambda(gen_definedor(gen_noop(),
+                                         gen_lambda(gen_definedor(gen_noop(), 
                                                                   gen_op_bound(LOADV, tmp))))));
 }
-
+ 
 static block gen_update(block object, block val, int optype) {
   block tmp = gen_op_var_fresh(STOREV, "tmp");
   return BLOCK(gen_op_simple(DUP),
                val,
                tmp,
-               gen_call("_modify", BLOCK(gen_lambda(object),
+               gen_call("_modify", BLOCK(gen_lambda(object), 
                                          gen_lambda(gen_binop(gen_noop(),
                                                               gen_op_bound(LOADV, tmp),
                                                               optype)))));
@@ -273,61 +202,34 @@ static block gen_update(block object, block val, int optype) {
 
 %%
 TopLevel:
-Module Imports Exp {
-  *answer = BLOCK($1, $2, gen_op_simple(TOP), $3);
+Exp {
+  *answer = $1;
 } |
-Module Imports FuncDefs {
-  *answer = BLOCK($1, $2, $3);
-}
-
-Module:
-%empty {
-  $$ = gen_noop();
-} |
-"module" Exp ';' {
-  if (!block_is_const($2)) {
-    FAIL(@$, "Module metadata must be constant.");
-    $$ = gen_noop();
-  } else {
-    $$ = gen_module($2);
-  }
-}
-
-Imports:
-%empty {
-  $$ = gen_noop();
-} |
-Import Imports {
-  $$ = BLOCK($1, $2);
-}
+FuncDefs {
+  *answer = $1;
+} 
 
 FuncDefs:
-%empty {
+/* empty */ {
   $$ = gen_noop();
 } |
 FuncDef FuncDefs {
-  $$ = block_bind($1, $2, OP_IS_CALL_PSEUDO);
+  $$ = block_join($1, $2);
 }
 
 Exp:
-FuncDef Exp %prec FUNCDEF {
-  $$ = block_bind_referenced($1, $2, OP_IS_CALL_PSEUDO);
+FuncDef Exp %prec ';' {
+  $$ = block_bind($1, $2, OP_IS_CALL_PSEUDO);
 } |
 
-Term "as" Pattern '|' Exp {
-  $$ = gen_destructure($1, $3, $5);
+Term "as" '$' IDENT '|' Exp {
+  $$ = gen_var_binding($1, jv_string_value($4), $6);
+  jv_free($4);
 } |
 
-"reduce" Term "as" Pattern '(' Exp ';' Exp ')' {
-  $$ = gen_reduce($2, $4, $6, $8);
-} |
-
-"foreach" Term "as" Pattern '(' Exp ';' Exp ';' Exp ')' {
-  $$ = gen_foreach($2, $4, $6, $8, $10);
-} |
-
-"foreach" Term "as" Pattern '(' Exp ';' Exp ')' {
-  $$ = gen_foreach($2, $4, $6, $8, gen_noop());
+"reduce" Term "as" '$' IDENT '(' Exp ';' Exp ')' {
+  $$ = gen_reduce(jv_string_value($5), $2, $7, $9);
+  jv_free($5);
 } |
 
 "if" Exp "then" Exp ElseBody {
@@ -338,37 +240,13 @@ Term "as" Pattern '|' Exp {
   $$ = $2;
 } |
 
-"try" Exp "catch" Exp {
-  //$$ = BLOCK(gen_op_target(FORK_OPT, $2), $2, $4);
-  $$ = gen_try($2, gen_try_handler($4));
-} |
-"try" Exp {
-  //$$ = BLOCK(gen_op_target(FORK_OPT, $2), $2, gen_op_simple(BACKTRACK));
-  $$ = gen_try($2, gen_op_simple(BACKTRACK));
-} |
-"try" Exp "catch" error {
-  FAIL(@$, "Possibly unterminated 'try' statement");
-  $$ = $2;
-} |
-
-"label" '$' IDENT '|' Exp {
-  jv v = jv_string_fmt("*label-%s", jv_string_value($3));
-  $$ = gen_location(@$, locations, gen_label(jv_string_value(v), $5));
-  jv_free($3);
-  jv_free(v);
-} |
-
-Exp '?' {
-  $$ = gen_try($1, gen_op_simple(BACKTRACK));
-} |
-
 Exp '=' Exp {
   $$ = gen_call("_assign", BLOCK(gen_lambda($1), gen_lambda($3)));
 } |
 
 Exp "or" Exp {
   $$ = gen_or($1, $3);
-} |
+} | 
 
 Exp "and" Exp {
   $$ = gen_and($1, $3);
@@ -386,12 +264,12 @@ Exp "|=" Exp {
   $$ = gen_call("_modify", BLOCK(gen_lambda($1), gen_lambda($3)));
 } |
 
-Exp '|' Exp {
-  $$ = block_join($1, $3);
+Exp '|' Exp { 
+  $$ = block_join($1, $3); 
 } |
 
-Exp ',' Exp {
-  $$ = gen_both($1, $3);
+Exp ',' Exp { 
+  $$ = gen_both($1, $3); 
 } |
 
 Exp '+' Exp {
@@ -424,14 +302,10 @@ Exp "*=" Exp {
 
 Exp '/' Exp {
   $$ = gen_binop($1, $3, '/');
-  if (block_is_const_inf($$))
-    FAIL(@$, "Division by zero?");
 } |
 
 Exp '%' Exp {
   $$ = gen_binop($1, $3, '%');
-  if (block_is_const_inf($$))
-    FAIL(@$, "Remainder by zero?");
 } |
 
 Exp "/=" Exp {
@@ -466,67 +340,8 @@ Exp ">=" Exp {
   $$ = gen_binop($1, $3, GREATEREQ);
 } |
 
-Term {
-  $$ = $1;
-}
-
-Import:
-"import" String "as" '$' IDENT ';' {
-  jv v = block_const($2);
-  // XXX Make gen_import take only blocks and the int is_data so we
-  // don't have to free so much stuff here
-  $$ = gen_import(jv_string_value(v), gen_noop(), jv_string_value($5), 1);
-  block_free($2);
-  jv_free($5);
-  jv_free(v);
-} |
-"import" String "as" IDENT ';' {
-  jv v = block_const($2);
-  $$ = gen_import(jv_string_value(v), gen_noop(), jv_string_value($4), 0);
-  block_free($2);
-  jv_free($4);
-  jv_free(v);
-} |
-"include" String ';' {
-  jv v = block_const($2);
-  $$ = gen_import(jv_string_value(v), gen_noop(), NULL, 0);
-  block_free($2);
-  jv_free(v);
-} |
-"import" String "as" IDENT Exp ';' {
-  if (!block_is_const($5)) {
-    FAIL(@$, "Module metadata must be constant.");
-    $$ = gen_noop();
-  } else {
-    jv v = block_const($2);
-    $$ = gen_import(jv_string_value(v), $5, jv_string_value($4), 0);
-    jv_free(v);
-  }
-  block_free($2);
-  jv_free($4);
-} |
-"include" String Exp ';' {
-  if (!block_is_const($3)) {
-    FAIL(@$, "Module metadata must be constant.");
-    $$ = gen_noop();
-  } else {
-    jv v = block_const($2);
-    $$ = gen_import(jv_string_value(v), $3, NULL, 0);
-    jv_free(v);
-  }
-  block_free($2);
-} |
-"import" String "as" '$' IDENT Exp ';' {
-  if (!block_is_const($6)) {
-    FAIL(@$, "Module metadata must be constant.");
-    $$ = gen_noop();
-  } else {
-    jv v = block_const($2);
-    $$ = gen_import(jv_string_value(v), $6, jv_string_value($5), 1);
-    jv_free(v);
-  }
-  block_free($2);
-  jv_free($5);
+Term { 
+  $$ = $1; 
 }
 
 FuncDef:
@@ -535,28 +350,82 @@ FuncDef:
   jv_free($2);
 } |
 
-"def" IDENT '(' Params ')' ':' Exp ';' {
-  $$ = gen_function(jv_string_value($2), $4, $7);
+"def" IDENT '(' IDENT ')' ':' Exp ';' {
+  $$ = gen_function(jv_string_value($2), 
+                    gen_param(jv_string_value($4)), 
+                    $7);
   jv_free($2);
-}
-
-Params:
-Param {
-  $$ = $1;
-} |
-Params ';' Param {
-  $$ = BLOCK($1, $3);
-}
-
-Param:
-'$' IDENT {
-  $$ = gen_param_regular(jv_string_value($2));
-  jv_free($2);
+  jv_free($4);
 } |
 
-IDENT {
-  $$ = gen_param(jv_string_value($1));
-  jv_free($1);
+"def" IDENT '(' IDENT ';' IDENT ')' ':' Exp ';' {
+  $$ = gen_function(jv_string_value($2), 
+                    BLOCK(gen_param(jv_string_value($4)), 
+                          gen_param(jv_string_value($6))),
+                    $9);
+  jv_free($2);
+  jv_free($4);
+  jv_free($6);
+} |
+
+"def" IDENT '(' IDENT ';' IDENT ';' IDENT ')' ':' Exp ';' {
+  $$ = gen_function(jv_string_value($2), 
+                    BLOCK(gen_param(jv_string_value($4)), 
+                          gen_param(jv_string_value($6)),
+                          gen_param(jv_string_value($8))),
+                    $11);
+  jv_free($2);
+  jv_free($4);
+  jv_free($6);
+  jv_free($8);
+} |
+
+"def" IDENT '(' IDENT ';' IDENT ';' IDENT ';' IDENT ')' ':' Exp ';' {
+  $$ = gen_function(jv_string_value($2), 
+                    BLOCK(gen_param(jv_string_value($4)), 
+                          gen_param(jv_string_value($6)),
+                          gen_param(jv_string_value($8)),
+                          gen_param(jv_string_value($10))),
+                    $13);
+  jv_free($2);
+  jv_free($4);
+  jv_free($6);
+  jv_free($8);
+  jv_free($10);
+} |
+
+"def" IDENT '(' IDENT ';' IDENT ';' IDENT ';' IDENT ';' IDENT ')' ':' Exp ';' {
+  $$ = gen_function(jv_string_value($2), 
+                    BLOCK(gen_param(jv_string_value($4)), 
+                          gen_param(jv_string_value($6)),
+                          gen_param(jv_string_value($8)),
+                          gen_param(jv_string_value($10)),
+                          gen_param(jv_string_value($12))),
+                    $15);
+  jv_free($2);
+  jv_free($4);
+  jv_free($6);
+  jv_free($8);
+  jv_free($10);
+  jv_free($12);
+} |
+
+"def" IDENT '(' IDENT ';' IDENT ';' IDENT ';' IDENT ';' IDENT ';' IDENT ')' ':' Exp ';' {
+  $$ = gen_function(jv_string_value($2), 
+                    BLOCK(gen_param(jv_string_value($4)), 
+                          gen_param(jv_string_value($6)),
+                          gen_param(jv_string_value($8)),
+                          gen_param(jv_string_value($10)),
+                          gen_param(jv_string_value($12)),
+                          gen_param(jv_string_value($14))),
+                    $17);
+  jv_free($2);
+  jv_free($4);
+  jv_free($6);
+  jv_free($8);
+  jv_free($10);
+  jv_free($12);
+  jv_free($14);
 }
 
 
@@ -572,7 +441,7 @@ FORMAT QQSTRING_START { $<literal>$ = $1; } QQString QQSTRING_END {
 
 
 QQString:
-%empty {
+/* empty */ {
   $$ = gen_const(jv_string(""));
 } |
 QQString QQSTRING_TEXT {
@@ -592,7 +461,7 @@ ElseBody:
 }
 
 ExpD:
-ExpD '|' ExpD {
+ExpD '|' ExpD { 
   $$ = block_join($1, $3);
 } |
 '-' ExpD {
@@ -605,28 +474,16 @@ Term {
 
 Term:
 '.' {
-  $$ = gen_noop();
+  $$ = gen_noop(); 
 } |
 REC {
-  $$ = gen_call("recurse", gen_noop());
-} |
-BREAK '$' IDENT {
-  jv v = jv_string_fmt("*label-%s", jv_string_value($3));     // impossible symbol
-  $$ = gen_location(@$, locations,
-                    BLOCK(gen_op_unbound(LOADV, jv_string_value(v)),
-                    gen_call("error", gen_noop())));
-  jv_free(v);
-  jv_free($3);
-} |
-BREAK error {
-  FAIL(@$, "break requires a label to break to");
-  $$ = gen_noop();
+  $$ = gen_call("recurse_down", gen_noop());
 } |
 Term FIELD '?' {
   $$ = gen_index_opt($1, gen_const($2));
 } |
-FIELD '?' {
-  $$ = gen_index_opt(gen_noop(), gen_const($1));
+FIELD '?' { 
+  $$ = gen_index_opt(gen_noop(), gen_const($1)); 
 } |
 Term '.' String '?' {
   $$ = gen_index_opt($1, $3);
@@ -634,16 +491,16 @@ Term '.' String '?' {
 '.' String '?' {
   $$ = gen_index_opt(gen_noop(), $2);
 } |
-Term FIELD %prec NONOPT {
+Term FIELD {
   $$ = gen_index($1, gen_const($2));
 } |
-FIELD %prec NONOPT {
-  $$ = gen_index(gen_noop(), gen_const($1));
+FIELD { 
+  $$ = gen_index(gen_noop(), gen_const($1)); 
 } |
-Term '.' String %prec NONOPT {
+Term '.' String {
   $$ = gen_index($1, $3);
 } |
-'.' String %prec NONOPT {
+'.' String {
   $$ = gen_index(gen_noop(), $2);
 } |
 '.' error {
@@ -654,19 +511,19 @@ Term '.' String %prec NONOPT {
   jv_free($2);
   FAIL(@$, "try .[\"field\"] instead of .field for unusually named fields");
   $$ = gen_noop();
-} |
+} | 
 /* FIXME: string literals */
 Term '[' Exp ']' '?' {
-  $$ = gen_index_opt($1, $3);
+  $$ = gen_index_opt($1, $3); 
 } |
-Term '[' Exp ']' %prec NONOPT {
-  $$ = gen_index($1, $3);
+Term '[' Exp ']' {
+  $$ = gen_index($1, $3); 
 } |
 Term '[' ']' '?' {
-  $$ = block_join($1, gen_op_simple(EACH_OPT));
+  $$ = block_join($1, gen_op_simple(EACH_OPT)); 
 } |
-Term '[' ']' %prec NONOPT {
-  $$ = block_join($1, gen_op_simple(EACH));
+Term '[' ']' {
+  $$ = block_join($1, gen_op_simple(EACH)); 
 } |
 Term '[' Exp ':' Exp ']' '?' {
   $$ = gen_slice_index($1, $3, $5, INDEX_OPT);
@@ -677,17 +534,17 @@ Term '[' Exp ':' ']' '?' {
 Term '[' ':' Exp ']' '?' {
   $$ = gen_slice_index($1, gen_const(jv_null()), $4, INDEX_OPT);
 } |
-Term '[' Exp ':' Exp ']' %prec NONOPT {
+Term '[' Exp ':' Exp ']' {
   $$ = gen_slice_index($1, $3, $5, INDEX);
 } |
-Term '[' Exp ':' ']' %prec NONOPT {
+Term '[' Exp ':' ']' {
   $$ = gen_slice_index($1, $3, gen_const(jv_null()), INDEX);
 } |
-Term '[' ':' Exp ']' %prec NONOPT {
+Term '[' ':' Exp ']' {
   $$ = gen_slice_index($1, gen_const(jv_null()), $4, INDEX);
 } |
 LITERAL {
-  $$ = gen_const($1);
+  $$ = gen_const($1); 
 } |
 String {
   $$ = $1;
@@ -695,45 +552,54 @@ String {
 FORMAT {
   $$ = gen_format(gen_noop(), $1);
 } |
-'(' Exp ')' {
-  $$ = $2;
+'(' Exp ')' { 
+  $$ = $2; 
+} | 
+'[' Exp ']' { 
+  $$ = gen_collect($2); 
 } |
-'[' Exp ']' {
-  $$ = gen_collect($2);
+'[' ']' { 
+  $$ = gen_const(jv_array()); 
 } |
-'[' ']' {
-  $$ = gen_const(jv_array());
-} |
-'{' MkDict '}' {
-  block o = gen_const_object($2);
-  if (o.first != NULL)
-    $$ = o;
-  else
-    $$ = BLOCK(gen_subexp(gen_const(jv_object())), $2, gen_op_simple(POP));
-} |
-'$' LOC {
-  $$ = gen_const(JV_OBJECT(jv_string("file"), jv_copy(locations->fname),
-                           jv_string("line"), jv_number(locfile_get_line(locations, @$.start) + 1)));
+'{' MkDict '}' { 
+  $$ = BLOCK(gen_subexp(gen_const(jv_object())), $2, gen_op_simple(POP));
 } |
 '$' IDENT {
-  $$ = gen_location(@$, locations, gen_op_unbound(LOADV, jv_string_value($2)));
+  $$ = gen_location(@$, gen_op_unbound(LOADV, jv_string_value($2)));
   jv_free($2);
-} |
+} | 
 IDENT {
-  const char *s = jv_string_value($1);
-  if (strcmp(s, "false") == 0)
-    $$ = gen_const(jv_false());
-  else if (strcmp(s, "true") == 0)
-    $$ = gen_const(jv_true());
-  else if (strcmp(s, "null") == 0)
-    $$ = gen_const(jv_null());
-  else
-    $$ = gen_location(@$, locations, gen_call(s, gen_noop()));
+  $$ = gen_location(@$, gen_call(jv_string_value($1), gen_noop()));
   jv_free($1);
 } |
-IDENT '(' Args ')' {
-  $$ = gen_call(jv_string_value($1), $3);
-  $$ = gen_location(@1, locations, $$);
+IDENT '(' Exp ')' {
+  $$ = gen_call(jv_string_value($1), gen_lambda($3));
+  $$ = gen_location(@1, $$);
+  jv_free($1);
+} |
+IDENT '(' Exp ';' Exp ')' {
+  $$ = gen_call(jv_string_value($1), BLOCK(gen_lambda($3), gen_lambda($5)));
+  $$ = gen_location(@1, $$);
+  jv_free($1);
+} |
+IDENT '(' Exp ';' Exp ';' Exp ')' {
+  $$ = gen_call(jv_string_value($1), BLOCK(gen_lambda($3), gen_lambda($5), gen_lambda($7)));
+  $$ = gen_location(@1, $$);
+  jv_free($1);
+} |
+IDENT '(' Exp ';' Exp ';' Exp ';' Exp ')' {
+  $$ = gen_call(jv_string_value($1), BLOCK(gen_lambda($3), gen_lambda($5), gen_lambda($7), gen_lambda($9)));
+  $$ = gen_location(@1, $$);
+  jv_free($1);
+} |
+IDENT '(' Exp ';' Exp ';' Exp ';' Exp ';' Exp ')' {
+  $$ = gen_call(jv_string_value($1), BLOCK(gen_lambda($3), gen_lambda($5), gen_lambda($7), gen_lambda($9), gen_lambda($11)));
+  $$ = gen_location(@1, $$);
+  jv_free($1);
+} |
+IDENT '(' Exp ';' Exp ';' Exp ';' Exp ';' Exp ';' Exp ')' {
+  $$ = gen_call(jv_string_value($1), BLOCK(gen_lambda($3), gen_lambda($5), gen_lambda($7), gen_lambda($9), gen_lambda($11), gen_lambda($13)));
+  $$ = gen_location(@1, $$);
   jv_free($1);
 } |
 '(' error ')' { $$ = gen_noop(); } |
@@ -741,148 +607,24 @@ IDENT '(' Args ')' {
 Term '[' error ']' { $$ = $1; } |
 '{' error '}' { $$ = gen_noop(); }
 
-Args:
-Arg {
-  $$ = $1;
-} |
-Args ';' Arg {
-  $$ = BLOCK($1, $3);
-}
-
-Arg:
-Exp {
-  $$ = gen_lambda($1);
-}
-
-Pattern:
-'$' IDENT {
-  $$ = gen_op_unbound(STOREV, jv_string_value($2));
-  jv_free($2);
-} |
-'[' ArrayPats ']' {
-  $$ = BLOCK($2, gen_op_simple(POP));
-} |
-'{' ObjPats '}' {
-  $$ = BLOCK($2, gen_op_simple(POP));
-}
-
-ArrayPats:
-Pattern {
-  $$ = gen_array_matcher(gen_noop(), $1);
-} |
-ArrayPats ',' Pattern {
-  $$ = gen_array_matcher($1, $3);
-}
-
-ObjPats:
-ObjPat {
-  $$ = $1;
-} |
-ObjPats ',' ObjPat {
-  $$ = BLOCK($1, $3);
-}
-
-ObjPat:
-'$' IDENT {
-  $$ = gen_object_matcher(gen_const($2), gen_op_unbound(STOREV, jv_string_value($2)));
-} |
-IDENT ':' Pattern {
-  $$ = gen_object_matcher(gen_const($1), $3);
-} |
-Keyword ':' Pattern {
-  $$ = gen_object_matcher(gen_const($1), $3);
-} |
-String ':' Pattern {
-  $$ = gen_object_matcher($1, $3);
-} |
-'(' Exp ')' ':' Pattern {
-  $$ = gen_object_matcher($2, $5);
-}
-
-Keyword:
-"as" {
-  $$ = jv_string("as");
-} |
-"def" {
-  $$ = jv_string("def");
-} |
-"module" {
-  $$ = jv_string("module");
-} |
-"import" {
-  $$ = jv_string("import");
-} |
-"include" {
-  $$ = jv_string("include");
-} |
-"if" {
-  $$ = jv_string("if");
-} |
-"then" {
-  $$ = jv_string("then");
-} |
-"else" {
-  $$ = jv_string("else");
-} |
-"elif" {
-  $$ = jv_string("elif");
-} |
-"reduce" {
-  $$ = jv_string("reduce");
-} |
-"foreach" {
-  $$ = jv_string("foreach");
-} |
-"end" {
-  $$ = jv_string("end");
-} |
-"and" {
-  $$ = jv_string("and");
-} |
-"or" {
-  $$ = jv_string("or");
-} |
-"try" {
-  $$ = jv_string("try");
-} |
-"catch" {
-  $$ = jv_string("catch");
-} |
-"label" {
-  $$ = jv_string("label");
-} |
-"break" {
-  $$ = jv_string("break");
-} |
-"__loc__" {
-  $$ = jv_string("__loc__");
-}
-
 MkDict:
-%empty {
-  $$=gen_noop();
+{ 
+  $$=gen_noop(); 
 } |
  MkDictPair { $$ = $1; }
 | MkDictPair ',' MkDict { $$=block_join($1, $3); }
 | error ',' MkDict { $$ = $3; }
 
-MkDictPair:
-IDENT ':' ExpD {
+MkDictPair
+: IDENT ':' ExpD { 
   $$ = gen_dictpair(gen_const($1), $3);
  }
-| Keyword ':' ExpD {
-  $$ = gen_dictpair(gen_const($1), $3);
-  }
 | String ':' ExpD {
   $$ = gen_dictpair($1, $3);
   }
 | String {
   $$ = gen_dictpair($1, BLOCK(gen_op_simple(POP), gen_op_simple(DUP2),
                               gen_op_simple(DUP2), gen_op_simple(INDEX)));
-  }
-| '$' IDENT {
-  $$ = gen_dictpair(gen_const($2),
-                    gen_location(@$, locations, gen_op_unbound(LOADV, jv_string_value($2))));
   }
 | IDENT {
   $$ = gen_dictpair(gen_const(jv_copy($1)),
@@ -914,10 +656,9 @@ int jq_parse(struct locfile* locations, block* answer) {
 int jq_parse_library(struct locfile* locations, block* answer) {
   int errs = jq_parse(locations, answer);
   if (errs) return errs;
-  if (block_has_main(*answer)) {
-    locfile_locate(locations, UNKNOWN_LOCATION, "jq: error: library should only have function definitions, not a main expression");
+  if (!block_has_only_binders(*answer, OP_IS_CALL_PSEUDO)) {
+    locfile_locate(locations, UNKNOWN_LOCATION, "error: library should only have function definitions, not a main expression");
     return 1;
   }
-  assert(block_has_only_binders_and_imports(*answer, OP_IS_CALL_PSEUDO));
   return 0;
 }

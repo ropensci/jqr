@@ -9,7 +9,6 @@
 #define NONE 0, 1
 #define CONSTANT OP_HAS_CONSTANT, 2
 #define VARIABLE (OP_HAS_VARIABLE | OP_HAS_BINDING), 3
-#define GLOBAL (OP_HAS_CONSTANT | OP_HAS_VARIABLE | OP_HAS_BINDING | OP_IS_CALL_PSEUDO), 4
 #define BRANCH OP_HAS_BRANCH, 2
 #define CFUNC (OP_HAS_CFUNC | OP_HAS_BINDING), 3
 #define UFUNC (OP_HAS_UFUNC | OP_HAS_BINDING | OP_IS_CALL_PSEUDO), 4
@@ -37,9 +36,9 @@ const struct opcode_description* opcode_describe(opcode op) {
 }
 
 
-int bytecode_operation_length(uint16_t* codeptr) {
+static int bytecode_operation_length(uint16_t* codeptr) {
   int length = opcode_describe(*codeptr)->length;
-  if (*codeptr == CALL_JQ || *codeptr == TAIL_CALL_JQ) {
+  if (*codeptr == CALL_JQ) {
     length += codeptr[1] * 2;
   }
   return length;
@@ -99,17 +98,17 @@ void dump_operation(struct bytecode* bc, uint16_t* codeptr) {
   printf("%s", op->name);
   if (op->length > 1) {
     uint16_t imm = bc->code[pc++];
-    if (op->op == CALL_JQ || op->op == TAIL_CALL_JQ) {
+    if (op->op == CALL_JQ) {
       for (int i=0; i<imm+1; i++) {
         uint16_t level = bc->code[pc++];
         uint16_t idx = bc->code[pc++];
         jv name;
         if (idx & ARG_NEWCLOSURE) {
           idx &= ~ARG_NEWCLOSURE;
-          name = jv_object_get(jv_copy(getlevel(bc,level)->subfunctions[idx]->debuginfo),
+          name = jv_object_get(jv_copy(getlevel(bc,level)->subfunctions[idx]->debuginfo), 
                                jv_string("name"));
         } else {
-          name = jv_array_get(jv_object_get(jv_copy(getlevel(bc,level)->debuginfo),
+          name = jv_array_get(jv_object_get(jv_copy(getlevel(bc,level)->debuginfo), 
                                             jv_string("params")), idx);
         }
         printf(" %s:%d",
@@ -133,8 +132,8 @@ void dump_operation(struct bytecode* bc, uint16_t* codeptr) {
     } else if (op->flags & OP_HAS_VARIABLE) {
       uint16_t v = bc->code[pc++];
       jv name = jv_array_get(jv_object_get(jv_copy(getlevel(bc,imm)->debuginfo), jv_string("locals")), v);
-      printf(" $%s:%d",
-             jv_string_value(name),
+      printf(" $%s:%d", 
+             jv_string_value(name), 
              v);
       jv_free(name);
       if (imm) {
@@ -143,7 +142,7 @@ void dump_operation(struct bytecode* bc, uint16_t* codeptr) {
     } else {
       printf(" %d", imm);
     }
-  }
+  }  
 }
 
 void bytecode_free(struct bytecode* bc) {

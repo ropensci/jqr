@@ -2,7 +2,6 @@ src/builtin.c
 src/bytecode.c
 src/compile.c
 src/execute.c
-src/inject_errors.c
 src/jv_alloc.c
 src/jv_aux.c
 src/jv.c
@@ -12,7 +11,5 @@ src/jv_parse.c
 src/jv_print.c
 src/jv_unicode.c
 src/lexer.c
-src/linker.c
 src/locfile.c
 src/parser.c
-src/util.c

@@ -46,7 +46,6 @@ void jv_free(jv);
 int jv_get_refcnt(jv);
 
 int jv_equal(jv, jv);
-int jv_identical(jv, jv);
 int jv_contains(jv, jv);
 
 jv jv_invalid(void);
@@ -81,27 +80,6 @@ jv jv_array_indexes(jv, jv);
            (x = jv_array_get(jv_copy(a), i), 1) : 0;                    \
          i++)
 
-#define JV_ARRAY_1(e) (jv_array_append(jv_array(),e))
-#define JV_ARRAY_2(e1,e2) (jv_array_append(JV_ARRAY_1(e1),e2))
-#define JV_ARRAY_3(e1,e2,e3) (jv_array_append(JV_ARRAY_2(e1,e2),e3))
-#define JV_ARRAY_4(e1,e2,e3,e4) (jv_array_append(JV_ARRAY_3(e1,e2,e3),e4))
-#define JV_ARRAY_5(e1,e2,e3,e4,e5) (jv_array_append(JV_ARRAY_4(e1,e2,e3,e4),e5))
-#define JV_ARRAY_6(e1,e2,e3,e4,e5,e6) (jv_array_append(JV_ARRAY_5(e1,e2,e3,e4,e5),e6))
-#define JV_ARRAY_7(e1,e2,e3,e4,e5,e6,e7) (jv_array_append(JV_ARRAY_6(e1,e2,e3,e4,e5,e6),e7))
-#define JV_ARRAY_8(e1,e2,e3,e4,e5,e6,e7,e8) (jv_array_append(JV_ARRAY_7(e1,e2,e3,e4,e5,e6,e7),e8))
-#define JV_ARRAY_9(e1,e2,e3,e4,e5,e6,e7,e8,e9) (jv_array_append(JV_ARRAY_8(e1,e2,e3,e4,e5,e6,e7,e8),e9))
-#define JV_ARRAY_IDX(_1,_2,_3,_4,_5,_6,_7,_8,_9,NAME,...) NAME
-#define JV_ARRAY(...) \
-  JV_ARRAY_IDX(__VA_ARGS__, JV_ARRAY_9, JV_ARRAY_8, JV_ARRAY_7, JV_ARRAY_6, JV_ARRAY_5, JV_ARRAY_4, JV_ARRAY_3, JV_ARRAY_2, JV_ARRAY_1)(__VA_ARGS__)
-
-#ifdef __GNUC__
-#define JV_PRINTF_LIKE(fmt_arg_num, args_num) \
-  __attribute__ ((__format__( __printf__, fmt_arg_num, args_num)))
-#define JV_VPRINTF_LIKE(fmt_arg_num) \
-  __attribute__ ((__format__( __printf__, fmt_arg_num, 0)))
-#endif
-
-
 jv jv_string(const char*);
 jv jv_string_sized(const char*, int);
 jv jv_string_empty(int len);
@@ -112,8 +90,8 @@ const char* jv_string_value(jv);
 jv jv_string_indexes(jv j, jv k);
 jv jv_string_slice(jv j, int start, int end);
 jv jv_string_concat(jv, jv);
-jv jv_string_vfmt(const char*, va_list) JV_VPRINTF_LIKE(1);
-jv jv_string_fmt(const char*, ...) JV_PRINTF_LIKE(1, 2);
+jv jv_string_vfmt(const char*, va_list);
+jv jv_string_fmt(const char*, ...);
 jv jv_string_append_codepoint(jv a, uint32_t c);
 jv jv_string_append_buf(jv a, const char* buf, int len);
 jv jv_string_append_str(jv a, const char* str);
@@ -143,49 +121,16 @@ jv jv_object_iter_value(jv, int);
             1)                                                          \
            : 0;                                                         \
          jv_i__ = jv_object_iter_next(t, jv_i__))                       \
-
-#define JV_OBJECT_1(k) (jv_object_set(jv_object(),(k),jv_null()))
-#define JV_OBJECT_2(k1,v1) (jv_object_set(jv_object(),(k1),(v1)))
-#define JV_OBJECT_3(k1,v1,k2) (jv_object_set(JV_OBJECT_2(k1,v1),k2,jv_null()))
-#define JV_OBJECT_4(k1,v1,k2,v2) (jv_object_set(JV_OBJECT_2(k1,v1),k2,v2))
-#define JV_OBJECT_5(k1,v1,k2,v2,k3) (jv_object_set(JV_OBJECT_4(k1,v1,k2,v2),k3,jv_null))
-#define JV_OBJECT_6(k1,v1,k2,v2,k3,v3) (jv_object_set(JV_OBJECT_4(k1,v1,k2,v2),k3,v3))
-#define JV_OBJECT_7(k1,v1,k2,v2,k3,v3,k4) (jv_object_set(JV_OBJECT_6(k1,v1,k2,v2,k3,v3),k4,jv_null()))
-#define JV_OBJECT_8(k1,v1,k2,v2,k3,v3,k4,v4) (jv_object_set(JV_OBJECT_6(k1,v1,k2,v2,k3,v3),k4,v4))
-#define JV_OBJECT_IDX(_1,_2,_3,_4,_5,_6,_7,_8,NAME,...) NAME
-#define JV_OBJECT(...) \
-  JV_OBJECT_IDX(__VA_ARGS__, JV_OBJECT_8, JV_OBJECT_7, JV_OBJECT_6, JV_OBJECT_5, JV_OBJECT_4, JV_OBJECT_3, JV_OBJECT_2, JV_OBJECT_1)(__VA_ARGS__)
-
+ 
 
 
 int jv_get_refcnt(jv);
 
-enum jv_print_flags {
-  JV_PRINT_PRETTY   = 1,
-  JV_PRINT_ASCII    = 2,
-  JV_PRINT_COLOUR   = 4,
-  JV_PRINT_SORTED   = 8,
-  JV_PRINT_INVALID  = 16,
-  JV_PRINT_REFCOUNT = 32,
-  JV_PRINT_TAB      = 64,
-  JV_PRINT_ISATTY   = 128,
-  JV_PRINT_SPACE0   = 256,
-  JV_PRINT_SPACE1   = 512,
-  JV_PRINT_SPACE2   = 1024,
-};
-#define JV_PRINT_INDENT_FLAGS(n) \
-    ((n) < 0 || (n) > 7 ? JV_PRINT_TAB | JV_PRINT_PRETTY : (n) == 0 ? 0 : (n) << 8 | JV_PRINT_PRETTY)
+enum { JV_PRINT_PRETTY = 1, JV_PRINT_ASCII = 2, JV_PRINT_COLOUR = 4, JV_PRINT_SORTED = 8 };
 void jv_dumpf(jv, FILE *f, int flags);
 void jv_dump(jv, int flags);
 void jv_show(jv, int flags);
 jv jv_dump_string(jv, int flags);
-char *jv_dump_string_trunc(jv x, char *outbuf, size_t bufsize);
-
-enum {
-  JV_PARSE_SEQ              = 1,
-  JV_PARSE_STREAMING        = 2,
-  JV_PARSE_STREAM_ERRORS    = 4,
-};
 
 jv jv_parse(const char* string);
 jv jv_parse_sized(const char* string, int length);
@@ -195,12 +140,11 @@ void jv_nomem_handler(jv_nomem_handler_f, void *);
 
 jv jv_load_file(const char *, int);
 
-typedef struct jv_parser jv_parser;
-jv_parser* jv_parser_new(int);
-void jv_parser_set_buf(jv_parser*, const char*, int, int);
-int jv_parser_remaining(jv_parser*);
-jv jv_parser_next(jv_parser*);
-void jv_parser_free(jv_parser*);
+struct jv_parser;
+struct jv_parser* jv_parser_new(int);
+void jv_parser_set_buf(struct jv_parser*, const char*, int, int);
+jv jv_parser_next(struct jv_parser*);
+void jv_parser_free(struct jv_parser*);
 
 jv jv_get(jv, jv);
 jv jv_set(jv, jv, jv);
@@ -209,7 +153,6 @@ jv jv_setpath(jv, jv, jv);
 jv jv_getpath(jv, jv);
 jv jv_delpaths(jv, jv);
 jv jv_keys(jv /*object or array*/);
-jv jv_keys_unsorted(jv /*object or array*/);
 int jv_cmp(jv, jv);
 jv jv_group(jv, jv);
 jv jv_sort(jv, jv);

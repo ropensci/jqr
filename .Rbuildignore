@@ -8,4 +8,4 @@
 ^README\.Rmd$
 man-roxygen
 ^notes\.md$
-^appveryor\.yml$
+^appveyor.yml$

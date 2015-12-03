@@ -4,36 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "jv_alloc.h"
-
-/*
- * The stack is a directed forest of variably sized blocks. Each block has a
- * "next" block which is at a higher memory address, or 0 if the block has no
- * "next" block. More than one block may have no "next" block. A block may be
- * the "next" block of more than one other block. Pushed blocks are added at
- * the low-address end of the stack.
- *
- * Stack pointers are negative integers that are offsets relative to "mem_end",
- * the end of the allocated region. The stack "bound" is the stack pointer of
- * the last block that would be able to fit in the currently allocated region.
- * The stack "limit" is the stack pointer of the last block currently in the
- * stack. The stack pointer of the "next" block is stored directly below each
- * block.
- *
- *                      <- mem_end = 0x100
- * 0xF8  +------------+
- * 0xF0  |            |
- * 0xE8  +------------+ <- stack_ptr1 = -0x18
- * 0xE0  next = 0
- * 0xD8  +------------+
- * 0xD0  |            |
- * 0xC8  |            |
- * 0xC0  +------------+ <- stack_ptr2 = limit = -0x40
- * 0xB8  next = -0x18
- * 0xB0
- * 0xA8                 <- bound = -0x58
- * 0xA0
- */
 
 struct determine_alignment {
   char x;
@@ -81,9 +51,9 @@ static stack_ptr* stack_block_next(struct stack* s, stack_ptr p) {
 static void stack_reallocate(struct stack* s, size_t sz) {
   int old_mem_length = -(s->bound) + ALIGNMENT;
   char* old_mem_start = s->mem_end - old_mem_length;
-
+  
   int new_mem_length = align_round_up((old_mem_length + sz + 256) * 2);
-  char* new_mem_start = jv_mem_realloc(old_mem_start, new_mem_length);
+  char* new_mem_start = realloc(old_mem_start, new_mem_length);
   memmove(new_mem_start + (new_mem_length - old_mem_length),
             new_mem_start, old_mem_length);
   s->mem_end = new_mem_start + new_mem_length;

@@ -11,7 +11,7 @@ typedef enum {
 } opcode;
 
 enum {
-  NUM_OPCODES =
+  NUM_OPCODES = 
 #define OP(name, imm, in, out) +1
 #include "opcode_list.h"
 #undef OP
@@ -25,9 +25,6 @@ enum {
   OP_HAS_UFUNC = 64,
   OP_IS_CALL_PSEUDO = 128,
   OP_HAS_BINDING = 1024,
-  // NOTE: Not actually part of any op -- a pseudo-op flag for special
-  //       handling of `break`.
-  OP_BIND_WILDCARD = 2048,
 };
 struct opcode_description {
   opcode op;
@@ -86,7 +83,6 @@ struct bytecode {
 void dump_disassembly(int, struct bytecode* code);
 void dump_operation(struct bytecode* bc, uint16_t* op);
 
-int bytecode_operation_length(uint16_t* codeptr);
 void bytecode_free(struct bytecode* bc);
 
 #endif

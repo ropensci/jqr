@@ -5,7 +5,7 @@ Name: jq
 Version: %{myver}
 Release: %{myrel}%{?dist}
 Source0: jq-%{myver}.tar.gz
-URL: https://stedolan.github.io/jq
+URL: https://github.com/stedolan/jq
 License: BSD
 AutoReqProv: no
 #BuildPrereq: autoconf, libtool, automake, flex, bison, python
