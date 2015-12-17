@@ -5,9 +5,9 @@
 #' @examples
 #' x <- '{"foo":[{"foo": []}, {"foo":[{"foo":[]}]}]}'
 #' x %>% recurse(.foo[])
-#' x %>% recurse(.foo[]) %>% jq(TRUE)
+#' # x %>% recurse(.foo[]) %>% pretty
 #' '{"a":0, "b":[1]}' %>% recurse
-#' '{"a":0, "b":[1]}' %>% recurse %>% jq(TRUE)
+#' # '{"a":0, "b":[1]}' %>% recurse %>% pretty
 recurse <- function(.data, ...) {
   recurse_(.data, .dots = lazyeval::lazy_dots(...))
 }
@@ -15,6 +15,7 @@ recurse <- function(.data, ...) {
 #' @export
 #' @rdname recurse
 recurse_ <- function(.data, ..., .dots) {
+  check_piped(is_piped())
   tmp <- lazyeval::all_dots(.dots, ...)
   z <- if (length(tmp) == 0) {
     "recurse_down"

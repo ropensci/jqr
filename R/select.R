@@ -28,6 +28,7 @@ select <- function(.data, ...) {
 #' @export
 #' @rdname select
 select_ <- function(.data, ..., .dots) {
+  check_piped(is_piped())
   tmp <- lazyeval::all_dots(.dots, ...)
   vals <- unname(Map(function(x,y) {
     if (nchar(x) == 0) {

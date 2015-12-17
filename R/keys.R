@@ -9,19 +9,20 @@
 #' # get keys
 #' str <- '{"foo": 5, "bar": 7}'
 #' jq_(str, "keys")
-#' str %>% keys() %>% jq
+#' str %>% keys()
 #'
 #' # delete by key name
 #' jq_(str, "del(.bar)")
-#' str %>% del(bar) %>% jq
+#' str %>% del(bar)
 #'
 #' # check for key existence
 #' str3 <- '[[0,1], ["a","b","c"]]'
 #' jq_(str3, "map(has(2))")
-#' str3 %>% haskey(2) %>% jq
+#' str3 %>% haskey(2)
 #' jq_(str3, "map(has(1,2))")
-#' str3 %>% haskey(1,2) %>% jq
+#' str3 %>% haskey(1,2)
 keys <- function(.data) {
+  check_piped(is_piped())
   dots <- comb(tryargs(.data), structure("keys", type="keys"))
   structure(list(data=.data, args=dots), class="jqr")
 }
@@ -35,6 +36,7 @@ del <- function(.data, ...) {
 #' @export
 #' @rdname keys
 del_ <- function(.data, ..., .dots) {
+  check_piped(is_piped())
   tmp <- lazyeval::all_dots(.dots, ...)
   z <- paste0("del(.", tmp[[1]]$expr, ")", collapse = "")
   dots <- comb(tryargs(.data), structure(z, type="del"))
@@ -50,6 +52,7 @@ haskey <- function(.data, ...) {
 #' @export
 #' @rdname keys
 haskey_ <- function(.data, ..., .dots) {
+  check_piped(is_piped())
   tmp <- lazyeval::all_dots(.dots, ...)
   z <- paste0("map(has(", paste0(unlist(pluck(tmp, "expr")), collapse = ","), "))", collapse = "")
   dots <- comb(tryargs(.data), structure(z, type="del"))

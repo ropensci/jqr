@@ -5,15 +5,15 @@
 #' @param dots dots
 #' @param x What to index to
 #' @examples
-#' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>% index %>% jq(TRUE)
-#' '{"a": 1, "b": 1}' %>% index %>% jq
-#' '[]' %>% index %>% jq
-#' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>% index(0) %>% jq
-#' '["a","b","c","d","e"]' %>% index(2) %>% jq
-#' '["a","b","c","d","e"]' %>% index(2:4) %>% jq
-#' '["a","b","c","d","e"]' %>% index(2:5) %>% jq
-#' '["a","b","c","d","e"]' %>% index(":3") %>% jq
-#' '["a","b","c","d","e"]' %>% index("-2:") %>% jq
+#' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>% index
+#' '{"a": 1, "b": 1}' %>% index
+#' '[]' %>% index
+#' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>% index(0)
+#' '["a","b","c","d","e"]' %>% index(2)
+#' '["a","b","c","d","e"]' %>% index(2:4)
+#' '["a","b","c","d","e"]' %>% index(2:5)
+#' '["a","b","c","d","e"]' %>% index(":3")
+#' '["a","b","c","d","e"]' %>% index("-2:")
 index <- function(.data, x = "") {
   index_(.data, dots = paste0(".[", collapse_vec(x), "]"))
 }
@@ -21,6 +21,7 @@ index <- function(.data, x = "") {
 #' @export
 #' @rdname index
 index_ <- function(.data, dots) {
+  check_piped(is_piped())
   dots <- comb(tryargs(.data), structure(dots, type="index"))
   structure(list(data=.data, args=dots), class="jqr")
 }
@@ -34,6 +35,7 @@ indexif <- function(.data, x = "") {
 #' @export
 #' @rdname index
 indexif_ <- function(.data, dots) {
+  check_piped(is_piped())
   dots <- comb(tryargs(.data), structure(dots, type="indexif"))
   structure(list(data=.data, dots), class="jqr")
 }

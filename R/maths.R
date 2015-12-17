@@ -9,64 +9,64 @@
 #' # adding null gives back same result
 #' jq_('{"a": 7}', '.a + null')
 #' jq_('{"a": 7}', '.a += 1')
-#' '{"a": 7}' %>%  do(.a + 1) %>% jq
-#' # '{"a": 7}' %>%  do(.a += 1) %>% jq # this doesn't work quite yet
-#' '{"a": [1,2], "b": [3,4]}' %>%  do(.a + .b) %>% jq
-#' '{"a": [1,2], "b": [3,4]}' %>%  do(.a - .b) %>% jq
-#' '{"a": 3}' %>%  do(4 - .a) %>% jq
-#' '["xml", "yaml", "json"]' %>%  do('. - ["xml", "yaml"]') %>% jq
-#' '5' %>%  do(10 / . * 3) %>% jq
+#' '{"a": 7}' %>%  do(.a + 1)
+#' # '{"a": 7}' %>%  do(.a += 1) # this doesn't work quite yet
+#' '{"a": [1,2], "b": [3,4]}' %>%  do(.a + .b)
+#' '{"a": [1,2], "b": [3,4]}' %>%  do(.a - .b)
+#' '{"a": 3}' %>%  do(4 - .a)
+#' '["xml", "yaml", "json"]' %>%  do('. - ["xml", "yaml"]')
+#' '5' %>%  do(10 / . * 3)
 #'
 #' # comparisons
-#' '[5,4,2,7]' %>% index() %>% do(. < 4) %>% jq
-#' '[5,4,2,7]' %>% index() %>% do(. > 4) %>% jq
-#' '[5,4,2,7]' %>% index() %>% do(. <= 4) %>% jq
-#' '[5,4,2,7]' %>% index() %>% do(. >= 4) %>% jq
-#' '[5,4,2,7]' %>% index() %>% do(. == 4) %>% jq
-#' '[5,4,2,7]' %>% index() %>% do(. != 4) %>% jq
+#' '[5,4,2,7]' %>% index() %>% do(. < 4)
+#' '[5,4,2,7]' %>% index() %>% do(. > 4)
+#' '[5,4,2,7]' %>% index() %>% do(. <= 4)
+#' '[5,4,2,7]' %>% index() %>% do(. >= 4)
+#' '[5,4,2,7]' %>% index() %>% do(. == 4)
+#' '[5,4,2,7]' %>% index() %>% do(. != 4)
 #'
 #' # length
-#' '[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj %>% jq
+#' '[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj
 #'
 #' # sqrt
-#' '9' %>% sqrtj %>% jq
+#' '9' %>% sqrtj
 #'
 #' # floor
-#' '3.14159' %>% floorj %>% jq
+#' '3.14159' %>% floorj
 #'
 #' # find minimum
-#' '[5,4,2,7]' %>% minj %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(foo) %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(bar) %>% jq
+#' '[5,4,2,7]' %>% minj
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(foo)
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(bar)
 #'
 #' # find maximum
-#' '[5,4,2,7]' %>% maxj %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(foo) %>% jq
-#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(bar) %>% jq
+#' '[5,4,2,7]' %>% maxj
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(foo)
+#' '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(bar)
 #'
 #' # increment values
 #' ## requires special % operators, they get escaped internally
-#' '{"foo": 1}' %>% do(.foo %+=% 1) %>% jq
-#' '{"foo": 1}' %>% do(.foo %-=% 1) %>% jq
-#' '{"foo": 1}' %>% do(.foo %*=% 4) %>% jq
-#' '{"foo": 1}' %>% do(.foo %/=% 10) %>% jq
-#' '{"foo": 1}' %>% do(.foo %//=% 10) %>% jq
+#' '{"foo": 1}' %>% do(.foo %+=% 1)
+#' '{"foo": 1}' %>% do(.foo %-=% 1)
+#' '{"foo": 1}' %>% do(.foo %*=% 4)
+#' '{"foo": 1}' %>% do(.foo %/=% 10)
+#' '{"foo": 1}' %>% do(.foo %//=% 10)
 #' ### fix me - %= doesn't work
-#' # '{"foo": 1}' %>% do(.foo %%=% 10) %>% jq
+#' # '{"foo": 1}' %>% do(.foo %%=% 10)
 #'
 #' # add
-#' '["a","b","c"]' %>% add %>% jq
-#' '[1, 2, 3]' %>% add %>% jq
-#' '[]' %>% add %>% jq
+#' '["a","b","c"]' %>% add
+#' '[1, 2, 3]' %>% add
+#' '[]' %>% add
 #'
 #' # map
 #' ## as far as I know, this only works with numbers, thus it's
 #' ## in the maths section
-#' '[1, 2, 3]' %>% map(.+1) %>% jq
-#' '[1, 2, 3]' %>% map(./1) %>% jq
-#' '[1, 2, 3]' %>% map(.*4) %>% jq
+#' '[1, 2, 3]' %>% map(.+1)
+#' '[1, 2, 3]' %>% map(./1)
+#' '[1, 2, 3]' %>% map(.*4)
 
 #' @export
 #' @rdname maths
@@ -77,6 +77,7 @@ do <- function(.data, ...) {
 #' @export
 #' @rdname maths
 do_ <- function(.data, ..., .dots) {
+  check_piped(is_piped())
   tmp <- lazyeval::all_dots(.dots, ...)
   z <- paste0(unlist(lapply(tmp, function(x) sub_ops(deparse(x$expr)))), collapse = " ")
   dots <- comb(tryargs(.data), structure(z, type = "do"))
@@ -100,6 +101,7 @@ sub_ops <- function(x) {
 #' @export
 #' @rdname maths
 lengthj <- function(.data) {
+  check_piped(is_piped())
   dots <- comb(tryargs(.data), structure('length', type = "length"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -107,6 +109,7 @@ lengthj <- function(.data) {
 #' @export
 #' @rdname maths
 sqrtj <- function(.data) {
+  check_piped(is_piped())
   dots <- comb(tryargs(.data), structure("sqrt", type = "sqrt"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -114,6 +117,7 @@ sqrtj <- function(.data) {
 #' @export
 #' @rdname maths
 floorj <- function(.data) {
+  check_piped(is_piped())
   dots <- comb(tryargs(.data), structure('floor', type = "floor"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -127,6 +131,7 @@ minj <- function(.data, ...) {
 #' @export
 #' @rdname maths
 minj_ <- function(.data, ..., .dots) {
+  check_piped(is_piped())
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "min"
@@ -146,6 +151,7 @@ maxj <- function(.data, ...) {
 #' @export
 #' @rdname maths
 maxj_ <- function(.data, ..., .dots) {
+  check_piped(is_piped())
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "max"
@@ -159,6 +165,7 @@ maxj_ <- function(.data, ..., .dots) {
 #' @export
 #' @rdname maths
 add <- function(.data) {
+  check_piped(is_piped())
   dots <- comb(tryargs(.data), structure('add', type = "add"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -172,6 +179,7 @@ map <- function(.data, ...) {
   #' @export
 #' @rdname maths
 map_ <- function(.data, ..., .dots) {
+  check_piped(is_piped())
   tmp <- lazyeval::all_dots(.dots, ...)
   tmp <- sprintf("map(%s)", deparse(tmp[[1]]$expr))
   dots <- comb(tryargs(.data), structure(tmp, type = "map"))
