@@ -63,7 +63,9 @@ jq_(str, "[.[] | {name: .foo} | keys]")
 
 ### high level
 
-The other is higher level, and uses a suite of functions to construct queries. Queries are constucted, then excuted with the function `jq()`.
+The other is higher level, and uses a suite of functions to construct queries. Queries are constucted, then excuted internally with `jq()` after the last piped command.
+
+You don't have to use pipes though. See examples below.
 
 Examples:
 
@@ -94,10 +96,11 @@ reverse order
 
 Show the query to be used using `peek()`
 
+FIXME - broken right now
+
 
 ```r
 '[1,2,3,4]' %>% reverse %>% peek
-#> Error in .data$data: $ operator is invalid for atomic vectors
 ```
 
 #### get multiple outputs for array w/ > 1 element
@@ -106,16 +109,10 @@ Show the query to be used using `peek()`
 ```r
 x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
 jq_(x, '{user, title: .titles[]}')
-#> [1] "{\"user\":\"stedolan\",\"title\":\"JQ Primer\"}"
-#> [2] "{\"user\":\"stedolan\",\"title\":\"More JQ\"}"
 x %>% index()
-#> "stedolan" ["JQ Primer","More JQ"]
 x %>% select(user, title = `.titles[]`)
-#> {"user":"stedolan","title":"JQ Primer"} {"user":"stedolan","title":"More JQ"}
 x %>% select(user, title = `.titles[]`) %>% combine
-#> Error: Must be class json
 x %>% select(user, title = `.titles[]`) %>% combine %>% jsonlite::validate()
-#> Error: Must be class json
 ```
 
 #### string operations
@@ -256,9 +253,8 @@ More complicated `select()`, using the included dataset `githubcommits`
 ```r
 githubcommits %>%
   index() %>%
-  select(sha = .sha, name = .commit.committer.name) %>%
-  jq(TRUE)
-#> Error in .data$data: $ operator is invalid for atomic vectors
+  select(sha = .sha, name = .commit.committer.name)
+#> {"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]} {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]} {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]} {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]} {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}
 ```
 
 #### Maths
@@ -360,9 +356,8 @@ This outputs a few pieces of JSON
 ```r
 (x <- githubcommits %>%
   index() %>%
-  select(sha = .sha, name = .commit.committer.name) %>%
-  jq(TRUE))
-#> Error in .data$data: $ operator is invalid for atomic vectors
+  select(sha = .sha, name = .commit.committer.name))
+#> {"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]} {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]} {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]} {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]} {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}
 ```
 
 Use `combine()` to put them together.
@@ -370,40 +365,8 @@ Use `combine()` to put them together.
 
 ```r
 combine(x)
-#> Error: Must be class json
+#> [{"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]}, {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]}, {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]}, {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]}, {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}]
 ```
-
-#### Streaming
-
-Install the `rivr` package (not on CRAN and still in a state of flux):
-
-
-
-```r
-devtools::install_github("vsbuffalo/rivr")
-```
-
-Write `mtcars` to a temporary file
-
-
-```r
-writeLines(jsonlite::toJSON(mtcars, collapse = FALSE),
-             tmp <- tempfile())
-```
-
-Build a file iterator
-
-
-```r
-it_f <- rivr::file_iterator(tmp)
-#> Error: 'file_iterator' is not an exported object from 'namespace:rivr'
-it_j <- jq_iterator(it_f, '{cyl: ."cyl"}')
-#> Error: 'transform_iterator' is not an exported object from 'namespace:rivr'
-replicate(NROW(mtcars), it_j$yield())
-#> Error in FUN(X[[i]], ...): object 'it_j' not found
-```
-
-> the streaming bit is a [work in progress](https://github.com/ropensci/jqr/issues/8)
 
 ## Meta
 
