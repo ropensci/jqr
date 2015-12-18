@@ -14,8 +14,11 @@
 #'  }
 #' }'
 #'
+#' x %>% dotstr(posts[])
+#' x %>% dotstr(posts[]) %>% pretty
+#' x %>% dotstr(posts[]) %>% string
 #' x %>% vars(realnames = names) %>% dotstr(posts[]) %>%
-#'    select(title, author = "$names[.author]") %>% jq
+#'    select(title, author = "$names[.author]")
 vars <- function(.data, ...) {
   vars_(.data, .dots = lazyeval::lazy_dots(...))
 }
@@ -23,6 +26,7 @@ vars <- function(.data, ...) {
 #' @export
 #' @rdname vars
 vars_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   vals <- unlist(unname(Map(function(x,y) {
       sprintf(".%s as $%s", x, get_expr(y))

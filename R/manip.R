@@ -6,63 +6,69 @@
 #' @seealso \code{\link{add}}
 #' @examples
 #' # join
-#' jq_('["a","b,c,d","e"]', 'join(", ")')
-#' '["a","b,c,d","e"]' %>% join %>% jq
-#' '["a","b,c,d","e"]' %>% join(`;`) %>% jq
-#' '["a","b,c,d","e"]' %>% join(`yep`) %>% jq
+#' str <- '["a","b,c,d","e"]'
+#' jq_(str, 'join(", ")')
+#' str %>% join
+#' str %>% join(`;`)
+#' str %>% join(`yep`)
 #'
 #' # split
 #' jq_('"a, b,c,d, e"', 'split(", ")')
 #'
 #' # ltrimstr
 #' jq_('["fo", "foo", "barfoo", "foobar", "afoo"]', '[.[]|ltrimstr("foo")]')
-#' '["fo", "foo", "barfoo", "foobar", "afoo"]' %>% index() %>% ltrimstr(foo) %>% jq
+#' '["fo", "foo", "barfoo", "foobar", "afoo"]' %>% index() %>% ltrimstr(foo)
 #'
 #' # rtrimstr
 #' jq_('["fo", "foo", "barfoo", "foobar", "foob"]', '[.[]|rtrimstr("foo")]')
-#' '["fo", "foo", "barfoo", "foobar", "foob"]' %>% index() %>% rtrimstr(foo) %>% jq
+#' '["fo", "foo", "barfoo", "foobar", "foob"]' %>% index() %>% rtrimstr(foo)
 #'
 #' # startswith
-#' jq_('["fo", "foo", "barfoo", "foobar", "barfoob"]', '[.[]|startswith("foo")]')
-#' '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% startswith(foo) %>% jq
+#' str <- '["fo", "foo", "barfoo", "foobar", "barfoob"]'
+#' jq_(str, '[.[]|startswith("foo")]')
+#' str %>% index %>% startswith(foo)
 #'
 #' # endswith
-#' jq_('["fo", "foo", "barfoo", "foobar", "barfoob"]', '[.[]|endswith("foo")]')
-#' '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% endswith(foo) %>% jq
-#' '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% endswith(bar) %>% jq
+#' jq_(str, '[.[]|endswith("foo")]')
+#' str %>% index %>% endswith(foo)
+#' str %>% index %>% endswith_("foo")
+#' str %>% index %>% endswith(bar)
+#' str %>% index %>% endswith_("bar")
 #'
 #' # get index (location) of a character
 #' ## input has to be quoted
-#' '"a,b, cd, efg, hijk"' %>% index_loc(", ") %>% jq
-#' '"a,b, cd, efg, hijk"' %>% index_loc(",") %>% jq
-#' '"a,b, cd, efg, hijk"' %>% index_loc("j") %>% jq
-#' '"a,b, cd, efg, hijk"' %>% rindex_loc(", ") %>% jq
-#' '"a,b, cd, efg, hijk"' %>% indices(", ") %>% jq
+#' str <- '"a,b, cd, efg, hijk"'
+#' str %>% index_loc(", ")
+#' str %>% index_loc(",")
+#' str %>% index_loc("j")
+#' str %>% rindex_loc(", ")
+#' str %>% indices(", ")
 #'
 #' # tojson, fromjson, tostring, tonumber
-#' '[1, "foo", ["foo"]]' %>% index %>% tostring %>% jq
-#' '[1, "1"]' %>% index %>% tonumber %>% jq
-#' '[1, "foo", ["foo"]]' %>% index %>% tojson %>% jq
-#' '[1, "foo", ["foo"]]' %>% index %>% tojson %>% fromjson %>% jq
+#' '[1, "foo", ["foo"]]' %>% index %>% tostring
+#' '[1, "1"]' %>% index %>% tonumber
+#' '[1, "foo", ["foo"]]' %>% index %>% tojson
+#' '[1, "foo", ["foo"]]' %>% index %>% tojson %>% fromjson
 #'
 #' # contains
-#' '"foobar"' %>% contains("bar") %>% jq
-#' '["foobar", "foobaz", "blarp"]' %>% contains(`["baz", "bar"]`) %>% jq
-#' '["foobar", "foobaz", "blarp"]' %>% contains(`["bazzzzz", "bar"]`) %>% jq
+#' '"foobar"' %>% contains("bar")
+#' '["foobar", "foobaz", "blarp"]' %>% contains(`["baz", "bar"]`)
+#' '["foobar", "foobaz", "blarp"]' %>% contains(`["bazzzzz", "bar"]`)
 #' str <- '{"foo": 12, "bar":[1,2,{"barp":12, "blip":13}]}'
-#' str %>% contains(`{foo: 12, bar: [{barp: 12}]}`) %>% jq
-#' str %>% contains(`{foo: 12, bar: [{barp: 15}]}`) %>% jq
+#' str %>% contains(`{foo: 12, bar: [{barp: 12}]}`)
+#' str %>% contains(`{foo: 12, bar: [{barp: 15}]}`)
 #'
 #' # unique
-#' '[1,2,5,3,5,3,1,3]' %>% uniquej %>% jq
+#' '[1,2,5,3,5,3,1,3]' %>% uniquej
 #' str <- '[{"foo": 1, "bar": 2}, {"foo": 1, "bar": 3}, {"foo": 4, "bar": 5}]'
-#' str %>% uniquej(foo) %>% jq
-#' '["chunky", "bacon", "kitten", "cicada", "asparagus"]' %>% uniquej(length) %>% jq
+#' str %>% uniquej(foo)
+#' str %>% uniquej_("foo")
+#' '["chunky", "bacon", "kitten", "cicada", "asparagus"]' %>% uniquej(length)
 #'
 #' # group
 #' x <- '[{"foo":1, "bar":10}, {"foo":3, "bar":100}, {"foo":1, "bar":1}]'
 #' x %>% group(foo)
-#' x %>% group(foo) %>% jq
+#' x %>% group_("foo")
 
 #' @export
 #' @rdname manip
@@ -73,6 +79,7 @@ join <- function(.data, ...) {
 #' @export
 #' @rdname manip
 join_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("join(\"%s \")", setdef(tmp, ",")), type = "join"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -87,6 +94,7 @@ splitj <- function(.data, ...) {
 #' @export
 #' @rdname manip
 splitj_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("split(\"%s \")", setdef(tmp, ",")), type = "split"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -101,6 +109,7 @@ ltrimstr <- function(.data, ...) {
 #' @export
 #' @rdname manip
 ltrimstr_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("ltrimstr(\"%s\")", deparse(tmp[[1]]$expr)), type = "ltrimstr"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -115,6 +124,7 @@ rtrimstr <- function(.data, ...) {
 #' @export
 #' @rdname manip
 rtrimstr_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("rtrimstr(\"%s\")", deparse(tmp[[1]]$expr)), type = "rtrimstr"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -129,6 +139,7 @@ startswith <- function(.data, ...) {
 #' @export
 #' @rdname manip
 startswith_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("startswith(\"%s\")", deparse(tmp[[1]]$expr)), type = "startswith"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -143,6 +154,7 @@ endswith <- function(.data, ...) {
 #' @export
 #' @rdname manip
 endswith_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("endswith(\"%s\")", deparse(tmp[[1]]$expr)), type = "endswith"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -157,6 +169,7 @@ index_loc <- function(.data, ...) {
 #' @export
 #' @rdname manip
 index_loc_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("index(%s)", deparse(tmp[[1]]$expr)), type = "index_loc"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -171,6 +184,7 @@ rindex_loc <- function(.data, ...) {
 #' @export
 #' @rdname manip
 rindex_loc_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("rindex(%s)", deparse(tmp[[1]]$expr)), type = "rindex_loc"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -185,6 +199,7 @@ indices <- function(.data, ...) {
 #' @export
 #' @rdname manip
 indices_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("indices(%s)", deparse(tmp[[1]]$expr)), type = "rindex_loc"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -193,6 +208,7 @@ indices_ <- function(.data, ..., .dots) {
 #' @export
 #' @rdname manip
 tojson <- function(.data) {
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('tojson', type = "tojson"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -200,6 +216,7 @@ tojson <- function(.data) {
 #' @export
 #' @rdname manip
 fromjson <- function(.data) {
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('fromjson', type = "fromjson"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -207,6 +224,7 @@ fromjson <- function(.data) {
 #' @export
 #' @rdname manip
 tostring <- function(.data) {
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('tostring', type = "tostring"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -214,6 +232,7 @@ tostring <- function(.data) {
 #' @export
 #' @rdname manip
 tonumber <- function(.data) {
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('tonumber', type = "tonumber"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -227,6 +246,7 @@ contains <- function(.data, ...) {
 #' @export
 #' @rdname manip
 contains_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("contains(%s)", deparse(tmp[[1]]$expr)), type = "contains"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -241,6 +261,7 @@ uniquej <- function(.data, ...) {
 #' @export
 #' @rdname manip
 uniquej_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "unique"
@@ -265,6 +286,7 @@ group <- function(.data, ...) {
 #' @export
 #' @rdname manip
 group_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("group_by(.%s)", deparse(tmp[[1]]$expr)), type = "group"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")

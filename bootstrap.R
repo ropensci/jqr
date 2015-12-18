@@ -1,38 +1,69 @@
 #!/usr/bin/env Rscript
 
 ## This is no longer designed to be run regularly; but this is how the
-## jq sources were included.  When we upgrade to 1.5 (or in general)
-## this will need to be rerun, but from now should be run only by
-## mantainers, rather than by users.
+## jq sources were included.  When we upgrade this will need to be
+## rerun, but from now should be run only by mantainers, rather than
+## by users.
 
-url <- "https://github.com/stedolan/jq/archive/jq-1.5.tar.gz"
-if (!file.exists("jq-1.5.tar.gz")) {
-  downloader::download(url, "jq-1.5.tar.gz")
+download_file <- function(url, dest=tempfile(), overwrite=FALSE) {
+  on.exit(file.remove(dest))
+  content <- httr::GET(url,
+                       httr::write_disk(dest, overwrite),
+                       httr::progress("down"))
+  cat("\n")
+  code <- httr::status_code(content)
+  httr::stop_for_status(content)
+  on.exit()
+  dest
+}
+
+jq_version <- readLines("inst/jq_version")
+jq_tar <- sprintf("jq-%s.tar.gz", jq_version)
+jq_path <- "src/jq"
+
+url <- sprintf("https://github.com/stedolan/jq/releases/download/jq-%s/jq-%s.tar.gz",
+        jq_version, jq_version)
+
+if (!file.exists(jq_tar)) {
+  ok <- download_file(url, jq_tar)
 }
 if (!file.exists(Sys.getenv("TAR"))) {
   Sys.setenv(TAR="/usr/bin/tar")
 }
-if (file.exists("src/jq-1.5")) {
-  unlink("src/jq-1.5", recursive=TRUE)
+if (file.exists(jq_path)) {
+  unlink(jq_path, recursive=TRUE)
 }
 
-untar("jq-1.5.tar.gz", compressed=TRUE, exdir="src")
+untar(jq_tar, compressed=TRUE, exdir="src")
 ## Heh - the download goes into the wrong directory :(
-file.rename("src/jq-jq-1.5", "src/jq-1.5")
+##   invisible(file.rename(sprintf("src/jq-jq-%s", jq_version), jq_path))
+invisible(file.rename(sprintf("src/jq-%s", jq_version), jq_path))
 
 header <-
   c("The following license applies to code from the jq library which will",
     "be linked into the installed package")
-writeLines(c(header, "", readLines("src/jq-1.5/COPYING")),
+writeLines(c(header, "", readLines(file.path(jq_path, "COPYING"))),
            "inst/COPYING.jq")
 
+header <-
+  c("This is the AUTHORS file from jq:")
+writeLines(c(header, "", readLines(file.path(jq_path, "AUTHORS"))),
+           "inst/AUTHORS.jq")
+
 ## Drop some of the bits:
-unlink("src/jq-1.5/docs", recursive=TRUE)
-unlink("src/jq-1.5/tests", recursive=TRUE)
+drop <- c("autom4te.cache", "build", "config", "docs", "m4",
+          "scripts", "tests", ## Files:
+######################################################################
+          "aclocal.m4", "ChangeLog", "compile-ios.sh",
+          "configure", "configure.ac", "Dockerfile", "jq.1.default",
+          "jq.1.prebuilt", "jq.1", "Makefile.am", "Makefile.in", "NEWS",
+          "README", "README.md", "setup.sh", ".travis.yml")
+unlink(file.path(jq_path, drop), recursive=TRUE)
 
-## Rewite the version script
-writeLines(c("#!/bin/sh", "echo 1.5"), "src/jq-1.5/scripts/version")
+## These are bad news.
+invisible(file.remove(file.path(jq_path, c("main.c", "jq_test.c"))))
 
-owd <- setwd("src/jq-1.5")
-on.exit(setwd(owd))
-system2("autoreconf", "-i")
+writeLines(file.path("src", dir(jq_path, glob2rx("*.c"))),
+           "inst/jq_sources")
+
+source("patch.R")

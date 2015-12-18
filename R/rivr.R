@@ -4,7 +4,7 @@
 ##' @param it Any iterator that yields valid jq source input
 ##' @param program JQ program, operating on whatever unit \code{it}
 ##' returns.
-##' @export
+##' @keywords internal
 jq_iterator <- function(it, program) {
   rivr::transform_iterator(it, make_jq(program))
 }

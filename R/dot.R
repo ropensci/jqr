@@ -9,6 +9,7 @@ dot <- function(.data) {
 #' @export
 #' @rdname dot
 dot_ <- function(.data, dots) {
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure(dots, type="dot"))
   structure(list(data=.data, args=dots), class="jqr")
 }
@@ -22,6 +23,7 @@ dotstr <- function(.data, ...) {
 #' @export
 #' @rdname dot
 dotstr_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   z <- sprintf(".%s", deparse(tmp[[1]]$expr))
   dots <- comb(tryargs(.data), structure(z, type="dotsr"))

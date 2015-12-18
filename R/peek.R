@@ -9,9 +9,10 @@
 #' @param .data (list) input, using higher level interface
 #' @seealso \code{\link{jq}}, \code{\link{jq_}}
 #' @examples
-#' '{"a": 7}' %>%  do(.a + 1) %>% peek
+#' '{"a": 7}' %>% do(.a + 1) %>% peek
 #' '[8,3,null,6]' %>% sortj %>% peek
 peek <- function(.data) {
+  pipe_autoexec(toggle = FALSE)
   if (!is(.data, "jqr")) stop("must be of class jqr", call. = FALSE)
   structure(make_query(.data), class = "jq_query")
 }

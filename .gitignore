@@ -3,11 +3,10 @@
 .RData
 src/*.o
 src/*.so
-jq-1.5.tar.gz
+jq-*.tar.gz
+jqr_*.tar.gz
 notes.md
-src/jq-1.5/autom4te.cache
-src/jq-1.5/.deps
-src/jq-1.5/.libs
-src/jq-1.5/Makefile
-src/jq-1.5/*.lo
-src/jq-1.5/
+src/*.dll
+
+## jq sources
+src/*.c

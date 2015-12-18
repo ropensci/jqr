@@ -1,8 +1,9 @@
 Package: jqr
 Title: Client for 'jq', a JSON Processor
 Description: Client for jq, a JSON processor (http://stedolan.github.io/jq/).
-Version: 0.1.3.9900
-Depends: R (>= 3.1.2)
+Version: 0.1.7.9000
+Depends:
+    R (>= 3.1.2)
 License: MIT + file LICENSE
 LazyData: true
 Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
@@ -13,12 +14,13 @@ Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
 SystemRequirements: GNU make
 URL: https://github.com/ropensci/jqr
 BugReports: https://github.com/ropensci/jqr/issues
-LinkingTo: Rcpp
+LinkingTo: BH,
+    Rcpp
 Imports:
     Rcpp,
-    magrittr,
-    lazyeval
+    lazyeval,
+    magrittr
 Suggests:
-    testthat,
     jsonlite,
-    rivr
+    testthat,
+RoxygenNote: 5.0.1

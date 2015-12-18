@@ -4,23 +4,23 @@
 #' @template args
 #' @examples
 #' x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
-#' x %>% at(base64) %>% peek
-#' x %>% at(base64) %>% jq
-#' x %>% index() %>% at(base64) %>% jq
+#' # x %>% at(base64) %>% peek
+#' x %>% at(base64)
+#' x %>% index() %>% at(base64)
 #'
 #' y <- '["fo", "foo", "barfoo", "foobar", "barfoob"]'
-#' y %>% index() %>% at(base64) %>% jq
+#' y %>% index() %>% at(base64)
 #'
 #' ## prepare for shell use
-#' y %>% index() %>% at(sh) %>% jq
+#' y %>% index() %>% at(sh)
 #'
 #' ## rendered as csv with double quotes
 #' z <- '[1, 2, 3, "a"]'
-#' z %>% at(csv) %>% jq
+#' z %>% at(csv)
 #'
 #' ## rendered as csv with double quotes
-#' z %>% index() %>% jq
-#' z %>% index() %>% at(text) %>% jq
+#' z %>% index()
+#' z %>% index() %>% at(text)
 #'
 #' ## % encode for URI's
 #' #### DOESNT WORK --------------------------
@@ -37,6 +37,7 @@ at <- function(.data, ...) {
 #' @export
 #' @rdname at
 at_ <- function(.data, ..., .dots) {
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(paste0("@", get_expr(tmp)), type = "at"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")

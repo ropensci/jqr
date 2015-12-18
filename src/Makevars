@@ -1,30 +1,3 @@
 # -*-makefile-*-
-CXX_STD = CXX11
-
-## Change this to upgrade jq.  Alternatively we could drop the
-## versioned directory name and go with jq/, though that makes
-## unpacking the archive a slightly more complicated manoeuver.
-JQ_DIR = jq-1.5
-
-## This is what we need.
-LIBJQ = $(JQ_DIR)/.libs/libjq.a
-
-## So that we can do #include <jq.h>
-PKG_CPPFLAGS = -I$(JQ_DIR)
-
-# This forces the compilation to include the static library; no dynaic
-# linking, which is needed as we're not installing this anywhere on
-# the system.
-PKG_LIBS = $(LIBJQ)
-
-## This is straight from R-exts and works really well - it does not
-## recompile jq or run configure very often.  Sometimes reading the
-## documentation really does pay off.
-##
-## The stupid bit about YACC can go once jq-1.5 is released; this is a
-## workaround on OS/X only as that includes an outdated bison that
-## confuses configure.
-$(SHLIB): $(LIBJQ)
-$(LIBJQ):
-	(cd $(JQ_DIR) && ./configure --disable-maintainer-mode && $(MAKE) \
-	  CC="$(CC)" CFLAGS="$(CFLAGS) $(CPICFLAGS)" AR="$(AR)" RANLIB="$(RANLIB)")
+PKG_CPPFLAGS = -Ijq
+PKG_CFLAGS = -Ijq
