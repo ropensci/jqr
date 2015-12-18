@@ -26,6 +26,9 @@ the console for easier viewing. The \code{jqr} doesn't do pretty printing.
 '{"a": 7}' \%>\%  do(.a + 1)
 '[8,3,null,6]' \%>\% sortj
 
+x <- '[{"message": "hello", "name": "jenn"}, {"message": "world", "name": "beth"}]'
+jq(index(x))
+
 jq_('{"a": 7, "b": 4}', 'keys')
 jq_('[8,3,null,6]', 'sort')
 }
