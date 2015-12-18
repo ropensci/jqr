@@ -5,7 +5,8 @@
 #' @param dots dots
 #' @param x What to index to
 #' @examples
-#' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>% index
+#' str <- '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]'
+#' str %>% index
 #' '{"a": 1, "b": 1}' %>% index
 #' '[]' %>% index
 #' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>% index(0)
@@ -14,6 +15,8 @@
 #' '["a","b","c","d","e"]' %>% index(2:5)
 #' '["a","b","c","d","e"]' %>% index(":3")
 #' '["a","b","c","d","e"]' %>% index("-2:")
+#'
+#' str %>% index %>% select(bad = .name)
 index <- function(.data, x = "") {
   index_(.data, dots = paste0(".[", collapse_vec(x), "]"))
 }
@@ -21,7 +24,7 @@ index <- function(.data, x = "") {
 #' @export
 #' @rdname index
 index_ <- function(.data, dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure(dots, type="index"))
   structure(list(data=.data, args=dots), class="jqr")
 }
@@ -35,7 +38,7 @@ indexif <- function(.data, x = "") {
 #' @export
 #' @rdname index
 indexif_ <- function(.data, dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure(dots, type="indexif"))
   structure(list(data=.data, dots), class="jqr")
 }

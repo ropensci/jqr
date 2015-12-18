@@ -6,7 +6,7 @@
 #' '[1,[[],{"a":2}]]' %>% paths
 #' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>% paths
 paths <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('paths', type = "paths"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }

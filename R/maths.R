@@ -77,7 +77,7 @@ do <- function(.data, ...) {
 #' @export
 #' @rdname maths
 do_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   z <- paste0(unlist(lapply(tmp, function(x) sub_ops(deparse(x$expr)))), collapse = " ")
   dots <- comb(tryargs(.data), structure(z, type = "do"))
@@ -101,7 +101,7 @@ sub_ops <- function(x) {
 #' @export
 #' @rdname maths
 lengthj <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('length', type = "length"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -109,7 +109,7 @@ lengthj <- function(.data) {
 #' @export
 #' @rdname maths
 sqrtj <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure("sqrt", type = "sqrt"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -117,7 +117,7 @@ sqrtj <- function(.data) {
 #' @export
 #' @rdname maths
 floorj <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('floor', type = "floor"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -131,7 +131,7 @@ minj <- function(.data, ...) {
 #' @export
 #' @rdname maths
 minj_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "min"
@@ -151,7 +151,7 @@ maxj <- function(.data, ...) {
 #' @export
 #' @rdname maths
 maxj_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "max"
@@ -165,7 +165,7 @@ maxj_ <- function(.data, ..., .dots) {
 #' @export
 #' @rdname maths
 add <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('add', type = "add"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -179,7 +179,7 @@ map <- function(.data, ...) {
   #' @export
 #' @rdname maths
 map_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   tmp <- sprintf("map(%s)", deparse(tmp[[1]]$expr))
   dots <- comb(tryargs(.data), structure(tmp, type = "map"))

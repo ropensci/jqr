@@ -21,4 +21,16 @@ recurse_(.data, ..., .dots)
 \description{
 Search through a recursive structure, and extract interesting data from all levels
 }
+\examples{
+x <- '{"name": "/", "children": [
+  {"name": "/bin", "children": [
+    {"name": "/bin/ls", "children": []},
+    {"name": "/bin/sh", "children": []}]},
+  {"name": "/home", "children": [
+    {"name": "/home/stephen", "children": [
+      {"name": "/home/stephen/jq", "children": []}]}]}]}'
+x \%>\% recurse(.children[]) \%>\% select(name)
+x \%>\% recurse(.children[]) \%>\% select(name) \%>\% pretty
+x \%>\% recurse(.children[]) \%>\% select(name) \%>\% string
+}
 

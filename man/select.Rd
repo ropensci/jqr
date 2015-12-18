@@ -23,21 +23,23 @@ Select variables
 }
 \examples{
 '{"foo": 5, "bar": 7}' \%>\% select(a = .foo) \%>\% peek
-'{"foo": 5, "bar": 7}' \%>\% select(a = .foo) \%>\% jq
+'{"foo": 5, "bar": 7}' \%>\% select(a = .foo)
 
 # using json dataset, just first element
 x <- githubcommits \%>\% index(0)
 x \%>\%
-   select(message = .commit.message, name = .commit.committer.name) \%>\% jq
-x \%>\%
-   select(sha = .commit.tree.sha, author = .author.login) \%>\% jq
+   select(message = .commit.message, name = .commit.committer.name)
+x \%>\% select(sha = .commit.tree.sha, author = .author.login)
+x \%>\% select(sha = .commit.tree.sha, author = .author.login) \%>\% pretty
 
 # using json dataset, all elements
-x <- githubcommits \%>\% index()
+x <- index(githubcommits)
 x \%>\%
-   select(message = .commit.message, name = .commit.committer.name) \%>\% jq
+   select(message = .commit.message, name = .commit.committer.name) \%>\%
+   pretty
 ## pretty (newline after each element)
 x \%>\%
- select(sha = .sha, name = .commit.committer.name) \%>\% jq(TRUE)
+ select(sha = .sha, name = .commit.committer.name) \%>\%
+ pretty
 }
 

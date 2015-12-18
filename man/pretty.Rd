@@ -12,4 +12,9 @@ pretty(.data)
 \description{
 Pretty print
 }
+\examples{
+x <- '{"foo":[{"foo": []}, {"foo":[{"foo":[]}]}]}'
+x \%>\% recurse(.foo[])
+x \%>\% recurse(.foo[]) \%>\% pretty
+}
 

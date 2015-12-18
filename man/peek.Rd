@@ -16,7 +16,7 @@ and pretty prints to the console for easier viewing. The \code{jqr}
 doesn't do pretty printing.
 }
 \examples{
-'{"a": 7}' \%>\%  do(.a + 1) \%>\% peek
+'{"a": 7}' \%>\% do(.a + 1) \%>\% peek
 '[8,3,null,6]' \%>\% sortj \%>\% peek
 }
 \seealso{

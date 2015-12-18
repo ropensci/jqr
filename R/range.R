@@ -10,7 +10,7 @@
 #' # errors, correctly though
 #' # 2 %>% rangej
 rangej <- function(x, array = FALSE) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   x <- get_jq_seq(x, array)
   structure(list(data = "null", args = structure(x, type = "range")), class = "jqr")
 }

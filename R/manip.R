@@ -79,7 +79,7 @@ join <- function(.data, ...) {
 #' @export
 #' @rdname manip
 join_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("join(\"%s \")", setdef(tmp, ",")), type = "join"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -94,7 +94,7 @@ splitj <- function(.data, ...) {
 #' @export
 #' @rdname manip
 splitj_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("split(\"%s \")", setdef(tmp, ",")), type = "split"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -109,7 +109,7 @@ ltrimstr <- function(.data, ...) {
 #' @export
 #' @rdname manip
 ltrimstr_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("ltrimstr(\"%s\")", deparse(tmp[[1]]$expr)), type = "ltrimstr"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -124,7 +124,7 @@ rtrimstr <- function(.data, ...) {
 #' @export
 #' @rdname manip
 rtrimstr_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("rtrimstr(\"%s\")", deparse(tmp[[1]]$expr)), type = "rtrimstr"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -139,7 +139,7 @@ startswith <- function(.data, ...) {
 #' @export
 #' @rdname manip
 startswith_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("startswith(\"%s\")", deparse(tmp[[1]]$expr)), type = "startswith"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -154,7 +154,7 @@ endswith <- function(.data, ...) {
 #' @export
 #' @rdname manip
 endswith_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("endswith(\"%s\")", deparse(tmp[[1]]$expr)), type = "endswith"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -169,7 +169,7 @@ index_loc <- function(.data, ...) {
 #' @export
 #' @rdname manip
 index_loc_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("index(%s)", deparse(tmp[[1]]$expr)), type = "index_loc"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -184,7 +184,7 @@ rindex_loc <- function(.data, ...) {
 #' @export
 #' @rdname manip
 rindex_loc_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("rindex(%s)", deparse(tmp[[1]]$expr)), type = "rindex_loc"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -199,7 +199,7 @@ indices <- function(.data, ...) {
 #' @export
 #' @rdname manip
 indices_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("indices(%s)", deparse(tmp[[1]]$expr)), type = "rindex_loc"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -208,7 +208,7 @@ indices_ <- function(.data, ..., .dots) {
 #' @export
 #' @rdname manip
 tojson <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('tojson', type = "tojson"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -216,7 +216,7 @@ tojson <- function(.data) {
 #' @export
 #' @rdname manip
 fromjson <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('fromjson', type = "fromjson"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -224,7 +224,7 @@ fromjson <- function(.data) {
 #' @export
 #' @rdname manip
 tostring <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('tostring', type = "tostring"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -232,7 +232,7 @@ tostring <- function(.data) {
 #' @export
 #' @rdname manip
 tonumber <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('tonumber', type = "tonumber"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -246,7 +246,7 @@ contains <- function(.data, ...) {
 #' @export
 #' @rdname manip
 contains_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("contains(%s)", deparse(tmp[[1]]$expr)), type = "contains"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
@@ -261,7 +261,7 @@ uniquej <- function(.data, ...) {
 #' @export
 #' @rdname manip
 uniquej_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "unique"
@@ -286,7 +286,7 @@ group <- function(.data, ...) {
 #' @export
 #' @rdname manip
 group_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(sprintf("group_by(.%s)", deparse(tmp[[1]]$expr)), type = "group"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")

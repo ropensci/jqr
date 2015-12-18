@@ -17,7 +17,7 @@
 #' @export
 #' @rdname logicaltests
 allj <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('all', type = "all"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
@@ -25,7 +25,7 @@ allj <- function(.data) {
 #' @export
 #' @rdname logicaltests
 anyj <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('any', type = "any"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
 }

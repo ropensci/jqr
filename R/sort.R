@@ -16,7 +16,7 @@ sortj <- function(.data, ...) {
 #' @export
 #' @rdname sortj
 sortj_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   if (base::length(tmp) == 0) {
     z <- "sort"
@@ -30,7 +30,7 @@ sortj_ <- function(.data, ..., .dots) {
 #' @export
 #' @rdname sortj
 reverse <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure("reverse", type = "reverse"))
   structure(list(data = .data, args = dots), class = "jqr")
 }

@@ -10,6 +10,7 @@
 #'  select(sha = .sha, name = .commit.committer.name))
 #' combine(x)
 combine <- function(x) {
+  pipe_autoexec(toggle = FALSE)
   if (!is(x, "json")) stop("Must be class json", call. = FALSE)
   if (!jsonlite::validate(x)) {
     tmp <- paste0("[", paste0(x, collapse = ", "), "]")

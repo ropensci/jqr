@@ -5,14 +5,12 @@
 \alias{jq_}
 \title{Execute a query with jq}
 \usage{
-jq(.data, pretty = FALSE)
+jq(.data)
 
 jq_(data, query)
 }
 \arguments{
 \item{.data}{(list) input, using higher level interface}
-
-\item{pretty}{(logical) Add newlines when printed. Default: FALSE}
 
 \item{data}{(character) JSON data}
 

@@ -3,11 +3,16 @@
 #' @export
 #' @template args
 #' @examples
-#' x <- '{"foo":[{"foo": []}, {"foo":[{"foo":[]}]}]}'
-#' x %>% recurse(.foo[])
-#' # x %>% recurse(.foo[]) %>% pretty
-#' '{"a":0, "b":[1]}' %>% recurse
-#' # '{"a":0, "b":[1]}' %>% recurse %>% pretty
+#' x <- '{"name": "/", "children": [
+#'   {"name": "/bin", "children": [
+#'     {"name": "/bin/ls", "children": []},
+#'     {"name": "/bin/sh", "children": []}]},
+#'   {"name": "/home", "children": [
+#'     {"name": "/home/stephen", "children": [
+#'       {"name": "/home/stephen/jq", "children": []}]}]}]}'
+#' x %>% recurse(.children[]) %>% select(name)
+#' x %>% recurse(.children[]) %>% select(name) %>% pretty
+#' x %>% recurse(.children[]) %>% select(name) %>% string
 recurse <- function(.data, ...) {
   recurse_(.data, .dots = lazyeval::lazy_dots(...))
 }
@@ -15,7 +20,7 @@ recurse <- function(.data, ...) {
 #' @export
 #' @rdname recurse
 recurse_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   z <- if (length(tmp) == 0) {
     "recurse_down"

@@ -26,7 +26,8 @@ indexif_(.data, dots)
 index and related functions
 }
 \examples{
-'[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\% index
+str <- '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]'
+str \%>\% index
 '{"a": 1, "b": 1}' \%>\% index
 '[]' \%>\% index
 '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\% index(0)
@@ -35,5 +36,7 @@ index and related functions
 '["a","b","c","d","e"]' \%>\% index(2:5)
 '["a","b","c","d","e"]' \%>\% index(":3")
 '["a","b","c","d","e"]' \%>\% index("-2:")
+
+str \%>\% index \%>\% select(bad = .name)
 }
 

@@ -37,7 +37,7 @@ at <- function(.data, ...) {
 #' @export
 #' @rdname at
 at_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   dots <- comb(tryargs(.data), structure(paste0("@", get_expr(tmp)), type = "at"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")

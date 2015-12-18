@@ -22,7 +22,7 @@
 #' jq_(str3, "map(has(1,2))")
 #' str3 %>% haskey(1,2)
 keys <- function(.data) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure("keys", type="keys"))
   structure(list(data=.data, args=dots), class="jqr")
 }
@@ -36,7 +36,7 @@ del <- function(.data, ...) {
 #' @export
 #' @rdname keys
 del_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   z <- paste0("del(.", tmp[[1]]$expr, ")", collapse = "")
   dots <- comb(tryargs(.data), structure(z, type="del"))
@@ -52,7 +52,7 @@ haskey <- function(.data, ...) {
 #' @export
 #' @rdname keys
 haskey_ <- function(.data, ..., .dots) {
-  check_piped(is_piped())
+  pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
   z <- paste0("map(has(", paste0(unlist(pluck(tmp, "expr")), collapse = ","), "))", collapse = "")
   dots <- comb(tryargs(.data), structure(z, type="del"))
