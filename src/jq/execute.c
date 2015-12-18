@@ -1,3 +1,4 @@
+#include <R.h>
 #include <assert.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -256,9 +257,9 @@ static void print_error(jq_state *jq, jv value) {
   if (jq->err_cb)
     jq->err_cb(jq->err_cb_data, msg2);
   else if (jv_get_kind(msg2) == JV_KIND_STRING)
-    fprintf(stderr, "%s\n", jv_string_value(msg2));
+    REprintf("%s\n", jv_string_value(msg2));
   else
-    fprintf(stderr, "jq: error: %s\n", strerror(ENOMEM));
+    REprintf("jq: error: %s\n", strerror(ENOMEM));
   jv_free(msg2);
 }
 #define ON_BACKTRACK(op) ((op)+NUM_OPCODES)
@@ -278,7 +279,7 @@ jv jq_next(jq_state *jq) {
 
     if (jq->debug_trace_enabled) {
       dump_operation(frame_current(jq)->bc, pc);
-      printf("\t");
+      Rprintf("\t");
       const struct opcode_description* opdesc = opcode_describe(opcode);
       stack_ptr param = 0;
       if (!backtracking) {
@@ -288,20 +289,20 @@ jv jq_next(jq_state *jq) {
           if (i == 0) {
             param = jq->stk_top;
           } else {
-            printf(" | ");
+            Rprintf(" | ");
             param = *stack_block_next(&jq->stk, param);
           }
           if (!param) break;
           jv_dump(jv_copy(*(jv*)stack_block(&jq->stk, param)), 0);
-          //printf("<%d>", jv_get_refcnt(param->val));
-          //printf(" -- ");
+          //Rprintf("<%d>", jv_get_refcnt(param->val));
+          //Rprintf(" -- ");
           //jv_dump(jv_copy(jq->path), 0);
         }
       } else {
-        printf("\t<backtracking>");
+        Rprintf("\t<backtracking>");
       }
 
-      printf("\n");
+      Rprintf("\n");
     }
 
     if (backtracking) {
@@ -424,9 +425,9 @@ jv jq_next(jq_state *jq) {
       uint16_t v = *pc++;
       jv* var = frame_local_var(jq, v, level);
       if (jq->debug_trace_enabled) {
-        printf("V%d = ", v);
+        Rprintf("V%d = ", v);
         jv_dump(jv_copy(*var), 0);
-        printf("\n");
+        Rprintf("\n");
       }
       jv_free(stack_pop(jq));
       stack_push(jq, jv_copy(*var));
@@ -439,9 +440,9 @@ jv jq_next(jq_state *jq) {
       uint16_t v = *pc++;
       jv* var = frame_local_var(jq, v, level);
       if (jq->debug_trace_enabled) {
-        printf("V%d = ", v);
+        Rprintf("V%d = ", v);
         jv_dump(jv_copy(*var), 0);
-        printf("\n");
+        Rprintf("\n");
       }
       jv_free(stack_pop(jq));
       stack_push(jq, *var);
@@ -455,9 +456,9 @@ jv jq_next(jq_state *jq) {
       jv* var = frame_local_var(jq, v, level);
       jv val = stack_pop(jq);
       if (jq->debug_trace_enabled) {
-        printf("V%d = ", v);
+        Rprintf("V%d = ", v);
         jv_dump(jv_copy(val), 0);
-        printf("\n");
+        Rprintf("\n");
       }
       jv_free(*var);
       *var = val;
@@ -791,9 +792,9 @@ int jq_compile_args(jq_state *jq, const char* str, jv args) {
     if (jq->err_cb != NULL)
       jq->err_cb(jq->err_cb_data, s);
     else if (!jv_is_valid(s))
-      fprintf(stderr, "Error formatting jq compilation errors: %s\n", strerror(errno));
+      REprintf("Error formatting jq compilation errors: %s\n", strerror(errno));
     else
-      fprintf(stderr, "%s\n", jv_string_value(s));
+      REprintf("%s\n", jv_string_value(s));
     jv_free(s);
   }
   locfile_free(&locations);

@@ -1,3 +1,4 @@
+#include <R.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -47,9 +48,9 @@ static int bytecode_operation_length(uint16_t* codeptr) {
 static void dump_code(int indent, struct bytecode* bc) {
   int pc = 0;
   while (pc < bc->codelen) {
-    printf("%*s", indent, "");
+    Rprintf("%*s", indent, "");
     dump_operation(bc, bc->code + pc);
-    printf("\n");
+    Rprintf("\n");
     pc += bytecode_operation_length(bc->code + pc);
   }
 }
@@ -62,22 +63,22 @@ static void symbol_table_free(struct symbol_table* syms) {
 
 void dump_disassembly(int indent, struct bytecode* bc) {
   if (bc->nclosures > 0) {
-    printf("%*s[params: ", indent, "");
+    Rprintf("%*s[params: ", indent, "");
     jv params = jv_object_get(jv_copy(bc->debuginfo), jv_string("params"));
     for (int i=0; i<bc->nclosures; i++) {
-      if (i) printf(", ");
+      if (i) Rprintf(", ");
       jv name = jv_array_get(jv_copy(params), i);
-      printf("%s", jv_string_value(name));
+      Rprintf("%s", jv_string_value(name));
       jv_free(name);
     }
     jv_free(params);
-    printf("]\n");
+    Rprintf("]\n");
   }
   dump_code(indent, bc);
   for (int i=0; i<bc->nsubfunctions; i++) {
     struct bytecode* subfn = bc->subfunctions[i];
     jv name = jv_object_get(jv_copy(subfn->debuginfo), jv_string("name"));
-    printf("%*s%s:%d:\n", indent, "", jv_string_value(name), i);
+    Rprintf("%*s%s:%d:\n", indent, "", jv_string_value(name), i);
     jv_free(name);
     dump_disassembly(indent+2, subfn);
   }
@@ -93,9 +94,9 @@ static struct bytecode* getlevel(struct bytecode* bc, int level) {
 
 void dump_operation(struct bytecode* bc, uint16_t* codeptr) {
   int pc = codeptr - bc->code;
-  printf("%04d ", pc);
+  Rprintf("%04d ", pc);
   const struct opcode_description* op = opcode_describe(bc->code[pc++]);
-  printf("%s", op->name);
+  Rprintf("%s", op->name);
   if (op->length > 1) {
     uint16_t imm = bc->code[pc++];
     if (op->op == CALL_JQ) {
@@ -111,36 +112,36 @@ void dump_operation(struct bytecode* bc, uint16_t* codeptr) {
           name = jv_array_get(jv_object_get(jv_copy(getlevel(bc,level)->debuginfo), 
                                             jv_string("params")), idx);
         }
-        printf(" %s:%d",
+        Rprintf(" %s:%d",
                jv_string_value(name),
                idx);
         jv_free(name);
         if (level) {
-          printf("^%d", level);
+          Rprintf("^%d", level);
         }
       }
     } else if (op->op == CALL_BUILTIN) {
       int func = bc->code[pc++];
       jv name = jv_array_get(jv_copy(bc->globals->cfunc_names), func);
-      printf(" %s", jv_string_value(name));
+      Rprintf(" %s", jv_string_value(name));
       jv_free(name);
     } else if (op->flags & OP_HAS_BRANCH) {
-      printf(" %04d", pc + imm);
+      Rprintf(" %04d", pc + imm);
     } else if (op->flags & OP_HAS_CONSTANT) {
-      printf(" ");
+      Rprintf(" ");
       jv_dump(jv_array_get(jv_copy(bc->constants), imm), 0);
     } else if (op->flags & OP_HAS_VARIABLE) {
       uint16_t v = bc->code[pc++];
       jv name = jv_array_get(jv_object_get(jv_copy(getlevel(bc,imm)->debuginfo), jv_string("locals")), v);
-      printf(" $%s:%d", 
+      Rprintf(" $%s:%d", 
              jv_string_value(name), 
              v);
       jv_free(name);
       if (imm) {
-        printf("^%d", imm);
+        Rprintf("^%d", imm);
       }
     } else {
-      printf(" %d", imm);
+      Rprintf(" %d", imm);
     }
   }  
 }

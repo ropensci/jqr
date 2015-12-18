@@ -1,4 +1,2 @@
 #!/bin/sh
-JQ_DIR=src/jq
-echo "*** Copying jq sources from ${JQ_DIR}"
-cp ${JQ_DIR}/*.c src
+sh configure

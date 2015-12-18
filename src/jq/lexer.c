@@ -1,3 +1,4 @@
+#include <R.h>
 #line 2 "lexer.c"
 
 #line 4 "lexer.c"
@@ -824,7 +825,7 @@ YY_DECL
 			yyin = stdin;
 
 		if ( ! yyout )
-			yyout = stdout;
+			yyout = (FILE *) 0;
 
 		if ( ! YY_CURRENT_BUFFER ) {
 			jq_yyensure_buffer_stack (yyscanner);
@@ -1942,8 +1943,7 @@ YY_BUFFER_STATE jq_yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len , y
 
 static void yy_fatal_error (yyconst char* msg , yyscan_t yyscanner)
 {
-    	(void) fprintf( stderr, "%s\n", msg );
-	exit( YY_EXIT_FAILURE );
+    	(void) Rprintf("%s", msg );
 }
 
 /* Redefine yyless() so it works in section 3 code. */
@@ -2218,7 +2218,7 @@ static int yy_init_globals (yyscan_t yyscanner)
 /* Defined in main.c */
 #ifdef YY_STDINIT
     yyin = stdin;
-    yyout = stdout;
+    yyout = (FILE *) 0;
 #else
     yyin = (FILE *) 0;
     yyout = (FILE *) 0;

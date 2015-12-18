@@ -5,6 +5,18 @@
 ## rerun, but from now should be run only by mantainers, rather than
 ## by users.
 
+download_file <- function(url, dest=tempfile(), overwrite=FALSE) {
+  on.exit(file.remove(dest))
+  content <- httr::GET(url,
+                       httr::write_disk(dest, overwrite),
+                       httr::progress("down"))
+  cat("\n")
+  code <- httr::status_code(content)
+  httr::stop_for_status(content)
+  on.exit()
+  dest
+}
+
 jq_version <- readLines("inst/jq_version")
 jq_tar <- sprintf("jq-%s.tar.gz", jq_version)
 jq_path <- "src/jq"
@@ -13,7 +25,7 @@ url <- sprintf("https://github.com/stedolan/jq/releases/download/jq-%s/jq-%s.tar
         jq_version, jq_version)
 
 if (!file.exists(jq_tar)) {
-  downloader::download(url, jq_tar)
+  ok <- download_file(url, jq_tar)
 }
 if (!file.exists(Sys.getenv("TAR"))) {
   Sys.setenv(TAR="/usr/bin/tar")
@@ -53,3 +65,5 @@ invisible(file.remove(file.path(jq_path, c("main.c", "jq_test.c"))))
 
 writeLines(file.path("src", dir(jq_path, glob2rx("*.c"))),
            "inst/jq_sources")
+
+source("patch.R")

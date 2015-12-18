@@ -1,3 +1,4 @@
+#include <R.h>
 #include "jv.h"
 #include <stdio.h>
 #include <float.h>
@@ -268,14 +269,14 @@ void jv_dumpf(jv x, FILE *f, int flags) {
 }
 
 void jv_dump(jv x, int flags) {
-  jv_dumpf(x, stdout, flags);
+  jv_dumpf(x, (FILE *) 0, flags);
 }
 
 void jv_show(jv x, int flags) {
   if (flags == -1)
     flags = JV_PRINT_PRETTY | JV_PRINT_COLOUR;
-  jv_dumpf(jv_copy(x), stderr, flags);
-  fflush(stderr);
+  jv_dumpf(jv_copy(x), (FILE *) 0, flags);
+  fflush((FILE *) 0);
 }
 
 jv jv_dump_string(jv x, int flags) {

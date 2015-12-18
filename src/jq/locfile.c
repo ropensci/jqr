@@ -1,3 +1,4 @@
+#include <R.h>
 #include <assert.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -72,7 +73,7 @@ void locfile_locate(struct locfile* l, location loc, const char* fmt, ...) {
     if (cb)
       cb(cb_data, m2);
     else
-      fprintf(stderr, "%s", jv_string_value(m2));
+      REprintf("%s", jv_string_value(m2));
     jv_free(m1);
     jv_free(m2);
     return;
@@ -88,7 +89,7 @@ void locfile_locate(struct locfile* l, location loc, const char* fmt, ...) {
   if (cb)
     cb(cb_data, m2);
   else
-    fprintf(stderr, "%s", jv_string_value(m2));
+    REprintf("%s", jv_string_value(m2));
   jv_free(m2);
   return;
 
@@ -96,8 +97,8 @@ enomem:
   if (cb != NULL)
     cb(cb_data, jv_invalid());
   else if (errno == ENOMEM || errno == 0)
-    fprintf(stderr, "Error formatting jq compilation error: %s", strerror(errno ? errno : ENOMEM));
+    REprintf("Error formatting jq compilation error: %s", strerror(errno ? errno : ENOMEM));
   else
-    fprintf(stderr, "Error formatting jq compilation error: %s", strerror(errno));
+    REprintf("Error formatting jq compilation error: %s", strerror(errno));
   return;
 }
