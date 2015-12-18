@@ -1,7 +1,7 @@
 Package: jqr
 Title: Client for 'jq', a JSON Processor
 Description: Client for jq, a JSON processor (http://stedolan.github.io/jq/).
-Version: 0.1.5.9000
+Version: 0.1.7.9000
 Depends:
     R (>= 3.1.2)
 License: MIT + file LICENSE

@@ -19,4 +19,5 @@ returns.}
 Create stream/iterator that works by applying jq to a
 stream/iterator.
 }
+\keyword{internal}
 
