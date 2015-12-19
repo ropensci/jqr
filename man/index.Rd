@@ -29,7 +29,7 @@ index and related functions
 str <- '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]'
 str \%>\% index
 str \%>\% indexif
-str \%>\% indexif('that')
+# str \%>\% indexif('that')
 '{"a": 1, "b": 1}' \%>\% index
 '[]' \%>\% index
 '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\% index(0)
