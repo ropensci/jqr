@@ -27,4 +27,11 @@ dotstr_(.data, ..., .dots)
 \description{
 dot and related functions
 }
+\examples{
+str <- '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]'
+str \%>\% dot
+str \%>\% index \%>\% dotstr(name)
+'{"foo": 5, "bar": 8}' \%>\% dot
+'{"foo": 5, "bar": 8}' \%>\% dotstr(foo)
+}
 
