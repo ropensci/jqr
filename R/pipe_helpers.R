@@ -1,3 +1,5 @@
+# from @smbache Stefan Milton Bache
+
 #' Information on Potential Pipeline
 #'
 #' This function figures out whether it is called from within a pipeline.
@@ -85,42 +87,3 @@ pipeline_on_exit <- function(env) {
 
   makeActiveBinding("result", jq_result, env)
 }
-
-
-# # Check whether inside a pipeline.
-# is_piped <- function() {
-#   parents <- lapply(sys.frames(), parent.env)
-#
-#   is_magrittr_env <-
-#     vapply(parents, identical, logical(1), y = environment(`%>%`))
-#
-#   answer <- any(is_magrittr_env)
-#
-#   list(answer = answer,
-#        env    = if (answer) sys.frames()[[min(which(is_magrittr_env))]])
-# }
-#
-# # Utility for hacking the effect into the pipeline
-# activate_jq_for_result <- function(env) {
-#   res <- NULL
-#
-#   jq_result <- function(v) {
-#     if (missing(v)) {
-#       res
-#     } else {
-#       res <<- v
-#       res$value <<- jq(res$value)
-#     }
-#   }
-#
-#   makeActiveBinding("result", jq_result, env)
-# }
-#
-# check_piped <- function(z) {
-#   if (isTRUE(z$answer) &&
-#       !exists('.jq_activated', envir = z$env, inherits = FALSE)) {
-#
-#     z$env$.jq_activated <- TRUE
-#     activate_jq_for_result(z$env)
-#   }
-# }
