@@ -1,7 +1,7 @@
 Package: jqr
 Title: Client for 'jq', a JSON Processor
 Description: Client for jq, a JSON processor (http://stedolan.github.io/jq/).
-Version: 0.1.7.9000
+Version: 0.1.7.9300
 Depends:
     R (>= 3.1.2)
 License: MIT + file LICENSE
@@ -11,6 +11,7 @@ Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
     person("Scott", "Chamberlain", role = "aut",
     email = "myrmecocystus@gmail.com"),
     person("Stephen", "Dolan", role = "cph"))
+VignetteBuilder: knitr
 SystemRequirements: GNU make
 URL: https://github.com/ropensci/jqr
 BugReports: https://github.com/ropensci/jqr/issues
@@ -23,4 +24,5 @@ Imports:
 Suggests:
     jsonlite,
     testthat,
+    knitr
 RoxygenNote: 5.0.1

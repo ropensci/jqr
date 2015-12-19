@@ -1,0 +1,75 @@
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{jqr dsl introduction}
+%\VignetteEncoding{UTF-8}
+-->
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(
+	comment = "#>",
+	collapse = TRUE,
+	warning = FALSE,
+	message = FALSE
+)
+```
+
+Introduction to jqr DSL
+=======================
+
+There's low an high level interfaces in `jqr`. This vignette covers the high level interface, or DSL (domain specific language).
+
+The `jqr` DSL uses a suite of functions to construct queries. Queries are constucted, then excuted internally with `jq()` after the last piped command.
+
+You don't have to use pipes - they are optional. Though they do make sense in that you can build up queries easily, just as you would with `jq`, or any other tools, on the command line.
+
+## The jqr DSL
+
+* Execute jq
+  * `jq` - execute jq
+* Utility functions
+  * `peek` - peek at query, without running it
+  * `string` - give back character string
+  * `combine` - combine pieces into proper JSON
+* Identity functions
+  * `dot` - takes its input and produces it unchanged as output.
+  * `dotstr` - produces value at the key 'foo'
+  * `index` - index to all elements, or elements by name or number
+  * `indexif` - same as above, but shouldn't fail when not found
+* Operations on keys, or by keys
+  * `keys` - takes no input, and retrieves keys
+  * `haskey` - checks if a json string has a key or keys
+  * `del` - deletes provided keys
+* Maths
+  * `do` - arbitary math operations
+  * `lengthj` - length, `j` on end to avoid collision with `base::length`
+  * `sqrtj` - square root, `j` on end to avoid collision with `base::length`
+  * `floorj` - returns the floor of its numeric input
+  * `minj` - minimum element of input
+  * `maxj` - maximum element of input
+  * `add` - adds strings or numbers together
+  * `map` - for any filter X, run X for each element of input array
+* Manipulation operations
+  * `join` - join strings
+  * `splitj` - ...
+  * `ltrimstr` -
+  * `rtrimstr` -
+  * `startswith` -
+  * `endswith` -
+  * `indices` -
+  * `tojson` -
+  * `fromjson` -
+  * `tostring` -
+  * `tonumber` -
+  * `contains` -
+  * `uniquej` -
+  * `group` -
+
+## Load jqr
+
+```{r}
+library("jqr")
+```
+
+## xxx
+
+Examples soon...
