@@ -4,14 +4,7 @@
 %\VignetteEncoding{UTF-8}
 -->
 
-```{r echo=FALSE}
-knitr::opts_chunk$set(
-	comment = "#>",
-	collapse = TRUE,
-	warning = FALSE,
-	message = FALSE
-)
-```
+
 
 Introduction to jqr DSL
 =======================
@@ -84,7 +77,8 @@ You don't have to use pipes - they are optional. Though they do make sense in th
 
 ## Load jqr
 
-```{r}
+
+```r
 library("jqr")
 ```
 
@@ -92,49 +86,66 @@ library("jqr")
 
 Peek
 
-```{r}
+
+```r
 '{"a": 7}' %>% do(.a + 1) %>% peek
+#> <jq query>
+#>   query:  .a + 1
 '[8,3,null,6]' %>% sortj %>% peek
+#> <jq query>
+#>   query:  sort
 ```
 
 String
 
-```{r}
+
+```r
 '{"a": 7}' %>% do(.a + 1) %>% string
+#> [1] "{\"a\": 7}"
 '[8,3,null,6]' %>% sortj %>% string
+#> [1] "[8,3,null,6]"
 ```
 
 Combine
 
-```{r}
+
+```r
 x <- '{"foo": 5, "bar": 7}' %>% select(a = .foo)
 combine(x)
+#> {"a":5}
 ```
 
 ## Some examples
 
 Index
 
-```{r}
+
+```r
 x <- '[{"message": "hello", "name": "jenn"}, {"message": "world", "name": "beth"}]'
 x %>% index()
+#> {"message":"hello","name":"jenn"} {"message":"world","name":"beth"}
 ```
 
 Sort
 
-```{r}
+
+```r
 '[8,3,null,6]' %>% sortj
+#> [null,3,6,8]
 ```
 
 reverse order
 
-```{r}
+
+```r
 '[1,2,3,4]' %>% reverse
+#> [4,3,2,1]
 ```
 
 Get multiple outputs for array w/ > 1 element
 
-```{r eval=FALSE}
+
+```r
 x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
 x %>% index()
 x %>% select(user, title = `.titles[]`)
@@ -143,114 +154,160 @@ x %>% select(user, title = `.titles[]`) %>% combine
 
 join
 
-```{r}
+
+```r
 '["a","b,c,d","e"]' %>% join
+#> "a, b,c,d, e"
 '["a","b,c,d","e"]' %>% join(`;`)
+#> "a; b,c,d; e"
 ```
 
 endswith
 
-```{r}
+
+```r
 '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% endswith(foo)
+#> false true true false false
 ```
 
 contains
 
-```{r}
+
+```r
 '"foobar"' %>% contains("bar")
+#> true
 ```
 
 unique
 
-```{r}
+
+```r
 '[1,2,5,3,5,3,1,3]' %>% uniquej
+#> [1,2,3,5]
 ```
 
 Get type information for each element
 
-```{r}
+
+```r
 '[0, false, [], {}, null, "hello"]' %>% types
+#> ["number","boolean","array","object","null","string"]
 '[0, false, [], {}, null, "hello", true, [1,2,3]]' %>% types
+#> ["number","boolean","array","object","null","string","boolean","array"]
 ```
 
 Select elements by type
 
-```{r}
+
+```r
 '[0, false, [], {}, null, "hello"]' %>% index() %>% type(booleans)
+#> false
 ```
 
 Get keys
 
-```{r}
+
+```r
 str <- '{"foo": 5, "bar": 7}'
 str %>% keys()
+#> ["bar","foo"]
 ```
 
 Delete by key name
 
-```{r}
+
+```r
 str %>% del(bar)
+#> {"foo":5}
 ```
 
 Check for key existence
 
-```{r}
+
+```r
 str3 <- '[[0,1], ["a","b","c"]]'
 str3 %>% haskey(2)
+#> [false,true]
 str3 %>% haskey(1,2)
+#> [true,false,true,true]
 ```
 
 Select variables by name, and rename
 
-```{r}
+
+```r
 '{"foo": 5, "bar": 7}' %>% select(a = .foo)
+#> {"a":5}
 ```
 
 More complicated `select()`, using the included dataset `githubcommits`
 
-```{r}
+
+```r
 githubcommits %>%
   index() %>%
   select(sha = .sha, name = .commit.committer.name)
+#> {"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]} {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]} {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]} {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]} {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}
 ```
 
 Maths comparisons
 
-```{r}
+
+```r
 '[5,4,2,7]' %>% index() %>% do(. < 4)
+#> false false true false
 '[5,4,2,7]' %>% index() %>% do(. > 4)
+#> true false false true
 '[5,4,2,7]' %>% index() %>% do(. <= 4)
+#> false true true false
 '[5,4,2,7]' %>% index() %>% do(. >= 4)
+#> true true false true
 '[5,4,2,7]' %>% index() %>% do(. == 4)
+#> false true false false
 '[5,4,2,7]' %>% index() %>% do(. != 4)
+#> true false true true
 ```
 
 Sqrt
 
-```{r}
+
+```r
 '9' %>% sqrtj
+#> 3
 ```
 
 Floor
 
-```{r}
+
+```r
 '3.14159' %>% floorj
+#> 3
 ```
 
 Find minimum
 
-```{r}
+
+```r
 '[5,4,2,7]' %>% minj
+#> 2
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj
+#> {"foo":2,"bar":3}
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(foo)
+#> {"foo":1,"bar":14}
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(bar)
+#> {"foo":2,"bar":3}
 ```
 
 Find maximum
 
-```{r}
+
+```r
 '[5,4,2,7]' %>% maxj
+#> 7
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj
+#> {"foo":1,"bar":14}
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(foo)
+#> {"foo":2,"bar":3}
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(bar)
+#> {"foo":1,"bar":14}
 ```

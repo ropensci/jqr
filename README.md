@@ -8,11 +8,13 @@ jqr
 
 R interface to jq, a JSON processor http://stedolan.github.io/jq/
 
-`jqr` is currenlty using `jq v1.4`
+`jqr` is currenlty using `jq v1.4` - [v1.4 manual](https://stedolan.github.io/jq/manual/v1.4/)
 
 `jqr` makes it easy to process large amounts of json without having to
 convert from json to R, or without using regular expressions.  This
 means that the eventual loading into R can be quicker.
+
+[DSL Vignette](vignettes/dsl.md)
 
 ## Install
 
