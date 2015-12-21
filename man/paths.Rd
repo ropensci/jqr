@@ -2,7 +2,7 @@
 % Please edit documentation in R/paths.R
 \name{paths}
 \alias{paths}
-\title{paths outputs the paths to all the elements in its input}
+\title{Outputs paths to all the elements in its input}
 \usage{
 paths(.data)
 }
@@ -10,7 +10,7 @@ paths(.data)
 \item{.data}{input}
 }
 \description{
-paths outputs the paths to all the elements in its input
+Outputs paths to all the elements in its input
 }
 \examples{
 '[1,[[],{"a":2}]]' \%>\% paths

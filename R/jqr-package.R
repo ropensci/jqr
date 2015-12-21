@@ -1,10 +1,19 @@
 #' jqr: An R client for the C library jq
 #'
-#' \code{\link{jq}} and \code{\link{jq_}} are the most important functions.
-#' \code{\link{jq}} is meant to work with the high level interface in this
-#' package. \code{\link{jq_}} provides access to the low level interface
-#' in which you can use jq query strings just as you would on the command
-#' line.
+#' @section Low-level:
+#' Low level interface, in which you can execute `jq` code just as you
+#' would on the command line. Available via \code{\link{jq_}}
+#'
+#' @section High-level DSL:
+#' High-level, uses a suite of functions to construct queries. Queries
+#' are constucted, then excuted internally with `jq()`.
+#'
+#' @section Pipes:
+#' The high level DSL supports piping, though you don't have to use
+#' pipes.
+#'
+#' @section jq version:
+#' \code{jqr} is currenlty using \code{jq v1.4}
 #'
 #' @docType package
 #' @aliases jqr-package

@@ -1,4 +1,4 @@
-#' paths outputs the paths to all the elements in its input
+#' Outputs paths to all the elements in its input
 #'
 #' @export
 #' @param .data input

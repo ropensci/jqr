@@ -63,6 +63,24 @@ You don't have to use pipes - they are optional. Though they do make sense in th
   * `contains` -
   * `uniquej` -
   * `group` -
+* Sort
+  * `sortj` - sort an array
+  * `reverse` - reverse an array
+* Types
+  * `type` - select elements by type
+  * `types` - get type for each element
+* Functions
+  * `funs` - Define and use functions
+* Variables
+  * `vars` - xxx
+* Recurse
+  * `vars` - Search through a recursive structure - extract data from all levels
+* Paths
+  * `paths` - Outputs paths to all the elements in its input
+* Range
+  * `range` - Produce range of numbers
+* At 
+  * `at` - Format strings and escaping
 
 ## Load jqr
 

@@ -1,4 +1,4 @@
-#' Functions
+#' Define and use functions
 #'
 #' @export
 #' @param .data input

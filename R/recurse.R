@@ -1,4 +1,4 @@
-#' Search through a recursive structure, and extract interesting data from all levels
+#' Search through a recursive structure - extract data from all levels
 #'
 #' @export
 #' @template args

@@ -2,7 +2,7 @@
 % Please edit documentation in R/funs.R
 \name{funs}
 \alias{funs}
-\title{Functions}
+\title{Define and use functions}
 \usage{
 funs(.data, fxn, action)
 }
@@ -14,7 +14,7 @@ funs(.data, fxn, action)
 \item{action}{What to do with the function on the data}
 }
 \description{
-Functions
+Define and use functions
 }
 \examples{
 jq_("[1,2,10,20]", 'def increment: . + 1; map(increment)')

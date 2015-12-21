@@ -3,7 +3,7 @@
 \name{recurse}
 \alias{recurse}
 \alias{recurse_}
-\title{Search through a recursive structure, and extract interesting data from all levels}
+\title{Search through a recursive structure - extract data from all levels}
 \usage{
 recurse(.data, ...)
 
@@ -19,7 +19,7 @@ recurse_(.data, ..., .dots)
 \item{dots}{dots}
 }
 \description{
-Search through a recursive structure, and extract interesting data from all levels
+Search through a recursive structure - extract data from all levels
 }
 \examples{
 x <- '{"name": "/", "children": [
