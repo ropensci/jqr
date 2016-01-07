@@ -34,18 +34,18 @@ haskey_(.data, ..., .dots)
 \examples{
 # get keys
 str <- '{"foo": 5, "bar": 7}'
-jq_(str, "keys")
+jq(str, "keys")
 str \%>\% keys()
 
 # delete by key name
-jq_(str, "del(.bar)")
+jq(str, "del(.bar)")
 str \%>\% del(bar)
 
 # check for key existence
 str3 <- '[[0,1], ["a","b","c"]]'
-jq_(str3, "map(has(2))")
+jq(str3, "map(has(2))")
 str3 \%>\% haskey(2)
-jq_(str3, "map(has(1,2))")
+jq(str3, "map(has(1,2))")
 str3 \%>\% haskey(1,2)
 }
 

@@ -7,29 +7,29 @@
 #' @examples
 #' # join
 #' str <- '["a","b,c,d","e"]'
-#' jq_(str, 'join(", ")')
+#' jq(str, 'join(", ")')
 #' str %>% join
 #' str %>% join(`;`)
 #' str %>% join(`yep`)
 #'
 #' # split
-#' jq_('"a, b,c,d, e"', 'split(", ")')
+#' jq('"a, b,c,d, e"', 'split(", ")')
 #'
 #' # ltrimstr
-#' jq_('["fo", "foo", "barfoo", "foobar", "afoo"]', '[.[]|ltrimstr("foo")]')
+#' jq('["fo", "foo", "barfoo", "foobar", "afoo"]', '[.[]|ltrimstr("foo")]')
 #' '["fo", "foo", "barfoo", "foobar", "afoo"]' %>% index() %>% ltrimstr(foo)
 #'
 #' # rtrimstr
-#' jq_('["fo", "foo", "barfoo", "foobar", "foob"]', '[.[]|rtrimstr("foo")]')
+#' jq('["fo", "foo", "barfoo", "foobar", "foob"]', '[.[]|rtrimstr("foo")]')
 #' '["fo", "foo", "barfoo", "foobar", "foob"]' %>% index() %>% rtrimstr(foo)
 #'
 #' # startswith
 #' str <- '["fo", "foo", "barfoo", "foobar", "barfoob"]'
-#' jq_(str, '[.[]|startswith("foo")]')
+#' jq(str, '[.[]|startswith("foo")]')
 #' str %>% index %>% startswith(foo)
 #'
 #' # endswith
-#' jq_(str, '[.[]|endswith("foo")]')
+#' jq(str, '[.[]|endswith("foo")]')
 #' str %>% index %>% endswith(foo)
 #' str %>% index %>% endswith_("foo")
 #' str %>% index %>% endswith(bar)

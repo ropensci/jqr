@@ -2,23 +2,26 @@
 % Please edit documentation in R/jqr.R
 \name{jq}
 \alias{jq}
-\alias{jq_}
+\alias{jq.character}
+\alias{jq.jqr}
 \title{Execute a query with jq}
 \usage{
-jq(.data)
+jq(x, ...)
 
-jq_(data, query)
+\method{jq}{jqr}(x, ...)
+
+\method{jq}{character}(x, query, ...)
 }
 \arguments{
-\item{.data}{(list) input, using higher level interface}
+\item{x}{\code{json} object or character string with json data.}
 
-\item{data}{(character) JSON data}
+\item{...}{Not currently used.}
 
 \item{query}{(character) A query string}
 }
 \description{
-\code{jq} is meant to work with the high level interface in this package. \code{jq_}
-provides access to the low level interface in which you can use jq query strings just
+\code{jq} is meant to work with the high level interface in this package. \code{jq}
+also provides access to the low level interface in which you can use jq query strings just
 as you would on the command line. Output gets class of json, and pretty prints to
 the console for easier viewing. The \code{jqr} doesn't do pretty printing.
 }
@@ -29,8 +32,8 @@ the console for easier viewing. The \code{jqr} doesn't do pretty printing.
 x <- '[{"message": "hello", "name": "jenn"}, {"message": "world", "name": "beth"}]'
 jq(index(x))
 
-jq_('{"a": 7, "b": 4}', 'keys')
-jq_('[8,3,null,6]', 'sort')
+jq('{"a": 7, "b": 4}', 'keys')
+jq('[8,3,null,6]', 'sort')
 }
 \seealso{
 \code{\link{peek}}

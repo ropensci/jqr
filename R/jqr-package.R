@@ -2,7 +2,7 @@
 #'
 #' @section Low-level:
 #' Low level interface, in which you can execute `jq` code just as you
-#' would on the command line. Available via \code{\link{jq_}}
+#' would on the command line. Available via \code{\link{jq}}
 #'
 #' @section High-level DSL:
 #' High-level, uses a suite of functions to construct queries. Queries

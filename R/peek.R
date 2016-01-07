@@ -7,7 +7,7 @@
 #'
 #' @export
 #' @param .data (list) input, using higher level interface
-#' @seealso \code{\link{jq}}, \code{\link{jq_}}
+#' @seealso \code{\link{jq}}.
 #' @examples
 #' '{"a": 7}' %>% do(.a + 1) %>% peek
 #' '[8,3,null,6]' %>% sortj %>% peek
