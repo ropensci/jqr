@@ -10,6 +10,8 @@ Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
     email = "rich.fitzjohn@gmail.com"),
     person("Scott", "Chamberlain", role = "aut",
     email = "myrmecocystus@gmail.com"),
+    person("Stefan Milton Bache", role = "aut",
+    email = "stefan@stefanbache.dk"),
     person("Stephen", "Dolan", role = "cph"))
 VignetteBuilder: knitr
 SystemRequirements: GNU make
