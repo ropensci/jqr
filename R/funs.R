@@ -5,7 +5,7 @@
 #' @param fxn A function definition, without \code{def} (added internally)
 #' @param action What to do with the function on the data
 #' @examples
-#' jq_("[1,2,10,20]", 'def increment: . + 1; map(increment)')
+#' jq("[1,2,10,20]", 'def increment: . + 1; map(increment)')
 #' "[1,2,10,20]" %>% funs('increment: . + 1', 'map(increment)')
 #' "[1,2,10,20]" %>% funs('increment: . / 100', 'map(increment)')
 #' "[1,2,10,20]" %>% funs('increment: . / 100', 'map(increment)')

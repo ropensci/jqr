@@ -5,12 +5,12 @@
 #' @export
 #' @examples
 #' # get type information for each element
-#' jq_('[0, false, [], {}, null, "hello"]', 'map(type)')
+#' jq('[0, false, [], {}, null, "hello"]', 'map(type)')
 #' '[0, false, [], {}, null, "hello"]' %>% types
 #' '[0, false, [], {}, null, "hello", true, [1,2,3]]' %>% types
 #'
 #' # select elements by type
-#' jq_('[0, false, [], {}, null, "hello"]', '.[] | numbers,booleans')
+#' jq('[0, false, [], {}, null, "hello"]', '.[] | numbers,booleans')
 #' '[0, false, [], {}, null, "hello"]' %>% index() %>% type(booleans)
 types <- function(.data) {
   pipe_autoexec(toggle = TRUE)

@@ -5,10 +5,10 @@
 #' @export
 #' @examples
 #' # do math
-#' jq_('{"a": 7}', '.a + 1')
+#' jq('{"a": 7}', '.a + 1')
 #' # adding null gives back same result
-#' jq_('{"a": 7}', '.a + null')
-#' jq_('{"a": 7}', '.a += 1')
+#' jq('{"a": 7}', '.a + null')
+#' jq('{"a": 7}', '.a += 1')
 #' '{"a": 7}' %>%  do(.a + 1)
 #' # '{"a": 7}' %>%  do(.a += 1) # this doesn't work quite yet
 #' '{"a": [1,2], "b": [3,4]}' %>%  do(.a + .b)

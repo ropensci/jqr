@@ -55,13 +55,13 @@ str <- '[{
 
 
 ```r
-jq_(str, ".[]")
+jq(str, ".[]")
 #> [1] "{\"foo\":1,\"bar\":2}" "{\"foo\":3,\"bar\":4}" "{\"foo\":5,\"bar\":6}"
 ```
 
 
 ```r
-jq_(str, "[.[] | {name: .foo} | keys]")
+jq(str, "[.[] | {name: .foo} | keys]")
 #> [1] "[[\"name\"],[\"name\"],[\"name\"]]"
 ```
 
@@ -112,7 +112,7 @@ FIXME - broken right now
 
 ```r
 x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
-jq_(x, '{user, title: .titles[]}')
+jq(x, '{user, title: .titles[]}')
 x %>% index()
 x %>% select(user, title = `.titles[]`)
 x %>% select(user, title = `.titles[]`) %>% combine

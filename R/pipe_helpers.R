@@ -22,7 +22,7 @@ pipeline_info <- function() {
   is_piped <- any(is_magrittr_env)
 
   list(is_piped = is_piped,
-       env      = if (is_piped) sys.frames()[[min(which(is_magrittr_env))]])
+       env      = if (is_piped) sys.frames()[[max(which(is_magrittr_env))]])
 }
 
 #' Toggle Auto Execution On or Off for Pipelines

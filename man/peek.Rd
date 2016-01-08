@@ -20,6 +20,6 @@ doesn't do pretty printing.
 '[8,3,null,6]' \%>\% sortj \%>\% peek
 }
 \seealso{
-\code{\link{jq}}, \code{\link{jq_}}
+\code{\link{jq}}.
 }
 
