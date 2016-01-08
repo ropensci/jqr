@@ -27,13 +27,13 @@ jq <- function(x, ...) {
 #' @export
 jq.jqr <- function(x, ...) {
   pipe_autoexec(toggle = FALSE)
-  structure(jqr(x$data, make_query(x)), class = "json")
+  structure(jqr(x$data, make_query(x)), class = c("json", "character"))
 }
 
 #' @rdname jq
 #' @export
 jq.character <- function(x, query, ...) {
-  structure(jqr(x, query), class = "json")
+  structure(jqr(x, query), class = c("json", "character"))
 }
 
 #' @export
