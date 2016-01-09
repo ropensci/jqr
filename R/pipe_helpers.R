@@ -47,8 +47,9 @@ pipe_autoexec <- function(toggle) {
   info <- pipeline_info()
 
   if (isTRUE(info[["is_piped"]])) {
+    jq_exit <- function(j) if (inherits(j, "jqr")) jq(j) else j
     pipeline_on_exit(info$env)
-    info$env$.jq_exitfun <- if (toggle) jq else identity
+    info$env$.jq_exitfun <- if (toggle) jq_exit else identity
   }
 
   invisible()

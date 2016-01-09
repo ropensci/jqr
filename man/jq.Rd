@@ -10,14 +10,13 @@ jq(x, ...)
 
 \method{jq}{jqr}(x, ...)
 
-\method{jq}{character}(x, query, ...)
+\method{jq}{character}(x, ...)
 }
 \arguments{
 \item{x}{\code{json} object or character string with json data.}
 
-\item{...}{Not currently used.}
-
-\item{query}{(character) A query string}
+\item{...}{character specification of jq query. Each element in code{...}
+will be combined with " | ", which is convenient for long queries.}
 }
 \description{
 \code{jq} is meant to work with the high level interface in this package. \code{jq}
