@@ -27,13 +27,13 @@ jq <- function(x, ...) {
 #' @export
 jq.jqr <- function(x, ...) {
   pipe_autoexec(toggle = FALSE)
-  structure(jqr(x$data, make_query(x)), class = c("json", "character"))
+  structure(jqr(x$data, make_query(x)), class = "json")
 }
 
 #' @rdname jq
 #' @export
 jq.character <- function(x, query, ...) {
-  structure(jqr(x, query), class = c("json", "character"))
+  structure(jqr(x, query), class = "json")
 }
 
 #' @export
@@ -42,4 +42,6 @@ jq.default <- function(x, ...) {
 }
 
 #' @export
-print.json <- function(x, ...) cat(x, "\n")
+print.json <- function(x, ...) {
+  cat(jsonlite::prettify(combine(x)))
+}

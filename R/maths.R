@@ -57,9 +57,9 @@
 #' # '{"foo": 1}' %>% do(.foo %%=% 10)
 #'
 #' # add
-#' '["a","b","c"]' %>% add
-#' '[1, 2, 3]' %>% add
-#' '[]' %>% add
+#' '["a","b","c"]' %>% ad
+#' '[1, 2, 3]' %>% ad
+#' '[]' %>% ad
 #'
 #' # map
 #' ## as far as I know, this only works with numbers, thus it's
@@ -164,7 +164,7 @@ maxj_ <- function(.data, ..., .dots) {
 
 #' @export
 #' @rdname maths
-add <- function(.data) {
+ad <- function(.data) {
   pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure('add', type = "add"))
   structure(list(data = getdata(.data), args = dots), class = "jqr")
