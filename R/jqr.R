@@ -7,8 +7,8 @@
 #'
 #' @export
 #' @param x \code{json} object or character string with json data.
-#' @param query (character) A query string
-#' @param ... Not currently used.
+#' @param ... character specification of jq query. Each element in code{...}
+#'   will be combined with " | ", which is convenient for long queries.
 #' @seealso \code{\link{peek}}
 #' @examples
 #' '{"a": 7}' %>%  do(.a + 1)
@@ -27,12 +27,18 @@ jq <- function(x, ...) {
 #' @export
 jq.jqr <- function(x, ...) {
   pipe_autoexec(toggle = FALSE)
-  structure(jqr(x$data, make_query(x)), class = c("json", "character"))
+  res <- structure(jqr(x$data, make_query(x)), class = c("json", "character"))
+  query <- query_from_dots(...)
+  if (query != "")
+    jq(res, query)
+  else
+    res
 }
 
 #' @rdname jq
 #' @export
-jq.character <- function(x, query, ...) {
+jq.character <- function(x, ...) {
+  query <- query_from_dots(...)
   structure(jqr(x, query), class = c("json", "character"))
 }
 
@@ -45,3 +51,16 @@ jq.default <- function(x, ...) {
 print.json <- function(x, ...) {
   cat(jsonlite::prettify(combine(x)))
 }
+
+#' Helper function for createing a jq query string from ellipses.
+#' @noRd
+query_from_dots <- function(...)
+{
+  dots <- list(...)
+  if (!all(vapply(dots, is.character, logical(1))))
+    stop("jq query specification must be character.")
+
+  paste(unlist(dots), collapse = " | ")
+}
+
+
