@@ -15,6 +15,7 @@
 #' @section jq version:
 #' \code{jqr} is currenlty using \code{jq v1.4}
 #'
+#' @importFrom lazyeval all_dots lazy_dots
 #' @docType package
 #' @aliases jqr-package
 #' @name jqr

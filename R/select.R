@@ -1,6 +1,5 @@
 #' Select variables
 #'
-#' @import lazyeval
 #' @export
 #' @template args
 #' @examples
