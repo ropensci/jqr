@@ -31,3 +31,10 @@ pipes.
 \code{jqr} is currenlty using \code{jq v1.4}
 }
 
+\section{indexing}{
+
+note that \code{jq} indexing starts at \code{0}, whereas R indexing
+starts at \code{1}. So when you want the first thing in an array using \code{jq},
+for example, you want \code{0}, not \code{1}
+}
+
