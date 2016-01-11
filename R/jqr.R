@@ -25,9 +25,10 @@ jq <- function(x, ...) {
 
 #' @rdname jq
 #' @export
-jq.jqr <- function(x, ...) {
+jq.jqr <- function(x, ..., flags=jq_flags()) {
   pipe_autoexec(toggle = FALSE)
-  res <- structure(jqr(x$data, make_query(x)), class = c("json", "character"))
+  res <- structure(jqr(x$data, make_query(x), flags),
+                   class = c("json", "character"))
   query <- query_from_dots(...)
   if (query != "")
     jq(res, query)
@@ -37,9 +38,10 @@ jq.jqr <- function(x, ...) {
 
 #' @rdname jq
 #' @export
-jq.character <- function(x, ...) {
+jq.character <- function(x, ..., flags=jq_flags()) {
   query <- query_from_dots(...)
-  structure(jqr(x, query), class = c("json", "character"))
+  structure(jqr(x, query, flags),
+            class = c("json", "character"))
 }
 
 #' @export
@@ -63,4 +65,19 @@ query_from_dots <- function(...)
   paste(unlist(dots), collapse = " | ")
 }
 
-
+##' Flags for use with jq
+##' @title Flags for use with jq
+##' @param pretty Pretty print the json (different to jsonlite's
+##'   pretty printing).
+##' @param ascii Force jq to produce pure ASCII output with non-ASCII
+##'   characters replaced by equivalent escape sequences.
+##' @param color Add ANSI escape sequences for coloured output
+##' @param sorted Output fields of each object with keys in sorted order
+##' @export
+jq_flags <- function(pretty=FALSE, ascii=FALSE, color=FALSE, sorted=FALSE) {
+  sum(c(integer(0),
+        if (pretty) 1L,
+        if (ascii)  2L,
+        if (color)  4L,
+        if (sorted) 8L))
+}

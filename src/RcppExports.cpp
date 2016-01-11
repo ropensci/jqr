@@ -6,14 +6,15 @@
 using namespace Rcpp;
 
 // jqr
-std::vector<std::string> jqr(std::string json, std::string program);
-RcppExport SEXP jqr_jqr(SEXP jsonSEXP, SEXP programSEXP) {
+std::vector<std::string> jqr(std::string json, std::string program, int flags);
+RcppExport SEXP jqr_jqr(SEXP jsonSEXP, SEXP programSEXP, SEXP flagsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< std::string >::type json(jsonSEXP);
     Rcpp::traits::input_parameter< std::string >::type program(programSEXP);
-    __result = Rcpp::wrap(jqr(json, program));
+    Rcpp::traits::input_parameter< int >::type flags(flagsSEXP);
+    __result = Rcpp::wrap(jqr(json, program, flags));
     return __result;
 END_RCPP
 }
