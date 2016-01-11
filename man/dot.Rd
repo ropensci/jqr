@@ -9,7 +9,7 @@
 \usage{
 dot(.data)
 
-dot_(.data, dots)
+dot_(.data, dots = ".")
 
 dotstr(.data, ...)
 
@@ -33,5 +33,6 @@ str \%>\% dot
 str \%>\% index \%>\% dotstr(name)
 '{"foo": 5, "bar": 8}' \%>\% dot
 '{"foo": 5, "bar": 8}' \%>\% dotstr(foo)
+'{"foo": {"bar": 8}}' \%>\% dotstr(foo.bar)
 }
 
