@@ -11,7 +11,7 @@
 #' combine(x)
 combine <- function(x) {
   pipe_autoexec(toggle = FALSE)
-  if (!is(x, "json")) stop("Must be class json", call. = FALSE)
+  if (!is(x, "jqson")) stop("Must be class json", call. = FALSE)
   if (!jsonlite::validate(x)) {
     tmp <- paste0("[", paste0(x, collapse = ", "), "]")
     tmpval <- jsonlite::validate(tmp)
@@ -21,5 +21,5 @@ combine <- function(x) {
       stop(attr(tmpval, "err"), call. = FALSE)
     }
   }
-  structure(x, class = "json", pretty = TRUE)
+  structure(x, class = "jqson", pretty = TRUE)
 }

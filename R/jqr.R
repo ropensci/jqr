@@ -28,7 +28,7 @@ jq <- function(x, ...) {
 jq.jqr <- function(x, ..., flags=jq_flags()) {
   pipe_autoexec(toggle = FALSE)
   res <- structure(jqr(x$data, make_query(x), flags),
-                   class = c("json", "character"))
+                   class = c("jqson", "character"))
   query <- query_from_dots(...)
   if (query != "")
     jq(res, query)
@@ -41,7 +41,7 @@ jq.jqr <- function(x, ..., flags=jq_flags()) {
 jq.character <- function(x, ..., flags=jq_flags()) {
   query <- query_from_dots(...)
   structure(jqr(x, query, flags),
-            class = c("json", "character"))
+            class = c("jqson", "character"))
 }
 
 #' @export
@@ -50,7 +50,7 @@ jq.default <- function(x, ...) {
 }
 
 #' @export
-print.json <- function(x, ...) {
+print.jqson <- function(x, ...) {
   cat(jsonlite::prettify(combine(x)))
 }
 

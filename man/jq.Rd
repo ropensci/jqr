@@ -8,9 +8,9 @@
 \usage{
 jq(x, ...)
 
-\method{jq}{jqr}(x, ...)
+\method{jq}{jqr}(x, ..., flags = jq_flags())
 
-\method{jq}{character}(x, ...)
+\method{jq}{character}(x, ..., flags = jq_flags())
 }
 \arguments{
 \item{x}{\code{json} object or character string with json data.}
