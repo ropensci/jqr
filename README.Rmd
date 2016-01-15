@@ -21,7 +21,7 @@ R interface to jq, a JSON processor http://stedolan.github.io/jq/
 convert from json to R, or without using regular expressions.  This
 means that the eventual loading into R can be quicker.
 
-[DSL Vignette](vignettes/dsl.md)
+[Introduction](vignettes/jqr_vignette.md)
 
 ## Install
 

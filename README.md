@@ -14,7 +14,7 @@ R interface to jq, a JSON processor http://stedolan.github.io/jq/
 convert from json to R, or without using regular expressions.  This
 means that the eventual loading into R can be quicker.
 
-[DSL Vignette](vignettes/dsl.md)
+[Introduction](vignettes/jqr_vignette.md)
 
 ## Install
 
@@ -56,13 +56,36 @@ str <- '[{
 
 ```r
 jq(str, ".[]")
-#> [1] "{\"foo\":1,\"bar\":2}" "{\"foo\":3,\"bar\":4}" "{\"foo\":5,\"bar\":6}"
+#> [
+#>     {
+#>         "foo": 1,
+#>         "bar": 2
+#>     },
+#>     {
+#>         "foo": 3,
+#>         "bar": 4
+#>     },
+#>     {
+#>         "foo": 5,
+#>         "bar": 6
+#>     }
+#> ]
 ```
 
 
 ```r
 jq(str, "[.[] | {name: .foo} | keys]")
-#> [1] "[[\"name\"],[\"name\"],[\"name\"]]"
+#> [
+#>     [
+#>         "name"
+#>     ],
+#>     [
+#>         "name"
+#>     ],
+#>     [
+#>         "name"
+#>     ]
+#> ]
 ```
 
 ### high level
@@ -79,7 +102,16 @@ Index
 ```r
 x <- '[{"message": "hello", "name": "jenn"}, {"message": "world", "name": "beth"}]'
 x %>% index()
-#> {"message":"hello","name":"jenn"} {"message":"world","name":"beth"}
+#> [
+#>     {
+#>         "message": "hello",
+#>         "name": "jenn"
+#>     },
+#>     {
+#>         "message": "world",
+#>         "name": "beth"
+#>     }
+#> ]
 ```
 
 Sort
@@ -87,7 +119,12 @@ Sort
 
 ```r
 '[8,3,null,6]' %>% sortj
-#> [null,3,6,8]
+#> [
+#>     null,
+#>     3,
+#>     6,
+#>     8
+#> ]
 ```
 
 reverse order
@@ -95,7 +132,12 @@ reverse order
 
 ```r
 '[1,2,3,4]' %>% reverse
-#> [4,3,2,1]
+#> [
+#>     4,
+#>     3,
+#>     2,
+#>     1
+#> ]
 ```
 
 Show the query to be used using `peek()`
@@ -136,7 +178,13 @@ ltrimstr
 
 ```r
 '["fo", "foo", "barfoo", "foobar", "afoo"]' %>% index() %>% ltrimstr(foo)
-#> "fo" "" "barfoo" "bar" "afoo"
+#> [
+#>     "fo",
+#>     "",
+#>     "barfoo",
+#>     "bar",
+#>     "afoo"
+#> ]
 ```
 
 rtrimstr
@@ -144,7 +192,13 @@ rtrimstr
 
 ```r
 '["fo", "foo", "barfoo", "foobar", "foob"]' %>% index() %>% rtrimstr(foo)
-#> "fo" "" "bar" "foobar" "foob"
+#> [
+#>     "fo",
+#>     "",
+#>     "bar",
+#>     "foobar",
+#>     "foob"
+#> ]
 ```
 
 startswith
@@ -152,7 +206,13 @@ startswith
 
 ```r
 '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% startswith(foo)
-#> false true false true false
+#> [
+#>     false,
+#>     true,
+#>     false,
+#>     true,
+#>     false
+#> ]
 ```
 
 endswith
@@ -160,7 +220,13 @@ endswith
 
 ```r
 '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% endswith(foo)
-#> false true true false false
+#> [
+#>     false,
+#>     true,
+#>     true,
+#>     false,
+#>     false
+#> ]
 ```
 
 tojson, fromjson, tostring
@@ -168,13 +234,33 @@ tojson, fromjson, tostring
 
 ```r
 '[1, "foo", ["foo"]]' %>% index
-#> 1 "foo" ["foo"]
+#> [
+#>     1,
+#>     "foo",
+#>     [
+#>         "foo"
+#>     ]
+#> ]
 '[1, "foo", ["foo"]]' %>% index %>% tostring
-#> "1" "foo" "[\"foo\"]"
+#> [
+#>     "1",
+#>     "foo",
+#>     "[\"foo\"]"
+#> ]
 '[1, "foo", ["foo"]]' %>% index %>% tojson
-#> "1" "\"foo\"" "[\"foo\"]"
+#> [
+#>     "1",
+#>     "\"foo\"",
+#>     "[\"foo\"]"
+#> ]
 '[1, "foo", ["foo"]]' %>% index %>% tojson %>% fromjson
-#> 1 "foo" ["foo"]
+#> [
+#>     1,
+#>     "foo",
+#>     [
+#>         "foo"
+#>     ]
+#> ]
 ```
 
 contains
@@ -190,7 +276,12 @@ unique
 
 ```r
 '[1,2,5,3,5,3,1,3]' %>% uniquej
-#> [1,2,3,5]
+#> [
+#>     1,
+#>     2,
+#>     3,
+#>     5
+#> ]
 ```
 
 #### types
@@ -200,9 +291,25 @@ get type information for each element
 
 ```r
 '[0, false, [], {}, null, "hello"]' %>% types
-#> ["number","boolean","array","object","null","string"]
+#> [
+#>     "number",
+#>     "boolean",
+#>     "array",
+#>     "object",
+#>     "null",
+#>     "string"
+#> ]
 '[0, false, [], {}, null, "hello", true, [1,2,3]]' %>% types
-#> ["number","boolean","array","object","null","string","boolean","array"]
+#> [
+#>     "number",
+#>     "boolean",
+#>     "array",
+#>     "object",
+#>     "null",
+#>     "string",
+#>     "boolean",
+#>     "array"
+#> ]
 ```
 
 select elements by type
@@ -221,7 +328,10 @@ get keys
 ```r
 str <- '{"foo": 5, "bar": 7}'
 str %>% keys()
-#> ["bar","foo"]
+#> [
+#>     "bar",
+#>     "foo"
+#> ]
 ```
 
 delete by key name
@@ -229,7 +339,9 @@ delete by key name
 
 ```r
 str %>% del(bar)
-#> {"foo":5}
+#> {
+#>     "foo": 5
+#> }
 ```
 
 check for key existence
@@ -238,9 +350,17 @@ check for key existence
 ```r
 str3 <- '[[0,1], ["a","b","c"]]'
 str3 %>% haskey(2)
-#> [false,true]
+#> [
+#>     false,
+#>     true
+#> ]
 str3 %>% haskey(1,2)
-#> [true,false,true,true]
+#> [
+#>     true,
+#>     false,
+#>     true,
+#>     true
+#> ]
 ```
 
 Select variables by name, and rename
@@ -248,7 +368,9 @@ Select variables by name, and rename
 
 ```r
 '{"foo": 5, "bar": 7}' %>% select(a = .foo)
-#> {"a":5}
+#> {
+#>     "a": 5
+#> }
 ```
 
 More complicated `select()`, using the included dataset `githubcommits`
@@ -258,7 +380,48 @@ More complicated `select()`, using the included dataset `githubcommits`
 githubcommits %>%
   index() %>%
   select(sha = .sha, name = .commit.committer.name)
-#> {"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]} {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]} {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]} {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]} {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}
+#> [
+#>     {
+#>         "sha": [
+#>             "110e009996e1359d25b8e99e71f83b96e5870790"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "a50e548cc5313c187483bc8fb1b95e1798e8ef65"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "4b258f7d31b34ff5d45fba431169e7fd4c995283"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     }
+#> ]
 ```
 
 #### Maths
@@ -268,9 +431,17 @@ githubcommits %>%
 '{"a": 7}' %>%  do(.a + 1)
 #> 8
 '{"a": [1,2], "b": [3,4]}' %>%  do(.a + .b)
-#> [1,2,3,4]
+#> [
+#>     1,
+#>     2,
+#>     3,
+#>     4
+#> ]
 '{"a": [1,2], "b": [3,4]}' %>%  do(.a - .b)
-#> [1,2]
+#> [
+#>     1,
+#>     2
+#> ]
 '{"a": 3}' %>%  do(4 - .a)
 #> 1
 '["xml", "yaml", "json"]' %>%  do('. - ["xml", "yaml"]')
@@ -284,17 +455,47 @@ comparisons
 
 ```r
 '[5,4,2,7]' %>% index() %>% do(. < 4)
-#> false false true false
+#> [
+#>     false,
+#>     false,
+#>     true,
+#>     false
+#> ]
 '[5,4,2,7]' %>% index() %>% do(. > 4)
-#> true false false true
+#> [
+#>     true,
+#>     false,
+#>     false,
+#>     true
+#> ]
 '[5,4,2,7]' %>% index() %>% do(. <= 4)
-#> false true true false
+#> [
+#>     false,
+#>     true,
+#>     true,
+#>     false
+#> ]
 '[5,4,2,7]' %>% index() %>% do(. >= 4)
-#> true true false true
+#> [
+#>     true,
+#>     true,
+#>     false,
+#>     true
+#> ]
 '[5,4,2,7]' %>% index() %>% do(. == 4)
-#> false true false false
+#> [
+#>     false,
+#>     true,
+#>     false,
+#>     false
+#> ]
 '[5,4,2,7]' %>% index() %>% do(. != 4)
-#> true false true true
+#> [
+#>     true,
+#>     false,
+#>     true,
+#>     true
+#> ]
 ```
 
 length
@@ -302,7 +503,12 @@ length
 
 ```r
 '[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj
-#> 2 6 1 0
+#> [
+#>     2,
+#>     6,
+#>     1,
+#>     0
+#> ]
 ```
 
 sqrt
@@ -328,11 +534,20 @@ find minimum
 '[5,4,2,7]' %>% minj
 #> 2
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj
-#> {"foo":2,"bar":3}
+#> {
+#>     "foo": 2,
+#>     "bar": 3
+#> }
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(foo)
-#> {"foo":1,"bar":14}
+#> {
+#>     "foo": 1,
+#>     "bar": 14
+#> }
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% minj(bar)
-#> {"foo":2,"bar":3}
+#> {
+#>     "foo": 2,
+#>     "bar": 3
+#> }
 ```
 
 find maximum
@@ -342,11 +557,20 @@ find maximum
 '[5,4,2,7]' %>% maxj
 #> 7
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj
-#> {"foo":1,"bar":14}
+#> {
+#>     "foo": 1,
+#>     "bar": 14
+#> }
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(foo)
-#> {"foo":2,"bar":3}
+#> {
+#>     "foo": 2,
+#>     "bar": 3
+#> }
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(bar)
-#> {"foo":1,"bar":14}
+#> {
+#>     "foo": 1,
+#>     "bar": 14
+#> }
 ```
 
 #### Combine into valid JSON
@@ -361,7 +585,48 @@ This outputs a few pieces of JSON
 (x <- githubcommits %>%
   index() %>%
   select(sha = .sha, name = .commit.committer.name))
-#> {"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]} {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]} {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]} {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]} {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}
+#> [
+#>     {
+#>         "sha": [
+#>             "110e009996e1359d25b8e99e71f83b96e5870790"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "a50e548cc5313c187483bc8fb1b95e1798e8ef65"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "4b258f7d31b34ff5d45fba431169e7fd4c995283"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     }
+#> ]
 ```
 
 Use `combine()` to put them together.
@@ -369,7 +634,48 @@ Use `combine()` to put them together.
 
 ```r
 combine(x)
-#> [{"sha":["110e009996e1359d25b8e99e71f83b96e5870790"],"name":["Nicolas Williams"]}, {"sha":["7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"],"name":["Nicolas Williams"]}, {"sha":["a50e548cc5313c187483bc8fb1b95e1798e8ef65"],"name":["Nicolas Williams"]}, {"sha":["4b258f7d31b34ff5d45fba431169e7fd4c995283"],"name":["Nicolas Williams"]}, {"sha":["d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"],"name":["Nicolas Williams"]}]
+#> [
+#>     {
+#>         "sha": [
+#>             "110e009996e1359d25b8e99e71f83b96e5870790"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "7b6a018dff623a4f13f6bcd52c7c56d9b4a4165f"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "a50e548cc5313c187483bc8fb1b95e1798e8ef65"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "4b258f7d31b34ff5d45fba431169e7fd4c995283"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     },
+#>     {
+#>         "sha": [
+#>             "d1cb8ee0ad3ddf03a37394bfa899cfd3ddd007c5"
+#>         ],
+#>         "name": [
+#>             "Nicolas Williams"
+#>         ]
+#>     }
+#> ]
 ```
 
 ## Meta
