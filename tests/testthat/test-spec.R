@@ -9,26 +9,26 @@ context("Ruby test suite")
 ## care; we'll need to loop over the returned list.
 
 jqr_conv <- function(json, program, ...) {
-  jsonlite::fromJSON(jqr(json, program), ...)
+  jsonlite::fromJSON(jqr(json, program, 0), ...)
 }
 
 test_that("int", {
-  expect_that(jqr('1', '.'),      equals("1"))
+  expect_that(jqr('1', '.', 0),      equals("1"))
   expect_that(jqr_conv('1', '.'), equals(1L))
 })
 
 test_that("float", {
-  expect_that(jqr('1.2', '.'),      equals("1.2"))
+  expect_that(jqr('1.2', '.', 0),      equals("1.2"))
   expect_that(jqr_conv('1.2', '.'), equals(1.2))
 })
 
 test_that("string", {
-  expect_that(jqr('"Zzz"', '.'),      equals('"Zzz"'))
+  expect_that(jqr('"Zzz"', '.', 0),      equals('"Zzz"'))
   expect_that(jqr_conv('"Zzz"', '.'), equals("Zzz"))
 })
 
 test_that("array", {
-  expect_that(jqr('[1, "2", 3]', '.'),      equals('[1,"2",3]'))
+  expect_that(jqr('[1, "2", 3]', '.', 0),      equals('[1,"2",3]'))
   expect_that(jqr_conv('[1, "2", 3]', '.'), equals(c("1", "2", "3")))
   ## To get the same behaviour as Ruby:
   expect_that(jqr_conv('[1, "2", 3]', '.', simplifyVector=FALSE),
@@ -37,7 +37,7 @@ test_that("array", {
 
 test_that("hash", {
   str <- '{"foo":100, "bar":"zoo"}'
-  expect_that(jqr(str, '.'), equals('{"foo":100,"bar":"zoo"}'))
+  expect_that(jqr(str, '.', 0), equals('{"foo":100,"bar":"zoo"}'))
   expect_that(jqr_conv(str, '.'), equals(list(foo=100L, bar="zoo")))
 })
 
@@ -65,7 +65,7 @@ test_that("composition", {
     }
 }'
 
-  expect_that(jqr(src, "."), equals(unclass(jsonlite::minify(src))))
+  expect_that(jqr(src, ".", 0), equals(unclass(jsonlite::minify(src))))
   expect_that(jqr_conv(src, "."),
               equals(jsonlite::fromJSON(src)))
 })
@@ -84,18 +84,18 @@ test_that("each value", {
 }}
 '
 
-  expect_that(jqr(src, '.menu.popup.menuitem[].value'),
+  expect_that(jqr(src, '.menu.popup.menuitem[].value', 0),
               equals(c('"New"', '"Open"', '"Close"')))
 })
 
 test_that("compile error", {
-  expect_error(jqr("{}", "..."))
+  expect_error(jqr("{}", "...", 0))
 })
 
 test_that("runtime error", {
   ## Hmm - this is meant to crash on Ruby but does not here (and does
   ## not on the command line either).
-  expect_that(jqr('{}', '.'), equals("{}"))
+  expect_that(jqr('{}', '.', 0), equals("{}"))
   ## expect {
   ##   jqr('{}', '.') do |value|
   ##     raise 'runtime error'
@@ -105,13 +105,13 @@ test_that("runtime error", {
 
 test_that("query for hash", {
   src <- list(FOO=100L, BAR=c(200L, 200L))
-  expect_that(jqr(jsonlite::toJSON(src), ".BAR[]"),
+  expect_that(jqr(jsonlite::toJSON(src), ".BAR[]", 0),
               equals(c("200", "200")))
 })
 
 test_that("query for array", {
   src <- list('FOO', 100L, 'BAR', c(200L, 200L))
 
-  expect_that(jqr(jsonlite::toJSON(src), ".[3][]"),
+  expect_that(jqr(jsonlite::toJSON(src), ".[3][]", 0),
               equals(c("200", "200")))
 })
