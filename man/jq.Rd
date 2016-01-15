@@ -17,6 +17,8 @@ jq(x, ...)
 
 \item{...}{character specification of jq query. Each element in code{...}
 will be combined with " | ", which is convenient for long queries.}
+
+\item{flags}{See \code{\link{jq_flags}}}
 }
 \description{
 \code{jq} is meant to work with the high level interface in this package. \code{jq}

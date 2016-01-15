@@ -9,6 +9,7 @@
 #' @param x \code{json} object or character string with json data.
 #' @param ... character specification of jq query. Each element in code{...}
 #'   will be combined with " | ", which is convenient for long queries.
+#' @param flags See \code{\link{jq_flags}}
 #' @seealso \code{\link{peek}}
 #' @examples
 #' '{"a": 7}' %>%  do(.a + 1)
