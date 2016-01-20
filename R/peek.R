@@ -2,8 +2,7 @@
 #'
 #' Prints the query resulting from \code{jq} all in one character string just
 #' as you would execute it on the command line. Output gets class of json,
-#' and pretty prints to the console for easier viewing. The \code{jqr}
-#' doesn't do pretty printing.
+#' and pretty prints to the console for easier viewing.
 #'
 #' @export
 #' @param .data (list) input, using higher level interface

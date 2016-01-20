@@ -11,17 +11,11 @@
 #' x %>%
 #'    select(message = .commit.message, name = .commit.committer.name)
 #' x %>% select(sha = .commit.tree.sha, author = .author.login)
-#' x %>% select(sha = .commit.tree.sha, author = .author.login) %>% pretty
 #'
 #' # using json dataset, all elements
 #' x <- index(githubcommits)
-#' x %>%
-#'    select(message = .commit.message, name = .commit.committer.name) %>%
-#'    pretty
-#' ## pretty (newline after each element)
-#' x %>%
-#'  select(sha = .sha, name = .commit.committer.name) %>%
-#'  pretty
+#' x %>% select(message = .commit.message, name = .commit.committer.name)
+#' x %>% select(sha = .sha, name = .commit.committer.name)
 select <- function(.data, ...) {
   select_(.data, .dots = lazyeval::lazy_dots(...))
 }

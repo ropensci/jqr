@@ -3,7 +3,7 @@
 #' \code{jq} is meant to work with the high level interface in this package. \code{jq}
 #' also provides access to the low level interface in which you can use jq query strings just
 #' as you would on the command line. Output gets class of json, and pretty prints to
-#' the console for easier viewing. The \code{jqr} doesn't do pretty printing.
+#' the console for easier viewing. \code{jqr} doesn't do pretty printing.
 #'
 #' @export
 #' @param x \code{json} object or character string with json data.

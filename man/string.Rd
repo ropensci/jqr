@@ -17,6 +17,6 @@ Give back a character string
 '[8,3,null,6]' \%>\% sortj \%>\% string
 }
 \seealso{
-\code{\link{peek}}, \code{\link{pretty}}
+\code{\link{peek}}
 }
 

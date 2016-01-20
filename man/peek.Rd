@@ -12,8 +12,7 @@ peek(.data)
 \description{
 Prints the query resulting from \code{jq} all in one character string just
 as you would execute it on the command line. Output gets class of json,
-and pretty prints to the console for easier viewing. The \code{jqr}
-doesn't do pretty printing.
+and pretty prints to the console for easier viewing.
 }
 \examples{
 '{"a": 7}' \%>\% do(.a + 1) \%>\% peek

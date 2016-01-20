@@ -34,7 +34,6 @@ x <- '{
 }'
 
 x \%>\% dotstr(posts[])
-x \%>\% dotstr(posts[]) \%>\% pretty
 x \%>\% dotstr(posts[]) \%>\% string
 x \%>\% vars(realnames = names) \%>\% dotstr(posts[]) \%>\%
    select(title, author = "$names[.author]")
