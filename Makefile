@@ -29,7 +29,7 @@ check_all:
 	REMAKE_TEST_INSTALL_PACKAGES=true make check
 
 clean:
-	rm -f src/*.o src/*.so
+	rm -f src/*.o src/*.so src/*.dll
 	./cleanup
 
 attributes:
