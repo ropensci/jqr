@@ -6,9 +6,9 @@ Depends:
     R (>= 3.1.2)
 License: MIT + file LICENSE
 LazyData: true
-Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
+Authors@R: c(person("Rich", "FitzJohn", role = "aut",
     email = "rich.fitzjohn@gmail.com"),
-    person("Scott", "Chamberlain", role = "aut",
+    person("Scott", "Chamberlain", role = c("aut", "cre"),
     email = "myrmecocystus@gmail.com"),
     person("Stefan Milton Bache", role = "aut",
     email = "stefan@stefanbache.dk"),
