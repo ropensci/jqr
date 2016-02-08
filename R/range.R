@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param x Input, single number or number range.
-#' @param array (logical) Create array. Deafult: FALSE
+#' @param array (logical) Create array. Default: \code{FALSE}
 #' @examples
 #' rangej(2:4)
 #' 2:4 %>% rangej
@@ -12,7 +12,7 @@
 rangej <- function(x, array = FALSE) {
   pipe_autoexec(toggle = TRUE)
   x <- get_jq_seq(x, array)
-  structure(list(data = "null", args = structure(x, type = "range")), class = "jqr")
+  structure(list(data = "null", args = list(structure(x, type = "range"))), class = "jqr")
 }
 
 get_jq_seq <- function(y, z) {

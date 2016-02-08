@@ -21,7 +21,3 @@ print.jq_query <- function(x, ...) {
   cat("<jq query>", sep = "\n")
   cat("  query: ", x)
 }
-
-make_query <- function(x) {
-  paste0(pop(x), collapse = " | ")
-}
