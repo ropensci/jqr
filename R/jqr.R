@@ -69,11 +69,14 @@ query_from_dots <- function(...)
 ##' Flags for use with jq
 ##' @title Flags for use with jq
 ##' @param pretty Pretty print the json (different to jsonlite's
-##'   pretty printing).
+##'   pretty printing). Default: \code{FALSE}
 ##' @param ascii Force jq to produce pure ASCII output with non-ASCII
 ##'   characters replaced by equivalent escape sequences.
-##' @param color Add ANSI escape sequences for coloured output
-##' @param sorted Output fields of each object with keys in sorted order
+##'   Default: \code{FALSE}
+##' @param color Add ANSI escape sequences for coloured output.
+##'   Default: \code{FALSE}
+##' @param sorted Output fields of each object with keys in sorted order.
+##'   Default: \code{FALSE}
 ##' @export
 jq_flags <- function(pretty=FALSE, ascii=FALSE, color=FALSE, sorted=FALSE) {
   sum(c(integer(0),

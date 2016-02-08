@@ -17,13 +17,20 @@ would on the command line. Available via \code{\link{jq}}
 \section{High-level DSL}{
 
 High-level, uses a suite of functions to construct queries. Queries
-are constucted, then excuted internally with `jq()`.
+are constucted, then excuted internally with \code{\link{jq}}
 }
 
 \section{Pipes}{
 
 The high level DSL supports piping, though you don't have to use
 pipes.
+}
+
+\section{NSE and SE}{
+
+Most DSL functions have NSE (non-standard evaluation) and SE
+(standard evaluation) versions, which make \code{jqr} easy to use
+for interactive use as well as programming.
 }
 
 \section{jq version}{

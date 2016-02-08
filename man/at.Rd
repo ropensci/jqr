@@ -10,7 +10,9 @@ at(.data, ...)
 at_(.data, ..., .dots)
 }
 \arguments{
-\item{.data}{input}
+\item{.data}{input. This can be JSON input, or an object of class
+\code{jqr} that has JSON and query params combined, which is passed
+from function to function when using the jqr DSL.}
 
 \item{...}{Comma separated list of unquoted variable names}
 

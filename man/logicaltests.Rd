@@ -11,7 +11,9 @@ allj(.data)
 anyj(.data)
 }
 \arguments{
-\item{.data}{input}
+\item{.data}{input. This can be JSON input, or an object of class
+\code{jqr} that has JSON and query params combined, which is passed
+from function to function when using the jqr DSL.}
 }
 \description{
 Logical tests

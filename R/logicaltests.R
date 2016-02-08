@@ -2,7 +2,9 @@
 #'
 #' @export
 #' @name logicaltests
-#' @param .data input
+#' @param .data input. This can be JSON input, or an object of class
+#' \code{jqr} that has JSON and query params combined, which is passed
+#' from function to function when using the jqr DSL.
 #' @examples
 #' # any
 #' '[true, false]' %>% anyj
