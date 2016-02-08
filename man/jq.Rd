@@ -8,7 +8,7 @@
 \usage{
 jq(x, ...)
 
-\method{jq}{jqr}(x, ..., flags = jq_flags())
+\method{jq}{jqr}(x, ...)
 
 \method{jq}{character}(x, ..., flags = jq_flags())
 }
