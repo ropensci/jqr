@@ -2,7 +2,7 @@
 ##' @importFrom Rcpp evalCpp
 NULL
 
-cpt <- function (l) Filter(Negate(is.null), l)
+cpt <- function(l) Filter(Negate(is.null), l)
 
 comb <- function(x, y) {
   cpt(do.call("c", list(x, list(y))))
@@ -10,7 +10,7 @@ comb <- function(x, y) {
 
 tryargs <- function(x) {
   res <- tryCatch(x$args, error = function(e) e)
-  if(is(res, "simpleError")) {
+  if (is(res, "simpleError")) {
     list()
   } else {
     x$args
@@ -18,9 +18,9 @@ tryargs <- function(x) {
 }
 
 pop <- function(x) {
-  if(!is.null(names(x))){
+  if (!is.null(names(x))) {
     tmp <- x[ !names(x) %in% "data" ]
-    if(base::length(tmp) == 1) {
+    if (base::length(tmp) == 1) {
       tmp[[1]]
     } else {
       tmp
@@ -31,7 +31,7 @@ pop <- function(x) {
 }
 
 getdata <- function(x) {
-  if("data" %in% names(x)){
+  if ("data" %in% names(x)) {
     x$data
   } else {
     x
@@ -44,4 +44,8 @@ pluck <- function(x, name, type) {
   } else {
     vapply(x, "[[", name, FUN.VALUE = type)
   }
+}
+
+make_query <- function(x) {
+  paste0(pop(x), collapse = " | ")
 }

@@ -9,7 +9,7 @@ rangej(x, array = FALSE)
 \arguments{
 \item{x}{Input, single number or number range.}
 
-\item{array}{(logical) Create array. Deafult: FALSE}
+\item{array}{(logical) Create array. Default: \code{FALSE}}
 }
 \description{
 Produce range of numbers
