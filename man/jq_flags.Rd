@@ -12,17 +12,14 @@ flags(.data, pretty = FALSE, ascii = FALSE, color = FALSE,
 }
 \arguments{
 \item{pretty}{Pretty print the json (different to jsonlite's
-pretty printing). Default: \code{FALSE}}
+pretty printing).}
 
 \item{ascii}{Force jq to produce pure ASCII output with non-ASCII
-characters replaced by equivalent escape sequences.
-Default: \code{FALSE}}
+characters replaced by equivalent escape sequences.}
 
-\item{color}{Add ANSI escape sequences for coloured output.
-Default: \code{FALSE}}
+\item{color}{Add ANSI escape sequences for coloured output}
 
-\item{sorted}{Output fields of each object with keys in sorted order.
-Default: \code{FALSE}}
+\item{sorted}{Output fields of each object with keys in sorted order}
 
 \item{.data}{A \code{jqr} object.}
 }

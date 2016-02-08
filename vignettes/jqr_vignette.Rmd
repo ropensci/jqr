@@ -16,11 +16,15 @@ knitr::opts_chunk$set(
 Introduction to jqr
 ===================
 
-[jq](https://stedolan.github.io/jq/) is a _lightweight and flexible command-line JSON processor_, written in C. It's super fast, and very flexible.
+[jq](https://stedolan.github.io/jq/) is a _lightweight and flexible command-line JSON processor_, written in C. It's super fast, and very flexible. `jq` gives you the ability to index into, parse, and do calculations on JSON data. You can cut up and filter JSON data. You can change JSON key names and values. `jq` lets you do conditionals and comparisons, and write your own custom functions to operate on JSON data.
+
+You can convert JSON into an R list or other R data structure, and proceed with data parsing, but why not do your JSON parsing on the actual JSON if it's easy enough?  That's where `jq` comes in. Doing your data manipulations on the actual JSON makes it easy to pass data to downstream processes that expect JSON.
+
+If you already familiar with `jq` by using it on the command line you can use the exact same commands with `jqr`. If you've never used `jq`, `jqr` makes `jq` easy to learn with a domain specific language - and you can learn the actual `jq` syntax as you go and apply it on the command line outside of R.
 
 ## NSE vs. SE
 
-Many functions in `jqr` have NSE as well as SE versions, where the NSE version for sorting an array is `sortj()` whereas the SE version is `sortj_()`. Some functions only have one version, and behave under SE rules. 
+Many functions in `jqr` have NSE (non-standard evaluation) as well as SE (standard evaluation) versions, where the NSE version for sorting an array is `sortj()` whereas the SE version is `sortj_()`. Some functions only have one version, and behave under SE rules. 
 
 When you pass JSON into a function as the first parameter (like `ad('["a","b","c"]')`) rather than piping it in (like `'["a","b","c"]' %>% ad`), `jq()` is not executed. Rather you get back an object of class `jqr` that holds the data you passed in and the query. To execute the query on the data, run `jq()`, e.g., like `jq(ad('["a","b","c"]'))` or `ad('["a","b","c"]') %>% jq()`.
 
@@ -47,7 +51,7 @@ The program passed is exactly the same as you'd pass on the command line. Becaus
 
 ### jqr DSL
 
-The `jqr` DSL uses a suite of functions to construct queries that are excuted internally with `jq()` after the last piped command. We use some logic provided by Stefan Bache to determine whether the function call is the last in a series of pipes, and if so, we run `jq()` on the JSON string and program/query passed.
+The `jqr` DSL uses a suite of functions to construct queries that are executed internally with `jq()` after the last piped command. We use some logic to determine whether the function call is the last in a series of pipes, and if so, we run `jq()` on the JSON string and program/query passed.
 
 You don't have to use pipes - they are optional. Though they do make things easier in that you can build up queries easily, just as you would with `jq`, or any other tools, on the command line.
 
@@ -67,7 +71,7 @@ You don't have to use pipes - they are optional. Though they do make things easi
   * `haskey` - checks if a json string has a key or keys
   * `del` - deletes provided keys
 * Maths
-  * `do` - arbitary math operations
+  * `do` - arbitrary math operations
   * `lengthj` - length
   * `sqrtj` - square root
   * `floorj` - returns the floor of its numeric input
@@ -78,8 +82,8 @@ You don't have to use pipes - they are optional. Though they do make things easi
 * Manipulation operations
   * `join` - join strings on given separator
   * `splitj` - split string on separator argument
-  * `ltrimstr` - removen given prefix string, if it starts with it
-  * `rtrimstr` - removen given suffix string, if it starts with it
+  * `ltrimstr` - remove given prefix string, if it starts with it
+  * `rtrimstr` - remove given suffix string, if it starts with it
   * `startswith` - logical output, test if input start with foo
   * `endswith` - logical output, test if input ends with foo
   * `indices` - array with numeric indices where foo occurs in inputs
@@ -100,8 +104,8 @@ You don't have to use pipes - they are optional. Though they do make things easi
   * `funs` - Define and use functions
 * Variables
   * `vars` - Define variables to use later
-* Recursepan
-  * `vars` - Search through a recursive structure - extract data from all levels
+* Recursion
+  * `recurse` - Search through a recursive structure - extract data from all levels
 * Paths
   * `paths` - Outputs paths to all the elements in its input
 * Range
