@@ -9,13 +9,21 @@
 Introduction to jqr
 ===================
 
-There's low and high level (or DSL [domain specific language]) interfaces in `jqr`.
+[jq](https://stedolan.github.io/jq/) is a _lightweight and flexible command-line JSON processor_, written in C. It's super fast, and very flexible.
 
 ## NSE vs. SE
 
-Many functions in `jqr` have NSE as well as SE versions, where the NSE version for sorting an array is `sortj()` whereas the SE version is `sortj_()`. Some functions only have one version, and behave under SE rules.
+Many functions in `jqr` have NSE as well as SE versions, where the NSE version for sorting an array is `sortj()` whereas the SE version is `sortj_()`. Some functions only have one version, and behave under SE rules. 
 
-## jqr low level interface
+When you pass JSON into a function as the first parameter (like `ad('["a","b","c"]')`) rather than piping it in (like `'["a","b","c"]' %>% ad`), `jq()` is not executed. Rather you get back an object of class `jqr` that holds the data you passed in and the query. To execute the query on the data, run `jq()`, e.g., like `jq(ad('["a","b","c"]'))` or `ad('["a","b","c"]') %>% jq()`.
+
+When piping JSON to DSL functions `jq()` is executed on the last DSL function used.
+
+## jqr API
+
+There's low and high level (or DSL [domain specific language]) interfaces in `jqr`.
+
+### jqr low level interface
 
 The low level and high level interfaces are unified via the function `jq()`. You can access the low leve interface by using `jq()` directly, passing a JSON string as the first parameter, the program (query) as the second, and [the flags](https://stedolan.github.io/jq/manual/#Invokingjq) as the third (by default no flags are passed).
 
@@ -28,11 +36,11 @@ For example, a JSON string could be `'{"a": 7, "b": 4}'`, and the program could 
 }
 ```
 
-The program passed is exactly the same as you'd pass on the command line. Because this is simpl a replication of the command line in R, there is a higher level interface, or DSL.
+The program passed is exactly the same as you'd pass on the command line. Because this is a  simple replication of the command line in R, there is a higher level interface, or DSL, to make it easier to use `jq`. Nonetheless, the low level interface is important as some `jq` veterans may not want to deal with a DSL, and you may need to drop down to the low level interface if the DSL doesn't work for some reason.
 
-## jqr DSL
+### jqr DSL
 
-The `jqr` DSL uses a suite of functions to construct queries that are excuted internally with `jq()` after the last piped command. We use some logic provided by Stefan Bache to determine whether the a function call is the last in a series of pipes, and if so, we run `jq()` on the JSON string passed, and the program/query passed.
+The `jqr` DSL uses a suite of functions to construct queries that are excuted internally with `jq()` after the last piped command. We use some logic provided by Stefan Bache to determine whether the function call is the last in a series of pipes, and if so, we run `jq()` on the JSON string and program/query passed.
 
 You don't have to use pipes - they are optional. Though they do make things easier in that you can build up queries easily, just as you would with `jq`, or any other tools, on the command line.
 
@@ -53,8 +61,8 @@ You don't have to use pipes - they are optional. Though they do make things easi
   * `del` - deletes provided keys
 * Maths
   * `do` - arbitary math operations
-  * `lengthj` - length, `j` on end to avoid collision with `base::length`
-  * `sqrtj` - square root, `j` on end to avoid collision with `base::length`
+  * `lengthj` - length
+  * `sqrtj` - square root
   * `floorj` - returns the floor of its numeric input
   * `minj` - minimum element of input
   * `maxj` - maximum element of input
@@ -77,7 +85,7 @@ You don't have to use pipes - they are optional. Though they do make things easi
   * `group` - groups the elements having the same .foo field into separate arrays
 * Sort
   * `sortj` - sort an array
-  * `reverse` - reverse an array
+  * `reverse` - reverse sort an array
 * Types
   * `type` - select elements by type
   * `types` - get type for each element
@@ -85,12 +93,12 @@ You don't have to use pipes - they are optional. Though they do make things easi
   * `funs` - Define and use functions
 * Variables
   * `vars` - Define variables to use later
-* Recurse
+* Recursepan
   * `vars` - Search through a recursive structure - extract data from all levels
 * Paths
   * `paths` - Outputs paths to all the elements in its input
 * Range
-  * `range` - Produce range of numbers
+  * `rangej` - Produce range of numbers
 * Format strings
   * `at` - Format strings and escaping
 
@@ -136,9 +144,7 @@ combine(x)
 #> }
 ```
 
-## Some examples
-
-Index
+## index
 
 
 ```r
@@ -156,7 +162,11 @@ x %>% index()
 #> ]
 ```
 
-Sort
+## sort
+
+Note the function name is `sortj` to avoid collision with `base::sort`. In addition, a 
+number of other functions in this package that conflict with base R functions have a 
+`j` on the end.
 
 
 ```r
@@ -169,7 +179,7 @@ Sort
 #> ]
 ```
 
-reverse order
+sort in reverse order
 
 
 ```r
@@ -182,17 +192,7 @@ reverse order
 #> ]
 ```
 
-Get multiple outputs for array w/ > 1 element
-
-
-```r
-x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
-x %>% index()
-x %>% select(user, title = `.titles[]`)
-x %>% select(user, title = `.titles[]`) %>% combine
-```
-
-join
+## join
 
 
 ```r
@@ -202,7 +202,7 @@ join
 #> "a; b,c,d; e"
 ```
 
-endswith
+## starts- and ends-with
 
 
 ```r
@@ -216,7 +216,19 @@ endswith
 #> ]
 ```
 
-contains
+
+```r
+'["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% startswith(foo)
+#> [
+#>     false,
+#>     true,
+#>     false,
+#>     true,
+#>     false
+#> ]
+```
+
+## contains
 
 
 ```r
@@ -224,7 +236,7 @@ contains
 #> true
 ```
 
-unique
+## unique
 
 
 ```r
@@ -236,6 +248,8 @@ unique
 #>     5
 #> ]
 ```
+
+## data types
 
 Get type information for each element
 
@@ -271,6 +285,8 @@ Select elements by type
 #> false
 ```
 
+## keys
+
 Get keys
 
 
@@ -290,6 +306,10 @@ Delete by key name
 str %>% del(bar)
 #> {
 #>     "foo": 5
+#> }
+str %>% del(foo)
+#> {
+#>     "bar": 7
 #> }
 ```
 
@@ -311,6 +331,8 @@ str3 %>% haskey(1,2)
 #>     true
 #> ]
 ```
+
+## select 
 
 Select variables by name, and rename
 
@@ -373,6 +395,8 @@ githubcommits %>%
 #> ]
 ```
 
+## maths 
+
 Maths comparisons
 
 
@@ -421,7 +445,7 @@ Maths comparisons
 #> ]
 ```
 
-Sqrt
+## sqrt
 
 
 ```r
@@ -429,7 +453,7 @@ Sqrt
 #> 3
 ```
 
-Floor
+## floor
 
 
 ```r
@@ -437,7 +461,7 @@ Floor
 #> 3
 ```
 
-Find minimum
+## find minimum
 
 
 ```r
@@ -460,7 +484,7 @@ Find minimum
 #> }
 ```
 
-Find maximum
+## find maximum
 
 
 ```r

@@ -20,7 +20,11 @@ Introduction to jqr
 
 ## NSE vs. SE
 
-Many functions in `jqr` have NSE as well as SE versions, where the NSE version for sorting an array is `sortj()` whereas the SE version is `sortj_()`. Some functions only have one version, and behave under SE rules.
+Many functions in `jqr` have NSE as well as SE versions, where the NSE version for sorting an array is `sortj()` whereas the SE version is `sortj_()`. Some functions only have one version, and behave under SE rules. 
+
+When you pass JSON into a function as the first parameter (like `ad('["a","b","c"]')`) rather than piping it in (like `'["a","b","c"]' %>% ad`), `jq()` is not executed. Rather you get back an object of class `jqr` that holds the data you passed in and the query. To execute the query on the data, run `jq()`, e.g., like `jq(ad('["a","b","c"]'))` or `ad('["a","b","c"]') %>% jq()`.
+
+When piping JSON to DSL functions `jq()` is executed on the last DSL function used.
 
 ## jqr API
 
@@ -43,7 +47,7 @@ The program passed is exactly the same as you'd pass on the command line. Becaus
 
 ### jqr DSL
 
-The `jqr` DSL uses a suite of functions to construct queries that are excuted internally with `jq()` after the last piped command. We use some logic provided by Stefan Bache to determine whether the function call is the last in a series of pipes, and if so, we run `jq()` on the JSON strig and program/query passed.
+The `jqr` DSL uses a suite of functions to construct queries that are excuted internally with `jq()` after the last piped command. We use some logic provided by Stefan Bache to determine whether the function call is the last in a series of pipes, and if so, we run `jq()` on the JSON string and program/query passed.
 
 You don't have to use pipes - they are optional. Though they do make things easier in that you can build up queries easily, just as you would with `jq`, or any other tools, on the command line.
 
