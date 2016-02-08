@@ -10,3 +10,4 @@ man-roxygen
 ^notes\.md$
 ^appveyor.yml$
 ^patch\.R$
+^CONDUCT\.md$
