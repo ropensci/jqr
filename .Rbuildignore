@@ -11,3 +11,4 @@ man-roxygen
 ^appveyor.yml$
 ^patch\.R$
 ^CONDUCT\.md$
+cran-comments.md
