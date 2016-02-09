@@ -19,5 +19,5 @@ peek <- function(.data) {
 #' @export
 print.jq_query <- function(x, ...) {
   cat("<jq query>", sep = "\n")
-  cat("  query: ", x)
+  cat(sprintf("  query: %s\n", x))
 }
