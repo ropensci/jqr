@@ -6,4 +6,7 @@ R development version, Ubuntu running on Travis-CI, and WinBuilder.
 
 This is a new package.
 
+We did notice warnings on Windows systems with the WinBuilder check, but 
+they're coming from the libjq C library which this package wraps.
+
 Thanks! Scott Chamberlain
