@@ -12,7 +12,7 @@
 #' '[8,3,null,6]' %>% sortj %>% peek
 peek <- function(.data) {
   pipe_autoexec(toggle = FALSE)
-  if (!is(.data, "jqr")) stop("must be of class jqr", call. = FALSE)
+  if (!inherits(.data, "jqr")) stop("must be of class jqr", call. = FALSE)
   structure(make_query(.data), class = "jq_query")
 }
 

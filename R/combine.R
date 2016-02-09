@@ -11,7 +11,7 @@
 #' combine(x)
 combine <- function(x) {
   pipe_autoexec(toggle = FALSE)
-  if (!is(x, "jqson")) stop("Must be class jqson", call. = FALSE)
+  if (!inherits(x, "jqson")) stop("Must be class jqson", call. = FALSE)
   if (!jsonlite::validate(x)) {
     tmp <- paste0("[", paste0(x, collapse = ", "), "]")
     tmpval <- jsonlite::validate(tmp)

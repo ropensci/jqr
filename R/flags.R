@@ -30,7 +30,7 @@ jq_flags <- function(pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALS
 #' @export
 flags <- function(.data, pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALSE)
 {
-  jq_obj <- `if`(is(.data, "jqr"), .data, dot_(.data, dots = "."))
+  jq_obj <- `if`(inherits(.data, "jqr"), .data, dot_(.data, dots = "."))
 
   pipe_autoexec(toggle = TRUE)
 

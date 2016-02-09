@@ -10,7 +10,7 @@ comb <- function(x, y) {
 
 tryargs <- function(x) {
   res <- tryCatch(x$args, error = function(e) e)
-  if (is(res, "simpleError")) {
+  if (inherits(res, "simpleError")) {
     list()
   } else {
     x$args

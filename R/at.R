@@ -44,7 +44,7 @@ at_ <- function(.data, ..., .dots) {
 }
 
 get_expr <- function(x) {
-  if (is(x, "lazy_dots")) {
+  if (inherits(x, "lazy_dots")) {
     as.character(x[[1]]$expr)
   } else {
     as.character(x$expr)
