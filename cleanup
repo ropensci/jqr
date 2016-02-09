@@ -1,6 +1,0 @@
-#!/bin/sh
-echo "Cleaning up"
-if [ -f inst/jq_sources ]; then
-    rm -f `cat inst/jq_sources`
-fi
-rm -f src/*.o src/*.so src/*.dll

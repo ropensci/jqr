@@ -1,3 +1,21 @@
 # -*-makefile-*-
+OBJECTS = \
+	jqr.o \
+	RcppExports.o \
+	jq/builtin.o \
+	jq/bytecode.o \
+	jq/compile.o \
+	jq/execute.o \
+	jq/jv_alloc.o \
+	jq/jv_aux.o \
+	jq/jv_dtoa.o \
+	jq/jv_file.o \
+	jq/jv_parse.o \
+	jq/jv_print.o \
+	jq/jv_unicode.o \
+	jq/jv.o \
+	jq/lexer.o \
+	jq/locfile.o \
+	jq/parser.o
 PKG_CPPFLAGS = -Ijq
 PKG_CFLAGS = -Ijq

@@ -63,7 +63,17 @@ unlink(file.path(jq_path, drop), recursive=TRUE)
 ## These are bad news.
 invisible(file.remove(file.path(jq_path, c("main.c", "jq_test.c"))))
 
-writeLines(file.path("src", dir(jq_path, glob2rx("*.c"))),
-           "inst/jq_sources")
-
 source("patch.R")
+
+## Generate the makevars file
+re <- "\\.(c|cpp)$"
+src <- c(dir("src", re),
+         file.path("jq", dir(jq_path, re)))
+objects <- sub(re, ".o", src)
+fmt <- '# -*-makefile-*-
+OBJECTS = \\
+\t%s
+PKG_CPPFLAGS = -Ijq
+PKG_CFLAGS = -Ijq'
+writeLines(sprintf(fmt, paste(objects, collapse=" \\\n\t")),
+           "src/Makevars")
