@@ -29,8 +29,7 @@ check_all:
 	REMAKE_TEST_INSTALL_PACKAGES=true make check
 
 clean:
-	rm -f src/*.o src/*.so
-	./cleanup
+	rm -f src/jq/*.o src/*.o src/*.so
 
 attributes:
 	${RSCRIPT} -e 'library(methods); Rcpp::compileAttributes()'

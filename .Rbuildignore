@@ -12,3 +12,4 @@ man-roxygen
 ^patch\.R$
 ^CONDUCT\.md$
 cran-comments.md
+^src/jq/.*\.o$
