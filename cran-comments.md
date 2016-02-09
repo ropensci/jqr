@@ -6,7 +6,10 @@ R development version, Ubuntu running on Travis-CI, and WinBuilder.
 
 This is a new package.
 
-We did notice warnings on Windows systems with the WinBuilder check, but 
+We did notice warnings on Windows systems with the WinBuilder check, but
 they're coming from the libjq C library which this package wraps.
+
+Note that CHECK says that 'jq' should be sentence cased, but that is
+an improper spelling of the software.
 
 Thanks! Scott Chamberlain
