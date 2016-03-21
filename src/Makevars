@@ -21,5 +21,4 @@ libjq.a: $(LIBJQ)
 	$(AR) rcs libjq.a $(LIBJQ)
 
 PKG_CPPFLAGS = -Ijq
-PKG_CFLAGS = -Ijq
 PKG_LIBS = -L. -ljq
