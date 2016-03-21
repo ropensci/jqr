@@ -1,7 +1,4 @@
-# -*-makefile-*-
-OBJECTS = \
-	jqr.o \
-	RcppExports.o \
+LIBJQ = \
 	jq/builtin.o \
 	jq/bytecode.o \
 	jq/compile.o \
@@ -17,5 +14,12 @@ OBJECTS = \
 	jq/lexer.o \
 	jq/locfile.o \
 	jq/parser.o
+
+$(SHLIB): libjq.a
+
+libjq.a: $(LIBJQ)
+	$(AR) rcs libjq.a $(LIBJQ)
+
 PKG_CPPFLAGS = -Ijq
 PKG_CFLAGS = -Ijq
+PKG_LIBS = -L. -ljq
