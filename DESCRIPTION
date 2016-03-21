@@ -29,5 +29,6 @@ Imports:
 Suggests:
     jsonlite,
     testthat,
-    knitr
+    knitr,
+    covr
 RoxygenNote: 5.0.1

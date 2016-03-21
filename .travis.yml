@@ -1,8 +1,6 @@
 language: r
-sudo: required
-
-r_github_packages:
-  - jimhester/covr
+sudo: false
+cache: packages
 
 after_failure:
   - ./travis-tool.sh dump_logs
