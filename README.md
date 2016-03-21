@@ -19,8 +19,14 @@ means that the eventual loading into R can be quicker.
 
 ## Install
 
+Stable version:
 
-Install `jqr` via devtools:
+
+```r
+install.packages("jqr")
+```
+
+Development version:
 
 
 ```r

@@ -26,8 +26,13 @@ means that the eventual loading into R can be quicker.
 
 ## Install
 
+Stable version:
 
-Install `jqr` via devtools:
+```{r eval=FALSE}
+install.packages("jqr")
+```
+
+Development version:
 
 ```{r eval=FALSE}
 devtools::install_github("ropensci/jqr")
