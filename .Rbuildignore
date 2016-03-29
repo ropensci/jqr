@@ -14,3 +14,4 @@ man-roxygen
 cran-comments.md
 ^src/jq/.*\.o$
 ^src/libjq.a$
+$src/Makevars$
