@@ -1,0 +1,12 @@
+PKG_CPPFLAGS = -I../windows/jq-1.5/include
+PKG_LIBS = -L../windows/jq-1.5/lib${R_ARCH} -ljq -lonig -lshlwapi
+
+all: clean winlibs
+
+winlibs:
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
+
+clean:
+	rm -f $(OBJECTS) jqr.dll
+
+.PHONY: all clean winlibs
