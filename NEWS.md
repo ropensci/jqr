@@ -1,4 +1,4 @@
-jqr 0.3.0
+jqr 0.2.2
 =========
 
 Fixes for CRAN:
@@ -7,8 +7,8 @@ Fixes for CRAN:
 * Backport eb2fc1d (https://git.io/vwCF5)
 
 jqr 0.2.0
-==============
+=========
 
-NEW FEATURES
+## NEW FEATURES
 
 * Released to CRAN.
