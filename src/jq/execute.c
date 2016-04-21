@@ -52,7 +52,7 @@ struct frame {
   stack_ptr retdata;
   uint16_t* retaddr;
   /* bc->nclosures closures followed by bc->nlocals local variables */
-  union frame_entry entries[0]; 
+  union frame_entry entries[]; 
 };
 
 static int frame_size(struct bytecode* bc) {
