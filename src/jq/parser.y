@@ -107,13 +107,13 @@ struct lexer_param {
     /*YYERROR*/;                                                   \
   } while (0)
 
-void yyerror(YYLTYPE* loc, block* answer, int* errors, 
+void yyerror(YYLTYPE* loc, block* answer, int* errors,
              struct locfile* locations, struct lexer_param* lexer_param_ptr, const char *s){
   (*errors)++;
   locfile_locate(locations, *loc, "error: %s", s);
 }
 
-int yylex(YYSTYPE* yylval, YYLTYPE* yylloc, block* answer, int* errors, 
+int yylex(YYSTYPE* yylval, YYLTYPE* yylloc, block* answer, int* errors,
           struct locfile* locations, struct lexer_param* lexer_param_ptr) {
   yyscan_t lexer = lexer_param_ptr->lexer;
   int tok = jq_yylex(yylval, yylloc, lexer);
@@ -175,7 +175,7 @@ static block gen_binop(block a, block b, int op) {
 }
 
 static block gen_format(block a, jv fmt) {
-  return BLOCK(a, gen_call("format", BLOCK(gen_lambda(gen_const(fmt)))));
+  return BLOCK(a, gen_call("format", gen_lambda(gen_const(fmt))));
 }
 
 static block gen_definedor_assign(block object, block val) {
@@ -183,16 +183,16 @@ static block gen_definedor_assign(block object, block val) {
   return BLOCK(gen_op_simple(DUP),
                val, tmp,
                gen_call("_modify", BLOCK(gen_lambda(object),
-                                         gen_lambda(gen_definedor(gen_noop(), 
+                                         gen_lambda(gen_definedor(gen_noop(),
                                                                   gen_op_bound(LOADV, tmp))))));
 }
- 
+
 static block gen_update(block object, block val, int optype) {
   block tmp = gen_op_var_fresh(STOREV, "tmp");
   return BLOCK(gen_op_simple(DUP),
                val,
                tmp,
-               gen_call("_modify", BLOCK(gen_lambda(object), 
+               gen_call("_modify", BLOCK(gen_lambda(object),
                                          gen_lambda(gen_binop(gen_noop(),
                                                               gen_op_bound(LOADV, tmp),
                                                               optype)))));
@@ -207,7 +207,7 @@ Exp {
 } |
 FuncDefs {
   *answer = $1;
-} 
+}
 
 FuncDefs:
 /* empty */ {
@@ -246,7 +246,7 @@ Exp '=' Exp {
 
 Exp "or" Exp {
   $$ = gen_or($1, $3);
-} | 
+} |
 
 Exp "and" Exp {
   $$ = gen_and($1, $3);
@@ -264,12 +264,12 @@ Exp "|=" Exp {
   $$ = gen_call("_modify", BLOCK(gen_lambda($1), gen_lambda($3)));
 } |
 
-Exp '|' Exp { 
-  $$ = block_join($1, $3); 
+Exp '|' Exp {
+  $$ = block_join($1, $3);
 } |
 
-Exp ',' Exp { 
-  $$ = gen_both($1, $3); 
+Exp ',' Exp {
+  $$ = gen_both($1, $3);
 } |
 
 Exp '+' Exp {
@@ -340,8 +340,8 @@ Exp ">=" Exp {
   $$ = gen_binop($1, $3, GREATEREQ);
 } |
 
-Term { 
-  $$ = $1; 
+Term {
+  $$ = $1;
 }
 
 FuncDef:
@@ -351,16 +351,16 @@ FuncDef:
 } |
 
 "def" IDENT '(' IDENT ')' ':' Exp ';' {
-  $$ = gen_function(jv_string_value($2), 
-                    gen_param(jv_string_value($4)), 
+  $$ = gen_function(jv_string_value($2),
+                    gen_param(jv_string_value($4)),
                     $7);
   jv_free($2);
   jv_free($4);
 } |
 
 "def" IDENT '(' IDENT ';' IDENT ')' ':' Exp ';' {
-  $$ = gen_function(jv_string_value($2), 
-                    BLOCK(gen_param(jv_string_value($4)), 
+  $$ = gen_function(jv_string_value($2),
+                    BLOCK(gen_param(jv_string_value($4)),
                           gen_param(jv_string_value($6))),
                     $9);
   jv_free($2);
@@ -369,8 +369,8 @@ FuncDef:
 } |
 
 "def" IDENT '(' IDENT ';' IDENT ';' IDENT ')' ':' Exp ';' {
-  $$ = gen_function(jv_string_value($2), 
-                    BLOCK(gen_param(jv_string_value($4)), 
+  $$ = gen_function(jv_string_value($2),
+                    BLOCK(gen_param(jv_string_value($4)),
                           gen_param(jv_string_value($6)),
                           gen_param(jv_string_value($8))),
                     $11);
@@ -381,8 +381,8 @@ FuncDef:
 } |
 
 "def" IDENT '(' IDENT ';' IDENT ';' IDENT ';' IDENT ')' ':' Exp ';' {
-  $$ = gen_function(jv_string_value($2), 
-                    BLOCK(gen_param(jv_string_value($4)), 
+  $$ = gen_function(jv_string_value($2),
+                    BLOCK(gen_param(jv_string_value($4)),
                           gen_param(jv_string_value($6)),
                           gen_param(jv_string_value($8)),
                           gen_param(jv_string_value($10))),
@@ -395,8 +395,8 @@ FuncDef:
 } |
 
 "def" IDENT '(' IDENT ';' IDENT ';' IDENT ';' IDENT ';' IDENT ')' ':' Exp ';' {
-  $$ = gen_function(jv_string_value($2), 
-                    BLOCK(gen_param(jv_string_value($4)), 
+  $$ = gen_function(jv_string_value($2),
+                    BLOCK(gen_param(jv_string_value($4)),
                           gen_param(jv_string_value($6)),
                           gen_param(jv_string_value($8)),
                           gen_param(jv_string_value($10)),
@@ -411,8 +411,8 @@ FuncDef:
 } |
 
 "def" IDENT '(' IDENT ';' IDENT ';' IDENT ';' IDENT ';' IDENT ';' IDENT ')' ':' Exp ';' {
-  $$ = gen_function(jv_string_value($2), 
-                    BLOCK(gen_param(jv_string_value($4)), 
+  $$ = gen_function(jv_string_value($2),
+                    BLOCK(gen_param(jv_string_value($4)),
                           gen_param(jv_string_value($6)),
                           gen_param(jv_string_value($8)),
                           gen_param(jv_string_value($10)),
@@ -461,7 +461,7 @@ ElseBody:
 }
 
 ExpD:
-ExpD '|' ExpD { 
+ExpD '|' ExpD {
   $$ = block_join($1, $3);
 } |
 '-' ExpD {
@@ -474,7 +474,7 @@ Term {
 
 Term:
 '.' {
-  $$ = gen_noop(); 
+  $$ = gen_noop();
 } |
 REC {
   $$ = gen_call("recurse_down", gen_noop());
@@ -482,8 +482,8 @@ REC {
 Term FIELD '?' {
   $$ = gen_index_opt($1, gen_const($2));
 } |
-FIELD '?' { 
-  $$ = gen_index_opt(gen_noop(), gen_const($1)); 
+FIELD '?' {
+  $$ = gen_index_opt(gen_noop(), gen_const($1));
 } |
 Term '.' String '?' {
   $$ = gen_index_opt($1, $3);
@@ -494,8 +494,8 @@ Term '.' String '?' {
 Term FIELD {
   $$ = gen_index($1, gen_const($2));
 } |
-FIELD { 
-  $$ = gen_index(gen_noop(), gen_const($1)); 
+FIELD {
+  $$ = gen_index(gen_noop(), gen_const($1));
 } |
 Term '.' String {
   $$ = gen_index($1, $3);
@@ -511,19 +511,19 @@ Term '.' String {
   jv_free($2);
   FAIL(@$, "try .[\"field\"] instead of .field for unusually named fields");
   $$ = gen_noop();
-} | 
+} |
 /* FIXME: string literals */
 Term '[' Exp ']' '?' {
-  $$ = gen_index_opt($1, $3); 
+  $$ = gen_index_opt($1, $3);
 } |
 Term '[' Exp ']' {
-  $$ = gen_index($1, $3); 
+  $$ = gen_index($1, $3);
 } |
 Term '[' ']' '?' {
-  $$ = block_join($1, gen_op_simple(EACH_OPT)); 
+  $$ = block_join($1, gen_op_simple(EACH_OPT));
 } |
 Term '[' ']' {
-  $$ = block_join($1, gen_op_simple(EACH)); 
+  $$ = block_join($1, gen_op_simple(EACH));
 } |
 Term '[' Exp ':' Exp ']' '?' {
   $$ = gen_slice_index($1, $3, $5, INDEX_OPT);
@@ -544,7 +544,7 @@ Term '[' ':' Exp ']' {
   $$ = gen_slice_index($1, gen_const(jv_null()), $4, INDEX);
 } |
 LITERAL {
-  $$ = gen_const($1); 
+  $$ = gen_const($1);
 } |
 String {
   $$ = $1;
@@ -552,22 +552,22 @@ String {
 FORMAT {
   $$ = gen_format(gen_noop(), $1);
 } |
-'(' Exp ')' { 
-  $$ = $2; 
-} | 
-'[' Exp ']' { 
-  $$ = gen_collect($2); 
+'(' Exp ')' {
+  $$ = $2;
 } |
-'[' ']' { 
-  $$ = gen_const(jv_array()); 
+'[' Exp ']' {
+  $$ = gen_collect($2);
 } |
-'{' MkDict '}' { 
+'[' ']' {
+  $$ = gen_const(jv_array());
+} |
+'{' MkDict '}' {
   $$ = BLOCK(gen_subexp(gen_const(jv_object())), $2, gen_op_simple(POP));
 } |
 '$' IDENT {
   $$ = gen_location(@$, gen_op_unbound(LOADV, jv_string_value($2)));
   jv_free($2);
-} | 
+} |
 IDENT {
   $$ = gen_location(@$, gen_call(jv_string_value($1), gen_noop()));
   jv_free($1);
@@ -608,15 +608,15 @@ Term '[' error ']' { $$ = $1; } |
 '{' error '}' { $$ = gen_noop(); }
 
 MkDict:
-{ 
-  $$=gen_noop(); 
+{
+  $$=gen_noop();
 } |
  MkDictPair { $$ = $1; }
 | MkDictPair ',' MkDict { $$=block_join($1, $3); }
 | error ',' MkDict { $$ = $3; }
 
 MkDictPair
-: IDENT ':' ExpD { 
+: IDENT ':' ExpD {
   $$ = gen_dictpair(gen_const($1), $3);
  }
 | String ':' ExpD {

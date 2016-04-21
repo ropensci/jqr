@@ -52,7 +52,7 @@ struct frame {
   stack_ptr retdata;
   uint16_t* retaddr;
   /* bc->nclosures closures followed by bc->nlocals local variables */
-  union frame_entry entries[0]; 
+  union frame_entry entries[];
 };
 
 static int frame_size(struct bytecode* bc) {
@@ -108,7 +108,7 @@ static struct closure make_closure(struct jq_state* jq, uint16_t* pc) {
   }
 }
 
-static struct frame* frame_push(struct jq_state* jq, struct closure callee, 
+static struct frame* frame_push(struct jq_state* jq, struct closure callee,
                                 uint16_t* argdef, int nargs) {
   stack_ptr new_frame_idx = stack_push_block(&jq->stk, jq->curr_frame, frame_size(callee.bc));
   struct frame* new_frame = stack_block(&jq->stk, new_frame_idx);
@@ -180,7 +180,7 @@ void stack_save(jq_state *jq, uint16_t* retaddr, struct stack_pos sp){
   struct forkpoint* fork = stack_block(&jq->stk, jq->fork_top);
   fork->saved_data_stack = jq->stk_top;
   fork->saved_curr_frame = jq->curr_frame;
-  fork->path_len = 
+  fork->path_len =
     jv_get_kind(jq->path) == JV_KIND_ARRAY ? jv_array_length(jv_copy(jq->path)) : 0;
   fork->subexp_nest = jq->subexp_nest;
   fork->return_address = retaddr;
@@ -355,7 +355,7 @@ jv jq_next(jq_state *jq) {
       stack_push(jq, b);
       break;
     }
-      
+
     case POP: {
       jv_free(stack_pop(jq));
       break;
@@ -540,8 +540,8 @@ jv jq_next(jq_state *jq) {
       break;
     }
 
-    case EACH: 
-    case EACH_OPT: 
+    case EACH:
+    case EACH_OPT:
       stack_push(jq, jv_number(-1));
       // fallthrough
     case ON_BACKTRACK(EACH):
@@ -619,7 +619,7 @@ jv jq_next(jq_state *jq) {
       pc += offset;
       break;
     }
-      
+
     case CALL_BUILTIN: {
       int nargs = *pc++;
       jv top = stack_pop(jq);
@@ -642,7 +642,7 @@ jv jq_next(jq_state *jq) {
       case 5: top = ((func_5)function->fptr)(in[0], in[1], in[2], in[3], in[4]); break;
       default: return jv_invalid_with_msg(jv_string("Function takes too many arguments"));
       }
-      
+
       if (jv_is_valid(top)) {
         stack_push(jq, top);
       } else {
@@ -731,7 +731,7 @@ void jq_set_nomem_handler(jq_state *jq, void (*nomem_handler)(void *), void *dat
 void jq_start(jq_state *jq, jv input, int flags) {
   jv_nomem_handler(jq->nomem_handler, jq->nomem_handler_data);
   jq_reset(jq);
-  
+
   struct closure top = {jq->bc, -1};
   struct frame* top_frame = frame_push(jq, top, 0, 0);
   top_frame->retdata = 0;
