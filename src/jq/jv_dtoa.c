@@ -187,7 +187,6 @@
  *	used for input more than STRTOD_DIGLIM digits long (default 40).
  */
 
-#define IEEE_8087
 #define NO_ERRNO
 #define NO_HEX_FP
 #define No_Hex_NaN
@@ -526,7 +525,7 @@ void jvp_dtoa_context_init(struct dtoa_context* C) {
   }
   C->p5s = 0;
 }
-  
+
  static Bigint *
  Balloc(struct dtoa_context* C, int k)
 {

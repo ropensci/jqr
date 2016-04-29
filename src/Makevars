@@ -20,5 +20,6 @@ $(SHLIB): libjq.a
 libjq.a: $(LIBJQ)
 	$(AR) rcs libjq.a $(LIBJQ)
 
+PKG_CFLAGS= -include endianfix.h
 PKG_CPPFLAGS = -Ijq
 PKG_LIBS = -L. -ljq
