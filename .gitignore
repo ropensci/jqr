@@ -9,6 +9,3 @@ jq-*.tar.gz
 jqr_*.tar.gz
 notes.md
 src/*.dll
-
-## jq sources
-src/*.c
