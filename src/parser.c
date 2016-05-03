@@ -118,7 +118,7 @@ struct lexer_param;
       (Loc).end = YYRHSLOC(Rhs, 0).end;         \
     }                                           \
   } while (0)
- 
+
 
 #line 124 "parser.c" /* yacc.c:355  */
 
@@ -249,13 +249,13 @@ struct lexer_param {
     /*YYERROR*/;                                                   \
   } while (0)
 
-void yyerror(YYLTYPE* loc, block* answer, int* errors, 
+void yyerror(YYLTYPE* loc, block* answer, int* errors,
              struct locfile* locations, struct lexer_param* lexer_param_ptr, const char *s){
   (*errors)++;
   locfile_locate(locations, *loc, "error: %s", s);
 }
 
-int yylex(YYSTYPE* yylval, YYLTYPE* yylloc, block* answer, int* errors, 
+int yylex(YYSTYPE* yylval, YYLTYPE* yylloc, block* answer, int* errors,
           struct locfile* locations, struct lexer_param* lexer_param_ptr) {
   yyscan_t lexer = lexer_param_ptr->lexer;
   int tok = jq_yylex(yylval, yylloc, lexer);
@@ -317,7 +317,7 @@ static block gen_binop(block a, block b, int op) {
 }
 
 static block gen_format(block a, jv fmt) {
-  return BLOCK(a, gen_call("format", BLOCK(gen_lambda(gen_const(fmt)))));
+  return BLOCK(a, gen_call("format", gen_lambda(gen_const(fmt))));
 }
 
 static block gen_definedor_assign(block object, block val) {
@@ -325,16 +325,16 @@ static block gen_definedor_assign(block object, block val) {
   return BLOCK(gen_op_simple(DUP),
                val, tmp,
                gen_call("_modify", BLOCK(gen_lambda(object),
-                                         gen_lambda(gen_definedor(gen_noop(), 
+                                         gen_lambda(gen_definedor(gen_noop(),
                                                                   gen_op_bound(LOADV, tmp))))));
 }
- 
+
 static block gen_update(block object, block val, int optype) {
   block tmp = gen_op_var_fresh(STOREV, "tmp");
   return BLOCK(gen_op_simple(DUP),
                val,
                tmp,
-               gen_call("_modify", BLOCK(gen_lambda(object), 
+               gen_call("_modify", BLOCK(gen_lambda(object),
                                          gen_lambda(gen_binop(gen_noop(),
                                                               gen_op_bound(LOADV, tmp),
                                                               optype)))));
@@ -2194,16 +2194,16 @@ yyreduce:
 
   case 17:
 #line 267 "parser.y" /* yacc.c:1646  */
-    { 
-  (yyval.blk) = block_join((yyvsp[-2].blk), (yyvsp[0].blk)); 
+    {
+  (yyval.blk) = block_join((yyvsp[-2].blk), (yyvsp[0].blk));
 }
 #line 2201 "parser.c" /* yacc.c:1646  */
     break;
 
   case 18:
 #line 271 "parser.y" /* yacc.c:1646  */
-    { 
-  (yyval.blk) = gen_both((yyvsp[-2].blk), (yyvsp[0].blk)); 
+    {
+  (yyval.blk) = gen_both((yyvsp[-2].blk), (yyvsp[0].blk));
 }
 #line 2209 "parser.c" /* yacc.c:1646  */
     break;
@@ -2346,8 +2346,8 @@ yyreduce:
 
   case 36:
 #line 343 "parser.y" /* yacc.c:1646  */
-    { 
-  (yyval.blk) = (yyvsp[0].blk); 
+    {
+  (yyval.blk) = (yyvsp[0].blk);
 }
 #line 2353 "parser.c" /* yacc.c:1646  */
     break;
@@ -2364,8 +2364,8 @@ yyreduce:
   case 38:
 #line 353 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_function(jv_string_value((yyvsp[-6].literal)), 
-                    gen_param(jv_string_value((yyvsp[-4].literal))), 
+  (yyval.blk) = gen_function(jv_string_value((yyvsp[-6].literal)),
+                    gen_param(jv_string_value((yyvsp[-4].literal))),
                     (yyvsp[-1].blk));
   jv_free((yyvsp[-6].literal));
   jv_free((yyvsp[-4].literal));
@@ -2376,8 +2376,8 @@ yyreduce:
   case 39:
 #line 361 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_function(jv_string_value((yyvsp[-8].literal)), 
-                    BLOCK(gen_param(jv_string_value((yyvsp[-6].literal))), 
+  (yyval.blk) = gen_function(jv_string_value((yyvsp[-8].literal)),
+                    BLOCK(gen_param(jv_string_value((yyvsp[-6].literal))),
                           gen_param(jv_string_value((yyvsp[-4].literal)))),
                     (yyvsp[-1].blk));
   jv_free((yyvsp[-8].literal));
@@ -2390,8 +2390,8 @@ yyreduce:
   case 40:
 #line 371 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_function(jv_string_value((yyvsp[-10].literal)), 
-                    BLOCK(gen_param(jv_string_value((yyvsp[-8].literal))), 
+  (yyval.blk) = gen_function(jv_string_value((yyvsp[-10].literal)),
+                    BLOCK(gen_param(jv_string_value((yyvsp[-8].literal))),
                           gen_param(jv_string_value((yyvsp[-6].literal))),
                           gen_param(jv_string_value((yyvsp[-4].literal)))),
                     (yyvsp[-1].blk));
@@ -2406,8 +2406,8 @@ yyreduce:
   case 41:
 #line 383 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_function(jv_string_value((yyvsp[-12].literal)), 
-                    BLOCK(gen_param(jv_string_value((yyvsp[-10].literal))), 
+  (yyval.blk) = gen_function(jv_string_value((yyvsp[-12].literal)),
+                    BLOCK(gen_param(jv_string_value((yyvsp[-10].literal))),
                           gen_param(jv_string_value((yyvsp[-8].literal))),
                           gen_param(jv_string_value((yyvsp[-6].literal))),
                           gen_param(jv_string_value((yyvsp[-4].literal)))),
@@ -2424,8 +2424,8 @@ yyreduce:
   case 42:
 #line 397 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_function(jv_string_value((yyvsp[-14].literal)), 
-                    BLOCK(gen_param(jv_string_value((yyvsp[-12].literal))), 
+  (yyval.blk) = gen_function(jv_string_value((yyvsp[-14].literal)),
+                    BLOCK(gen_param(jv_string_value((yyvsp[-12].literal))),
                           gen_param(jv_string_value((yyvsp[-10].literal))),
                           gen_param(jv_string_value((yyvsp[-8].literal))),
                           gen_param(jv_string_value((yyvsp[-6].literal))),
@@ -2444,8 +2444,8 @@ yyreduce:
   case 43:
 #line 413 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_function(jv_string_value((yyvsp[-16].literal)), 
-                    BLOCK(gen_param(jv_string_value((yyvsp[-14].literal))), 
+  (yyval.blk) = gen_function(jv_string_value((yyvsp[-16].literal)),
+                    BLOCK(gen_param(jv_string_value((yyvsp[-14].literal))),
                           gen_param(jv_string_value((yyvsp[-12].literal))),
                           gen_param(jv_string_value((yyvsp[-10].literal))),
                           gen_param(jv_string_value((yyvsp[-8].literal))),
@@ -2535,7 +2535,7 @@ yyreduce:
 
   case 53:
 #line 464 "parser.y" /* yacc.c:1646  */
-    { 
+    {
   (yyval.blk) = block_join((yyvsp[-2].blk), (yyvsp[0].blk));
 }
 #line 2542 "parser.c" /* yacc.c:1646  */
@@ -2560,7 +2560,7 @@ yyreduce:
   case 56:
 #line 476 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_noop(); 
+  (yyval.blk) = gen_noop();
 }
 #line 2566 "parser.c" /* yacc.c:1646  */
     break;
@@ -2583,8 +2583,8 @@ yyreduce:
 
   case 59:
 #line 485 "parser.y" /* yacc.c:1646  */
-    { 
-  (yyval.blk) = gen_index_opt(gen_noop(), gen_const((yyvsp[-1].literal))); 
+    {
+  (yyval.blk) = gen_index_opt(gen_noop(), gen_const((yyvsp[-1].literal)));
 }
 #line 2590 "parser.c" /* yacc.c:1646  */
     break;
@@ -2615,8 +2615,8 @@ yyreduce:
 
   case 63:
 #line 497 "parser.y" /* yacc.c:1646  */
-    { 
-  (yyval.blk) = gen_index(gen_noop(), gen_const((yyvsp[0].literal))); 
+    {
+  (yyval.blk) = gen_index(gen_noop(), gen_const((yyvsp[0].literal)));
 }
 #line 2622 "parser.c" /* yacc.c:1646  */
     break;
@@ -2659,7 +2659,7 @@ yyreduce:
   case 68:
 #line 516 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_index_opt((yyvsp[-4].blk), (yyvsp[-2].blk)); 
+  (yyval.blk) = gen_index_opt((yyvsp[-4].blk), (yyvsp[-2].blk));
 }
 #line 2665 "parser.c" /* yacc.c:1646  */
     break;
@@ -2667,7 +2667,7 @@ yyreduce:
   case 69:
 #line 519 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_index((yyvsp[-3].blk), (yyvsp[-1].blk)); 
+  (yyval.blk) = gen_index((yyvsp[-3].blk), (yyvsp[-1].blk));
 }
 #line 2673 "parser.c" /* yacc.c:1646  */
     break;
@@ -2675,7 +2675,7 @@ yyreduce:
   case 70:
 #line 522 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = block_join((yyvsp[-3].blk), gen_op_simple(EACH_OPT)); 
+  (yyval.blk) = block_join((yyvsp[-3].blk), gen_op_simple(EACH_OPT));
 }
 #line 2681 "parser.c" /* yacc.c:1646  */
     break;
@@ -2683,7 +2683,7 @@ yyreduce:
   case 71:
 #line 525 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = block_join((yyvsp[-2].blk), gen_op_simple(EACH)); 
+  (yyval.blk) = block_join((yyvsp[-2].blk), gen_op_simple(EACH));
 }
 #line 2689 "parser.c" /* yacc.c:1646  */
     break;
@@ -2739,7 +2739,7 @@ yyreduce:
   case 78:
 #line 546 "parser.y" /* yacc.c:1646  */
     {
-  (yyval.blk) = gen_const((yyvsp[0].literal)); 
+  (yyval.blk) = gen_const((yyvsp[0].literal));
 }
 #line 2745 "parser.c" /* yacc.c:1646  */
     break;
@@ -2762,31 +2762,31 @@ yyreduce:
 
   case 81:
 #line 555 "parser.y" /* yacc.c:1646  */
-    { 
-  (yyval.blk) = (yyvsp[-1].blk); 
+    {
+  (yyval.blk) = (yyvsp[-1].blk);
 }
 #line 2769 "parser.c" /* yacc.c:1646  */
     break;
 
   case 82:
 #line 558 "parser.y" /* yacc.c:1646  */
-    { 
-  (yyval.blk) = gen_collect((yyvsp[-1].blk)); 
+    {
+  (yyval.blk) = gen_collect((yyvsp[-1].blk));
 }
 #line 2777 "parser.c" /* yacc.c:1646  */
     break;
 
   case 83:
 #line 561 "parser.y" /* yacc.c:1646  */
-    { 
-  (yyval.blk) = gen_const(jv_array()); 
+    {
+  (yyval.blk) = gen_const(jv_array());
 }
 #line 2785 "parser.c" /* yacc.c:1646  */
     break;
 
   case 84:
 #line 564 "parser.y" /* yacc.c:1646  */
-    { 
+    {
   (yyval.blk) = BLOCK(gen_subexp(gen_const(jv_object())), (yyvsp[-1].blk), gen_op_simple(POP));
 }
 #line 2793 "parser.c" /* yacc.c:1646  */
@@ -2896,8 +2896,8 @@ yyreduce:
 
   case 97:
 #line 611 "parser.y" /* yacc.c:1646  */
-    { 
-  (yyval.blk)=gen_noop(); 
+    {
+  (yyval.blk)=gen_noop();
 }
 #line 2903 "parser.c" /* yacc.c:1646  */
     break;
@@ -2922,7 +2922,7 @@ yyreduce:
 
   case 101:
 #line 619 "parser.y" /* yacc.c:1646  */
-    { 
+    {
   (yyval.blk) = gen_dictpair(gen_const((yyvsp[-2].literal)), (yyvsp[0].blk));
  }
 #line 2929 "parser.c" /* yacc.c:1646  */
