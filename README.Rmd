@@ -115,8 +115,7 @@ x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
 jq(x, '{user, title: .titles[]}')
 x %>% index()
 x %>% select(user, title = `.titles[]`)
-x %>% select(user, title = `.titles[]`) %>% combine
-x %>% select(user, title = `.titles[]`) %>% combine %>% jsonlite::validate()
+jq(x, '{user, title: .titles[]}') %>% jsonlite::toJSON() %>% jsonlite::validate()
 ```
 
 #### string operations
