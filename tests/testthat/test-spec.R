@@ -89,6 +89,7 @@ test_that("each value", {
 })
 
 test_that("compile error", {
+  skip_on_os("solaris")
   expect_error(jqr("{}", "...", 0))
 })
 
