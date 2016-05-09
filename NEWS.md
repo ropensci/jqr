@@ -1,3 +1,10 @@
+jqr 0.2.3
+=========
+
+## Fixes for CRAN
+
+* Fixes in v0.2.2 actually applied in this version
+
 jqr 0.2.2
 =========
 
