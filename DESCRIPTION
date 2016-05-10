@@ -4,7 +4,7 @@ Description: Client for 'jq', a JSON processor (<http://stedolan.github.io/jq/>)
     in C. 'jq' allows the following with JSON data: index into, parse, do calculations,
     cut up and filter, change key names and values, perform conditionals and comparisons,
     and more.
-Version: 0.2.3
+Version: 0.2.3.9000
 Depends:
     R (>= 3.1.2)
 License: MIT + file LICENSE
@@ -21,7 +21,6 @@ Authors@R: c(person("Rich", "FitzJohn", role = "aut",
     person("Free Software Foundation", role = c("ctb","cph"), comment = "parser code in src/parser.c"),
     person("David M", "Gay", role = c("ctb","cph"), comment = "code in src/jv_dtoa.c"))
 VignetteBuilder: knitr
-SystemRequirements: GNU make
 URL: https://github.com/ropensci/jqr
 BugReports: https://github.com/ropensci/jqr/issues
 LinkingTo: BH,
