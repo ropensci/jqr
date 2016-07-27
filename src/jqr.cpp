@@ -19,7 +19,7 @@ typedef boost::shared_ptr<jv_parser> jv_parser_ptr;
 
 void jqr_err_cb(void *, jv x) {
   const char *msg = jv_string_value(x);
-  jv_free(x); // I think this is our responsibility.
+  //jv_free(x); // Causes segfaults valgrand / ASAN
   Rcpp::stop(msg);
 }
 
