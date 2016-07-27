@@ -20,7 +20,7 @@ typedef boost::shared_ptr<jv_parser> jv_parser_ptr;
 void jqr_err_cb(void *, jv x) {
   const char *msg = jv_string_value(x);
   //jv_free(x); // Causes segfaults valgrand / ASAN
-  Rcpp::stop(msg);
+  throw std::runtime_error(msg);
 }
 
 void delete_jq_state(jq_state* state) {
@@ -34,7 +34,7 @@ void delete_jv_parser(jv_parser* parser) {
 jq_state_ptr make_jq_state() {
   jq_state_ptr state(jq_init(), delete_jq_state);
   if (state.get() == NULL) {
-    Rcpp::stop("Error allocating jq");
+    throw std::runtime_error("Error allocating jq");
   }
   jq_set_error_cb(state.get(), jqr_err_cb, NULL);
   return state;
@@ -81,7 +81,7 @@ std::vector<std::string> jqr_parse(jq_state_ptr state, jv_parser_ptr parser, int
     const char * msg_str = jv_string_value(msg);
     jv_free(msg);
     jv_free(value);
-    Rcpp::stop(msg_str);
+    throw std::runtime_error(msg_str);
   } else {
     jv_free(value);
   }
@@ -90,18 +90,24 @@ std::vector<std::string> jqr_parse(jq_state_ptr state, jv_parser_ptr parser, int
 
 // [[Rcpp::export]]
 std::vector<std::string> jqr(std::string json, std::string program, int flags) {
-  jq_state_ptr state = make_jq_state();
+  try {
+    jq_state_ptr state = make_jq_state();
 
-  int compiled = jq_compile(state.get(), program.c_str());
-  // This doesn't get here because it's picked up in the callback, but
-  // serves as an extra check.
-  if (!compiled) {
-    Rcpp::stop("compile error [should never be seen]");
+    int compiled = jq_compile(state.get(), program.c_str());
+    // This doesn't get here because it's picked up in the callback, but
+    // serves as an extra check.
+    if (!compiled) {
+      throw std::runtime_error("compile error [should never be seen]");
+    }
+
+    int is_partial = 0;
+    jv_parser_ptr parser = make_jv_parser();
+    jv_parser_set_buf(parser.get(), json.c_str(), json.size(), is_partial);
+
+    return jqr_parse(state, parser, flags);
+  } catch(const std::exception& ex) {
+    Rcpp::stop(ex.what());
+  } catch(...) {
+    Rcpp::stop("Unknown failure occurred. Possible memory corruption");
   }
-
-  int is_partial = 0;
-  jv_parser_ptr parser = make_jv_parser();
-  jv_parser_set_buf(parser.get(), json.c_str(), json.size(), is_partial);
-
-  return jqr_parse(state, parser, flags);
 }

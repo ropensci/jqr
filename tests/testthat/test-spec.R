@@ -89,14 +89,14 @@ test_that("each value", {
 })
 
 test_that("compile error", {
-  skip_on_os("solaris")
+  #skip_on_os("solaris")
   expect_error(jqr("{}", "...", 0))
 })
 
 test_that("runtime error", {
   ## Hmm - this is meant to crash on Ruby but does not here (and does
   ## not on the command line either).
-  skip_on_os("solaris")
+  #skip_on_os("solaris")
   expect_that(jqr('{}', '.', 0), equals("{}"))
   ## expect {
   ##   jqr('{}', '.') do |value|
