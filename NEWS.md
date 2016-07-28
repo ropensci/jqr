@@ -1,3 +1,10 @@
+jqr 0.2.4
+=========
+
+## Fixes for CRAN
+
+* Fixed the ASAN/valgrind problem (use after free) in jqr.cpp
+
 jqr 0.2.3
 =========
 
