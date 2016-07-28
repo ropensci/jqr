@@ -18,9 +18,10 @@ typedef boost::shared_ptr<jv_parser> jv_parser_ptr;
 // typedef std::shared_ptr<jv_parser> jv_parser_ptr;
 
 void jqr_err_cb(void *, jv x) {
-  const char *msg = jv_string_value(x);
-  //jv_free(x); // Causes segfaults valgrand / ASAN
-  Rcpp::stop(msg);
+  char buf[1000];
+  strncpy(buf, jv_string_value(x), 1000);
+  jv_free(x);
+  Rcpp::stop(buf);
 }
 
 void delete_jq_state(jq_state* state) {
