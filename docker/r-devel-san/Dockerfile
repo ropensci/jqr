@@ -15,7 +15,7 @@ RUN git clone https://github.com/ropensci/jqr \
 
 RUN RDscript -e 'sessionInfo()'
 
-RUN RDscript -e 'library(jqr); testthat::test_dir("jqr/tests/testthat")' || true
+RUN RDscript -e 'library(jqr); jqr=jqr:::jqr; testthat::test_dir("jqr/tests/testthat")' || true
 
 RUN RDscript -e 'library(jqr); testthat::test_examples("jqr/man")'|| true
 
