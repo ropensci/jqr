@@ -1,3 +1,8 @@
+jqr 0.3.0
+=========
+
+* Update bundled libjq to stedolan/jq@0b82185 (1.5-patched)
+
 jqr 0.2.4
 =========
 
