@@ -21,16 +21,15 @@ LIBJQ = \
 all: clean
 
 clean:
-	rm -f $(LIBJQ) $(OBJECTS) $(SHLIB)
+	rm -f $(LIBJQ) $(OBJECTS) $(SHLIB) libstatjq.a
 
-$(SHLIB): libjq.a
+$(SHLIB): libstatjq.a
 
-libjq.a: $(LIBJQ)
-	$(AR) rcs libjq.a $(LIBJQ)
+libstatjq.a: $(LIBJQ)
+	$(AR) rcs libstatjq.a $(LIBJQ)
+
+PKG_CFLAGS=-include config.h
+PKG_CPPFLAGS=-Ijq
 
 WINLIBS=$(subst 64,-lshlwapi,$(subst 32,64,$(WIN)))
-
-
-PKG_CFLAGS=-include config.h -Wno-unused
-PKG_CPPFLAGS=-Ijq
-PKG_LIBS=-L. -ljq $(WINLIBS)
+PKG_LIBS=-L. -lstatjq $(WINLIBS)
