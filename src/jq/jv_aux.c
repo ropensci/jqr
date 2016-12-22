@@ -214,7 +214,7 @@ jv jv_has(jv t, jv k) {
 }
 
 // assumes keys is a sorted array
-jv jv_dels(jv t, jv keys) {
+static jv jv_dels(jv t, jv keys) {
   assert(jv_get_kind(keys) == JV_KIND_ARRAY);
   assert(jv_is_valid(t));
 
@@ -222,13 +222,17 @@ jv jv_dels(jv t, jv keys) {
     // no change
   } else if (jv_get_kind(t) == JV_KIND_ARRAY) {
     // extract slices, they must be handled differently
-    jv orig_keys = keys;
-    keys = jv_array();
+    jv neg_keys = jv_array();
+    jv nonneg_keys = jv_array();
     jv new_array = jv_array();
     jv starts = jv_array(), ends = jv_array();
-    jv_array_foreach(orig_keys, i, key) {
+    jv_array_foreach(keys, i, key) {
       if (jv_get_kind(key) == JV_KIND_NUMBER) {
-        keys = jv_array_append(keys, key);
+        if (jv_number_value(key) < 0) {
+          neg_keys = jv_array_append(neg_keys, key);
+        } else {
+          nonneg_keys = jv_array_append(nonneg_keys, key);
+        }
       } else if (jv_get_kind(key) == JV_KIND_OBJECT) {
         int start, end;
         if (parse_slice(jv_copy(t), key, &start, &end)) {
@@ -248,18 +252,30 @@ jv jv_dels(jv t, jv keys) {
       }
     }
 
-    int kidx = 0;
+    int neg_idx = 0;
+    int nonneg_idx = 0;
+    int len = jv_array_length(jv_copy(t));
     jv_array_foreach(t, i, elem) {
       int del = 0;
-      while (kidx < jv_array_length(jv_copy(keys))) {
-        int delidx = (int)jv_number_value(jv_array_get(jv_copy(keys), kidx));
+      while (neg_idx < jv_array_length(jv_copy(neg_keys))) {
+        int delidx = len + (int)jv_number_value(jv_array_get(jv_copy(neg_keys), neg_idx));
         if (i == delidx) {
           del = 1;
         }
         if (i < delidx) {
           break;
         }
-        kidx++;
+        neg_idx++;
+      }
+      while (nonneg_idx < jv_array_length(jv_copy(nonneg_keys))) {
+        int delidx = (int)jv_number_value(jv_array_get(jv_copy(nonneg_keys), nonneg_idx));
+        if (i == delidx) {
+          del = 1;
+        }
+        if (i < delidx) {
+          break;
+        }
+        nonneg_idx++;
       }
       for (int sidx=0; !del && sidx<jv_array_length(jv_copy(starts)); sidx++) {
         if ((int)jv_number_value(jv_array_get(jv_copy(starts), sidx)) <= i &&
@@ -273,9 +289,10 @@ jv jv_dels(jv t, jv keys) {
         jv_free(elem);
     }
   arr_out:
+    jv_free(neg_keys);
+    jv_free(nonneg_keys);
     jv_free(starts);
     jv_free(ends);
-    jv_free(orig_keys);
     jv_free(t);
     t = new_array;
   } else if (jv_get_kind(t) == JV_KIND_OBJECT) {
@@ -390,6 +407,11 @@ static jv delpaths_sorted(jv object, jv paths, int start) {
 }
 
 jv jv_delpaths(jv object, jv paths) {
+  if (jv_get_kind(paths) != JV_KIND_ARRAY) {
+    jv_free(object);
+    jv_free(paths);
+    return jv_invalid_with_msg(jv_string("Paths must be specified as an array"));
+  }
   paths = jv_sort(paths, jv_copy(paths));
   jv_array_foreach(paths, i, elem) {
     if (jv_get_kind(elem) != JV_KIND_ARRAY) {
@@ -549,14 +571,15 @@ int jv_cmp(jv a, jv b) {
 struct sort_entry {
   jv object;
   jv key;
+  int index;
 };
 
 static int sort_cmp(const void* pa, const void* pb) {
   const struct sort_entry* a = pa;
   const struct sort_entry* b = pb;
   int r = jv_cmp(jv_copy(a->key), jv_copy(b->key));
-  // comparing by address if r == 0 makes the sort stable
-  return r ? r : (int)(a - b);
+  // comparing by index if r == 0 makes the sort stable
+  return r ? r : (a->index - b->index);
 }
 
 static struct sort_entry* sort_items(jv objects, jv keys) {
@@ -568,6 +591,7 @@ static struct sort_entry* sort_items(jv objects, jv keys) {
   for (int i=0; i<n; i++) {
     entries[i].object = jv_array_get(jv_copy(objects), i);
     entries[i].key = jv_array_get(jv_copy(keys), i);
+    entries[i].index = i;
   }
   jv_free(objects);
   jv_free(keys);

@@ -9,7 +9,6 @@
 #include <libgen.h>
 
 #ifdef WIN32
-#include <windows.h>
 #include <shlwapi.h>
 #endif
 

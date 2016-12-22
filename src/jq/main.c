@@ -11,10 +11,19 @@
 #include <windows.h>
 #include <io.h>
 #include <fcntl.h>
-//#include <processenv.h>
+#include <processenv.h>
 #include <shellapi.h>
 #include <wchar.h>
 #include <wtypes.h>
+#endif
+
+#if !defined(HAVE_ISATTY) && defined(HAVE__ISATTY)
+#undef isatty
+#define isatty _isatty
+#endif
+
+#if defined(HAVE_ISATTY) || defined(HAVE__ISATTY)
+#define USE_ISATTY
 #endif
 
 #include "compile.h"
@@ -22,7 +31,7 @@
 #include "jq.h"
 #include "jv_alloc.h"
 #include "util.h"
-#include "version.h"
+#include "src/version.h"
 
 int jq_testsuite(jv lib_dirs, int verbose, int argc, char* argv[]);
 
@@ -40,30 +49,32 @@ static void usage(int code) {
 
   int ret = fprintf(f,
     "jq - commandline JSON processor [version %s]\n"
-    "Usage: %s [options] <jq filter> [file...]\n\n"
-    "\tjq is a tool for processing JSON inputs, applying the\n"
-    "\tgiven filter to its JSON text inputs and producing the\n"
-    "\tfilter's results as JSON on standard output.\n"
-    "\tThe simplest filter is ., which is the identity filter,\n"
-    "\tcopying jq's input to its output unmodified (except for\n"
-    "\tformatting).\n"
-    "\tFor more advanced filters see the jq(1) manpage (\"man jq\")\n"
-    "\tand/or https://stedolan.github.io/jq\n\n"
-    "\tSome of the options include:\n"
-    "\t -c\t\tcompact instead of pretty-printed output;\n"
-    "\t -n\t\tuse `null` as the single input value;\n"
-    "\t -e\t\tset the exit status code based on the output;\n"
-    "\t -s\t\tread (slurp) all inputs into an array; apply filter to it;\n"
-    "\t -r\t\toutput raw strings, not JSON texts;\n"
-    "\t -R\t\tread raw strings, not JSON texts;\n"
-    "\t -C\t\tcolorize JSON;\n"
-    "\t -M\t\tmonochrome (don't colorize JSON);\n"
-    "\t -S\t\tsort keys of objects on output;\n"
-    "\t --tab\tuse tabs for indentation;\n"
-    "\t --arg a v\tset variable $a to value <v>;\n"
-    "\t --argjson a v\tset variable $a to JSON value <v>;\n"
-    "\t --slurpfile a f\tset variable $a to an array of JSON texts read from <f>;\n"
-    "\tSee the manpage for more options.\n", JQ_VERSION, progname);
+    "\nUsage:\n\n\t%s [options] <jq filter> [file...]\n\n"
+    "jq is a tool for processing JSON inputs, applying the given filter to\n"
+    "its JSON text inputs and producing the filter's results as JSON on\n"
+    "standard output.\n\n"
+    "The simplest filter is ., which copies jq's input to its output\n"
+    "unmodified (except for formatting, but note that IEEE754 is used\n"
+    "for number representation internally, with all that that implies).\n\n"
+    "For more advanced filters see the jq(1) manpage (\"man jq\")\n"
+    "and/or https://stedolan.github.io/jq\n\n"
+    "Example:\n\n\t$ echo '{\"foo\": 0}' | jq .\n"
+    "\t{\n\t\t\"foo\": 0\n\t}\n\n"
+    "Some of the options include:\n"
+    "  -c               compact instead of pretty-printed output;\n"
+    "  -n               use `null` as the single input value;\n"
+    "  -e               set the exit status code based on the output;\n"
+    "  -s               read (slurp) all inputs into an array; apply filter to it;\n"
+    "  -r               output raw strings, not JSON texts;\n"
+    "  -R               read raw strings, not JSON texts;\n"
+    "  -C               colorize JSON;\n"
+    "  -M               monochrome (don't colorize JSON);\n"
+    "  -S               sort keys of objects on output;\n"
+    "  --tab            use tabs for indentation;\n"
+    "  --arg a v        set variable $a to value <v>;\n"
+    "  --argjson a v    set variable $a to JSON value <v>;\n"
+    "  --slurpfile a f  set variable $a to an array of JSON texts read from <f>;\n"
+    "\nSee the manpage for more options.\n", JQ_VERSION, progname);
   exit((ret < 0 && code == 0) ? 2 : code);
 }
 
@@ -104,8 +115,8 @@ enum {
   PROVIDE_NULL          = 4,
   RAW_OUTPUT            = 8,
   ASCII_OUTPUT          = 32,
-  COLOUR_OUTPUT         = 64,
-  NO_COLOUR_OUTPUT      = 128,
+  COLOR_OUTPUT          = 64,
+  NO_COLOR_OUTPUT       = 128,
   SORTED_OUTPUT         = 256,
   FROM_FILE             = 512,
   RAW_NO_LF             = 1024,
@@ -117,6 +128,21 @@ enum {
   DUMP_DISASM           = 32768,
 };
 static int options = 0;
+
+static const char *skip_shebang(const char *p) {
+  if (strncmp(p, "#!", sizeof("#!") - 1) != 0)
+    return p;
+  const char *n = strchr(p, '\n');
+  if (n == NULL || n[1] != '#')
+    return p;
+  n = strchr(n + 1, '\n');
+  if (n == NULL || n[1] == '#' || n[1] == '\0' || n[-1] != '\\' || n[-2] == '\\')
+    return p;
+  n = strchr(n + 1, '\n');
+  if (n == NULL)
+    return p;
+  return n+1;
+}
 
 static int process(jq_state *jq, jv value, int flags, int dumpopts) {
   int ret = 14; // No valid results && -e -> exit(4)
@@ -256,11 +282,11 @@ int main(int argc, char* argv[]) {
         if (!short_opts) continue;
       }
       if (isoption(argv[i], 'C', "color-output", &short_opts)) {
-        options |= COLOUR_OUTPUT;
+        options |= COLOR_OUTPUT;
         if (!short_opts) continue;
       }
       if (isoption(argv[i], 'M', "monochrome-output", &short_opts)) {
-        options |= NO_COLOUR_OUTPUT;
+        options |= NO_COLOR_OUTPUT;
         if (!short_opts) continue;
       }
       if (isoption(argv[i], 'a', "ascii-output", &short_opts)) {
@@ -423,18 +449,20 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  if (isatty(fileno(stdout))) {
+#ifdef USE_ISATTY
+  if (isatty(STDOUT_FILENO)) {
     dumpopts |= JV_PRINT_ISATTY;
 #ifndef WIN32
-  /* Disable colour by default on Windows builds as Windows
+  /* Disable color by default on Windows builds as Windows
      terminals tend not to display it correctly */
-    dumpopts |= JV_PRINT_COLOUR;
+    dumpopts |= JV_PRINT_COLOR;
 #endif
   }
+#endif
   if (options & SORTED_OUTPUT) dumpopts |= JV_PRINT_SORTED;
   if (options & ASCII_OUTPUT) dumpopts |= JV_PRINT_ASCII;
-  if (options & COLOUR_OUTPUT) dumpopts |= JV_PRINT_COLOUR;
-  if (options & NO_COLOUR_OUTPUT) dumpopts &= ~JV_PRINT_COLOUR;
+  if (options & COLOR_OUTPUT) dumpopts |= JV_PRINT_COLOR;
+  if (options & NO_COLOR_OUTPUT) dumpopts &= ~JV_PRINT_COLOR;
 
   if (jv_get_kind(lib_search_paths) == JV_KIND_NULL) {
     // Default search path list
@@ -457,14 +485,8 @@ int main(int argc, char* argv[]) {
   else
     jq_set_attr(jq, jv_string("VERSION_DIR"), jv_string_fmt("%.*s-master", (int)(strchr(JQ_VERSION, '-') - JQ_VERSION), JQ_VERSION));
 
-#if (!defined(WIN32) && defined(HAVE_ISATTY)) || defined(HAVE__ISATTY)
-
-#if defined(HAVE__ISATTY) && defined(isatty)
-#undef isatty
-#define isatty _isatty
-#endif
-
-  if (!program && isatty(STDOUT_FILENO) && !isatty(STDIN_FILENO))
+#ifdef USE_ISATTY
+  if (!program && (!isatty(STDOUT_FILENO) || !isatty(STDIN_FILENO)))
     program = ".";
 #endif
 
@@ -486,7 +508,7 @@ int main(int argc, char* argv[]) {
       goto out;
     }
     jq_set_attr(jq, jv_string("PROGRAM_ORIGIN"), jq_realpath(jv_string(dirname(program_origin))));
-    compiled = jq_compile_args(jq, jv_string_value(data), jv_copy(program_arguments));
+    compiled = jq_compile_args(jq, skip_shebang(jv_string_value(data)), jv_copy(program_arguments));
     free(program_origin);
     jv_free(data);
   } else {

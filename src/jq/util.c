@@ -34,7 +34,7 @@ void *alloca (size_t);
 
 #ifdef WIN32
 #include <windows.h>
-//#include <processenv.h>
+#include <processenv.h>
 #include <shellapi.h>
 #include <wchar.h>
 #include <wtypes.h>
@@ -47,12 +47,12 @@ void *alloca (size_t);
 
 #ifdef WIN32
 FILE *fopen(const char *fname, const char *mode) {
-  size_t sz = MultiByteToWideChar(CP_UTF8, 0, fname, -1, NULL, 0);
-  wchar_t *wfname = alloca(sz);
+  size_t sz = sizeof(wchar_t) * MultiByteToWideChar(CP_UTF8, 0, fname, -1, NULL, 0);
+  wchar_t *wfname = alloca(sz + 2); // +2 is not needed, but just in case
   MultiByteToWideChar(CP_UTF8, 0, fname, -1, wfname, sz);
 
-  sz = MultiByteToWideChar(CP_UTF8, 0, mode, -1, NULL, 0);
-  wchar_t *wmode = alloca(sz);
+  sz = sizeof(wchar_t) * MultiByteToWideChar(CP_UTF8, 0, mode, -1, NULL, 0);
+  wchar_t *wmode = alloca(sz); // +2 is not needed, but just in case
   MultiByteToWideChar(CP_UTF8, 0, mode, -1, wmode, sz);
   return _wfopen(wfname, wmode);
 }
@@ -435,10 +435,8 @@ jv jq_util_input_next_input(jq_util_input_state *state) {
     } else {
       if (jv_parser_remaining(state->parser) == 0) {
         is_last = jq_util_input_read_more(state);
-        if (is_last && state->buf_valid_len == 0) {
+        if (is_last && state->buf_valid_len == 0)
           value = jv_invalid();
-          break;
-        }
         jv_parser_set_buf(state->parser, state->buf, state->buf_valid_len, !is_last);
       }
       value = jv_parser_next(state->parser);
