@@ -6,10 +6,12 @@
 #include <string.h>
 #include <stdarg.h>
 #include <limits.h>
+#include <math.h>
 
 #include "jv_alloc.h"
 #include "jv.h"
 #include "jv_unicode.h"
+#include "util.h"
 
 /*
  * Internal refcounting helpers
@@ -61,6 +63,7 @@ const char* jv_kind_name(jv_kind k) {
 }
 
 static const jv JV_NULL = {JV_KIND_NULL, 0, 0, 0, {0}};
+static const jv JV_INVALID = {JV_KIND_INVALID, 0, 0, 0, {0}};
 static const jv JV_FALSE = {JV_KIND_FALSE, 0, 0, 0, {0}};
 static const jv JV_TRUE = {JV_KIND_TRUE, 0, 0, 0, {0}};
 
@@ -82,7 +85,7 @@ jv jv_bool(int x) {
 
 /*
  * Invalid objects, with optional error messages
- */ 
+ */
 
 typedef struct {
   jv_refcnt refcnt;
@@ -90,6 +93,8 @@ typedef struct {
 } jvp_invalid;
 
 jv jv_invalid_with_msg(jv err) {
+  if (jv_get_kind(err) == JV_KIND_NULL)
+    return JV_INVALID;
   jvp_invalid* i = jv_mem_alloc(sizeof(jvp_invalid));
   i->refcnt = JV_REFCNT_INIT;
   i->errmsg = err;
@@ -99,12 +104,16 @@ jv jv_invalid_with_msg(jv err) {
 }
 
 jv jv_invalid() {
-  return jv_invalid_with_msg(jv_null());
+  return JV_INVALID;
 }
 
 jv jv_invalid_get_msg(jv inv) {
   assert(jv_get_kind(inv) == JV_KIND_INVALID);
-  jv x = jv_copy(((jvp_invalid*)inv.u.ptr)->errmsg);
+  jv x;
+  if (inv.u.ptr == 0)
+    x = jv_null();
+  else
+    x = jv_copy(((jvp_invalid*)inv.u.ptr)->errmsg);
   jv_free(inv);
   return x;
 }
@@ -118,7 +127,7 @@ int jv_invalid_has_msg(jv inv) {
 
 static void jvp_invalid_free(jv x) {
   assert(jv_get_kind(x) == JV_KIND_INVALID);
-  if (jvp_refcnt_dec(x.u.ptr)) {
+  if (x.u.ptr != 0 && jvp_refcnt_dec(x.u.ptr)) {
     jv_free(((jvp_invalid*)x.u.ptr)->errmsg);
     jv_mem_free(x.u.ptr);
   }
@@ -129,10 +138,7 @@ static void jvp_invalid_free(jv x) {
  */
 
 jv jv_number(double x) {
-  jv j;
-  j.kind_flags = JV_KIND_NUMBER;
-  j.size = 0;
-  j.u.number = x;
+  jv j = {JV_KIND_NUMBER, 0, 0, 0, {.number = x}};
   return j;
 }
 
@@ -240,7 +246,7 @@ static jv* jvp_array_write(jv* a, int i) {
     jvp_array* new_array = jvp_array_alloc(ARRAY_SIZE_ROUND_UP(new_length));
     int j;
     for (j = 0; j < jvp_array_length(*a); j++) {
-      new_array->elements[j] = 
+      new_array->elements[j] =
         jv_copy(array->elements[j + jvp_array_offset(*a)]);
     }
     for (; j < new_length; j++) {
@@ -255,24 +261,41 @@ static jv* jvp_array_write(jv* a, int i) {
 }
 
 static int jvp_array_equal(jv a, jv b) {
-  if (jvp_array_length(a) != jvp_array_length(b)) 
+  if (jvp_array_length(a) != jvp_array_length(b))
     return 0;
   if (jvp_array_ptr(a) == jvp_array_ptr(b) &&
-      jvp_array_offset(a) == jvp_array_offset(b)) 
+      jvp_array_offset(a) == jvp_array_offset(b))
     return 1;
   for (int i=0; i<jvp_array_length(a); i++) {
-    if (!jv_equal(jv_copy(*jvp_array_read(a, i)), 
+    if (!jv_equal(jv_copy(*jvp_array_read(a, i)),
                   jv_copy(*jvp_array_read(b, i))))
       return 0;
   }
   return 1;
 }
 
+static void jvp_clamp_slice_params(int len, int *pstart, int *pend)
+{
+  if (*pstart < 0) *pstart = len + *pstart;
+  if (*pend < 0) *pend = len + *pend;
+
+  if (*pstart < 0) *pstart = 0;
+  if (*pstart > len) *pstart = len;
+  if (*pend > len) *pend = len;
+  if (*pend < *pstart) *pend = *pstart;
+}
+
 static jv jvp_array_slice(jv a, int start, int end) {
   assert(jv_get_kind(a) == JV_KIND_ARRAY);
+  int len = jvp_array_length(a);
+  jvp_clamp_slice_params(len, &start, &end);
+  assert(0 <= start && start <= end && end <= len);
+
   // FIXME: maybe slice should reallocate if the slice is small enough
-  assert(0 <= start && start <= end);
-  assert(end <= jvp_array_length(a));
+  if (start == end) {
+    jv_free(a);
+    return jv_array();
+  }
   // FIXME FIXME FIXME large offsets
   a.offset += start;
   a.size = end - start;
@@ -313,6 +336,14 @@ jv jv_array_get(jv j, int idx) {
 
 jv jv_array_set(jv j, int idx, jv val) {
   assert(jv_get_kind(j) == JV_KIND_ARRAY);
+
+  if (idx < 0)
+    idx = jvp_array_length(j) + idx;
+  if (idx < 0) {
+    jv_free(j);
+    jv_free(val);
+    return jv_invalid_with_msg(jv_string("Out of bounds negative array index"));
+  }
   // copy/free of val,j coalesced
   jv* slot = jvp_array_write(&j, idx);
   jv_free(*slot);
@@ -394,7 +425,7 @@ jv jv_array_indexes(jv a, jv b) {
 typedef struct {
   jv_refcnt refcnt;
   uint32_t hash;
-  // high 31 bits are length, low bit is a flag 
+  // high 31 bits are length, low bit is a flag
   // indicating whether hash has been computed.
   uint32_t length_hashed;
   uint32_t alloc_length;
@@ -442,7 +473,8 @@ static jv jvp_string_copy_replace_bad(const char* data, uint32_t length) {
 static jv jvp_string_new(const char* data, uint32_t length) {
   jvp_string* s = jvp_string_alloc(length);
   s->length_hashed = length << 1;
-  memcpy(s->data, data, length);
+  if (data != NULL)
+    memcpy(s->data, data, length);
   s->data[length] = 0;
   jv r = {JV_KIND_STRING, 0, 0, 0, {&s->refcnt}};
   return r;
@@ -477,7 +509,7 @@ static uint32_t jvp_string_remaining_space(jvp_string* s) {
 static jv jvp_string_append(jv string, const char* data, uint32_t len) {
   jvp_string* s = jvp_string_ptr(string);
   uint32_t currlen = jvp_string_length(s);
-    
+
   if (jvp_refcnt_unshared(string.u.ptr) &&
       jvp_string_remaining_space(s) >= len) {
     // the next string fits at the end of a
@@ -508,7 +540,7 @@ static uint32_t rotl32 (uint32_t x, int8_t r){
 
 static uint32_t jvp_string_hash(jv jstr) {
   jvp_string* str = jvp_string_ptr(jstr);
-  if (str->length_hashed & 1) 
+  if (str->length_hashed & 1)
     return str->hash;
 
   /* The following is based on MurmurHash3.
@@ -527,13 +559,13 @@ static uint32_t jvp_string_hash(jv jstr) {
 
   for(int i = -nblocks; i; i++) {
     uint32_t k1 = blocks[i]; //FIXME: endianness/alignment
-    
+
     k1 *= c1;
     k1 = rotl32(k1,15);
     k1 *= c2;
-    
+
     h1 ^= k1;
-    h1 = rotl32(h1,13); 
+    h1 = rotl32(h1,13);
     h1 = h1*5+0xe6546b64;
   }
 
@@ -577,7 +609,7 @@ static int jvp_string_equal(jv a, jv b) {
 
 jv jv_string_sized(const char* str, int len) {
   return
-    jvp_utf8_is_valid(str, str+len) ? 
+    jvp_utf8_is_valid(str, str+len) ?
     jvp_string_new(str, len) :
     jvp_string_copy_replace_bad(str, len);
 }
@@ -607,34 +639,6 @@ int jv_string_length_codepoints(jv j) {
   return len;
 }
 
-#ifndef HAVE_MEMMEM
-#ifdef memmem
-#undef memmem
-#endif
-#define memmem my_memmem
-static const void *memmem(const void *haystack, size_t haystacklen,
-                          const void *needle, size_t needlelen)
-{
-  const char *h = haystack;
-  const char *n = needle;
-  size_t hi, hi2, ni;
-
-  if (haystacklen < needlelen || haystacklen == 0)
-    return NULL;
-  for (hi = 0; hi < (haystacklen - needlelen + 1); hi++) {
-    for (ni = 0, hi2 = hi; ni < needlelen; ni++, hi2++) {
-      if (h[hi2] != n[ni])
-        goto not_this;
-    }
-
-    return &h[hi];
-
-not_this:
-    continue;
-  }
-  return NULL;
-}
-#endif /* HAVE_MEMMEM */
 
 jv jv_string_indexes(jv j, jv k) {
   assert(jv_get_kind(j) == JV_KIND_STRING);
@@ -647,7 +651,7 @@ jv jv_string_indexes(jv j, jv k) {
   jv a = jv_array();
 
   p = jstr;
-  while ((p = memmem(p, (jstr + jlen) - p, idxstr, idxlen)) != NULL) {
+  while ((p = _jq_memmem(p, (jstr + jlen) - p, idxstr, idxlen)) != NULL) {
     a = jv_array_append(a, jv_number(p - jstr));
     p += idxlen;
   }
@@ -660,19 +664,28 @@ jv jv_string_split(jv j, jv sep) {
   assert(jv_get_kind(j) == JV_KIND_STRING);
   assert(jv_get_kind(sep) == JV_KIND_STRING);
   const char *jstr = jv_string_value(j);
+  const char *jend = jstr + jv_string_length_bytes(jv_copy(j));
   const char *sepstr = jv_string_value(sep);
   const char *p, *s;
-  int jlen = jv_string_length_bytes(jv_copy(j));
   int seplen = jv_string_length_bytes(jv_copy(sep));
   jv a = jv_array();
 
   assert(jv_get_refcnt(a) == 1);
 
-  for (p = jstr; p < jstr + jlen; p = s + seplen) {
-    s = memmem(p, (jstr + jlen) - p, sepstr, seplen);
-    if (s == NULL)
-      s = jstr + jlen;
-    a = jv_array_append(a, jv_string_sized(p, s - p));
+  if (seplen == 0) {
+    int c;
+    while ((jstr = jvp_utf8_next(jstr, jend, &c)))
+      a = jv_array_append(a, jv_string_append_codepoint(jv_string(""), c));
+  } else {
+    for (p = jstr; p < jend; p = s + seplen) {
+      s = _jq_memmem(p, jend - p, sepstr, seplen);
+      if (s == NULL)
+        s = jend;
+      a = jv_array_append(a, jv_string_sized(p, s - p));
+      // Add an empty string to denote that j ends on a sep
+      if (s + seplen == jend && seplen != 0)
+        a = jv_array_append(a, jv_string(""));
+    }
   }
   jv_free(j);
   jv_free(sep);
@@ -703,7 +716,10 @@ jv jv_string_implode(jv j) {
   for (i = 0; i < len; i++) {
     jv n = jv_array_get(jv_copy(j), i);
     assert(jv_get_kind(n) == JV_KIND_NUMBER);
-    s = jv_string_append_codepoint(s, jv_number_value(n));
+    int nv = jv_number_value(n);
+    if (nv > 0x10FFFF)
+      nv = 0xFFFD; // U+FFFD REPLACEMENT CHARACTER
+    s = jv_string_append_codepoint(s, nv);
   }
 
   jv_free(j);
@@ -731,15 +747,7 @@ jv jv_string_slice(jv j, int start, int end) {
   int c;
   jv res;
 
-  if (start < 0) start = len + start;
-  if (end < 0) end = len + end;
-
-  if (start < 0) start = 0;
-  if (start > len) start = len;
-  if (end > len) end = len;
-  if (end < start) end = start;
-  if (start < 0 || start > end || end > len)
-    return jv_invalid_with_msg(jv_string("Invalid string slice indices"));
+  jvp_clamp_slice_params(len, &start, &end);
   assert(0 <= start && start <= end && end <= len);
 
   /* Look for byte offset corresponding to start codepoints */
@@ -780,7 +788,7 @@ jv jv_string_slice(jv j, int start, int end) {
 }
 
 jv jv_string_concat(jv a, jv b) {
-  a = jvp_string_append(a, jv_string_value(b), 
+  a = jvp_string_append(a, jv_string_value(b),
                         jvp_string_length(jvp_string_ptr(b)));
   jv_free(b);
   return a;
@@ -863,7 +871,7 @@ static jv jvp_object_new(int size) {
   // size must be a power of two
   assert(size > 0 && (size & (size - 1)) == 0);
 
-  jvp_object* obj = jv_mem_alloc(sizeof(jvp_object) + 
+  jvp_object* obj = jv_mem_alloc(sizeof(jvp_object) +
                                  sizeof(struct object_slot) * size +
                                  sizeof(int) * (size * 2));
   obj->refcnt.count = 1;
@@ -917,8 +925,8 @@ static struct object_slot* jvp_object_next_slot(jv object, struct object_slot* s
 
 static struct object_slot* jvp_object_find_slot(jv object, jv keystr, int* bucket) {
   uint32_t hash = jvp_string_hash(keystr);
-  for (struct object_slot* curr = jvp_object_get_slot(object, *bucket); 
-       curr; 
+  for (struct object_slot* curr = jvp_object_get_slot(object, *bucket);
+       curr;
        curr = jvp_object_next_slot(object, curr)) {
     if (curr->hash == hash && jvp_string_equal(keystr, curr->string)) {
       return curr;
@@ -1036,8 +1044,8 @@ static int jvp_object_delete(jv* object, jv key) {
   int* bucket = jvp_object_find_bucket(*object, key);
   int* prev_ptr = bucket;
   uint32_t hash = jvp_string_hash(key);
-  for (struct object_slot* curr = jvp_object_get_slot(*object, *bucket); 
-       curr; 
+  for (struct object_slot* curr = jvp_object_get_slot(*object, *bucket);
+       curr;
        curr = jvp_object_next_slot(*object, curr)) {
     if (hash == curr->hash && jvp_string_equal(key, curr->string)) {
       *prev_ptr = curr->next;
@@ -1191,7 +1199,7 @@ int jv_object_iter_next(jv object, int iter) {
   struct object_slot* slot;
   do {
     iter++;
-    if (iter >= jvp_object_size(object)) 
+    if (iter >= jvp_object_size(object))
       return ITER_FINISHED;
     slot = jvp_object_get_slot(object, iter);
   } while (jv_get_kind(slot->string) == JV_KIND_NULL);
@@ -1214,10 +1222,10 @@ jv jv_object_iter_value(jv object, int iter) {
  * Memory management
  */
 jv jv_copy(jv j) {
-  if (jv_get_kind(j) == JV_KIND_ARRAY || 
-      jv_get_kind(j) == JV_KIND_STRING || 
+  if (jv_get_kind(j) == JV_KIND_ARRAY ||
+      jv_get_kind(j) == JV_KIND_STRING ||
       jv_get_kind(j) == JV_KIND_OBJECT ||
-      jv_get_kind(j) == JV_KIND_INVALID) {
+      (jv_get_kind(j) == JV_KIND_INVALID && j.u.ptr != 0)) {
     jvp_refcnt_inc(j.u.ptr);
   }
   return j;
@@ -1270,6 +1278,32 @@ int jv_equal(jv a, jv b) {
       break;
     case JV_KIND_OBJECT:
       r = jvp_object_equal(a, b);
+      break;
+    default:
+      r = 1;
+      break;
+    }
+  }
+  jv_free(a);
+  jv_free(b);
+  return r;
+}
+
+int jv_identical(jv a, jv b) {
+  int r;
+  if (a.kind_flags != b.kind_flags
+      || a.offset != b.offset
+      || a.size != b.size) {
+    r = 0;
+  } else {
+    switch (jv_get_kind(a)) {
+    case JV_KIND_ARRAY:
+    case JV_KIND_STRING:
+    case JV_KIND_OBJECT:
+      r = a.u.ptr == b.u.ptr;
+      break;
+    case JV_KIND_NUMBER:
+      r = memcmp(&a.u.number, &b.u.number, sizeof(a.u.number)) == 0;
       break;
     default:
       r = 1;

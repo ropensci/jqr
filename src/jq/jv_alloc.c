@@ -1,6 +1,6 @@
-#include <R.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "jv_alloc.h"
 
 struct nomem_handler {
@@ -37,7 +37,8 @@ static void memory_exhausted() {
   if (nomem_handler.handler)
     nomem_handler.handler(nomem_handler.data); // Maybe handler() will longjmp() to safety
   // Or not
-  Rprintf("error: cannot allocate memory");
+  fprintf(stderr, "error: cannot allocate memory\n");
+  abort();
 }
 #else /* USE_TLS */
 
@@ -58,14 +59,17 @@ static void tsd_fini(void) {
 
 static void tsd_init(void) {
   if (pthread_key_create(&nomem_handler_key, NULL) != 0) {
-    Rprintf("error: cannot create thread specific key");
+    fprintf(stderr, "error: cannot create thread specific key");
+    abort();
   }
   if (atexit(tsd_fini) != 0) {
-    Rprintf("error: cannot set an exit handler");
+    fprintf(stderr, "error: cannot set an exit handler");
+    abort();
   }
   struct nomem_handler *nomem_handler = calloc(1, sizeof(struct nomem_handler));
   if (pthread_setspecific(nomem_handler_key, nomem_handler) != 0) {
-    Rprintf("error: cannot set thread specific data");
+    fprintf(stderr, "error: cannot set thread specific data");
+    abort();
   }
 }
 
@@ -76,7 +80,8 @@ void jv_nomem_handler(jv_nomem_handler_f handler, void *data) {
   nomem_handler = pthread_getspecific(nomem_handler_key);
   if (nomem_handler == NULL) {
     handler(data);
-    Rprintf("error: cannot allocate memory");
+    fprintf(stderr, "error: cannot allocate memory\n");
+    abort();
   }
   nomem_handler->handler = handler;
   nomem_handler->data = data;
@@ -90,7 +95,8 @@ static void memory_exhausted() {
   if (nomem_handler)
     nomem_handler->handler(nomem_handler->data); // Maybe handler() will longjmp() to safety
   // Or not
-  Rprintf("error: cannot allocate memory");
+  fprintf(stderr, "error: cannot allocate memory\n");
+  abort();
 }
 
 #else
@@ -104,7 +110,8 @@ void jv_nomem_handler(jv_nomem_handler_f handler, void *data) {
 }
 
 static void memory_exhausted() {
-  Rprintf("error: cannot allocate memory");
+  fprintf(stderr, "error: cannot allocate memory\n");
+  abort();
 }
 
 #endif /* HAVE_PTHREAD_KEY_CREATE */
@@ -123,6 +130,30 @@ void* jv_mem_alloc_unguarded(size_t sz) {
   return malloc(sz);
 }
 
+void* jv_mem_calloc(size_t nemb, size_t sz) {
+  void* p = calloc(nemb, sz);
+  if (!p) {
+    memory_exhausted();
+  }
+  return p;
+}
+
+void* jv_mem_calloc_unguarded(size_t nemb, size_t sz) {
+  return calloc(nemb, sz);
+}
+
+char* jv_mem_strdup(const char *s) {
+  char *p = strdup(s);
+  if (!p) {
+    memory_exhausted();
+  }
+  return p;
+}
+
+char* jv_mem_strdup_unguarded(const char *s) {
+  return strdup(s);
+}
+
 void jv_mem_free(void* p) {
   free(p);
 }
@@ -138,8 +169,11 @@ void* jv_mem_realloc(void* p, size_t sz) {
 #ifndef NDEBUG
 volatile char jv_mem_uninitialised;
 __attribute__((constructor)) void jv_mem_uninit_setup(){
+  // ignore warning that this reads uninitialized memory - that's the point!
+#ifndef __clang_analyzer__
   char* p = malloc(1);
   jv_mem_uninitialised = *p;
   free(p);
+#endif
 }
 #endif

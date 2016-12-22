@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_PARSER_H_INCLUDED
-# define YY_YY_PARSER_H_INCLUDED
+#ifndef YY_YY_SRC_PARSER_H_INCLUDED
+# define YY_YY_SRC_PARSER_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -40,7 +40,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 10 "parser.y" /* yacc.c:1909  */
+#line 11 "src/parser.y" /* yacc.c:1909  */
 
 #include "locfile.h"
 struct lexer_param;
@@ -56,9 +56,8 @@ struct lexer_param;
       (Loc).end = YYRHSLOC(Rhs, 0).end;         \
     }                                           \
   } while (0)
- 
 
-#line 62 "parser.h" /* yacc.c:1909  */
+#line 61 "src/parser.h" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -70,35 +69,45 @@ struct lexer_param;
     FIELD = 260,
     LITERAL = 261,
     FORMAT = 262,
-    Q = 263,
-    REC = 264,
-    SETMOD = 265,
-    EQ = 266,
-    NEQ = 267,
-    DEFINEDOR = 268,
-    AS = 269,
-    DEF = 270,
-    IF = 271,
-    THEN = 272,
-    ELSE = 273,
-    ELSE_IF = 274,
-    REDUCE = 275,
-    END = 276,
-    AND = 277,
-    OR = 278,
-    SETPIPE = 279,
-    SETPLUS = 280,
-    SETMINUS = 281,
-    SETMULT = 282,
-    SETDIV = 283,
-    SETDEFINEDOR = 284,
-    LESSEQ = 285,
-    GREATEREQ = 286,
-    QQSTRING_START = 287,
-    QQSTRING_TEXT = 288,
-    QQSTRING_INTERP_START = 289,
-    QQSTRING_INTERP_END = 290,
-    QQSTRING_END = 291
+    REC = 263,
+    SETMOD = 264,
+    EQ = 265,
+    NEQ = 266,
+    DEFINEDOR = 267,
+    AS = 268,
+    DEF = 269,
+    MODULE = 270,
+    IMPORT = 271,
+    INCLUDE = 272,
+    IF = 273,
+    THEN = 274,
+    ELSE = 275,
+    ELSE_IF = 276,
+    REDUCE = 277,
+    FOREACH = 278,
+    END = 279,
+    AND = 280,
+    OR = 281,
+    TRY = 282,
+    CATCH = 283,
+    LABEL = 284,
+    BREAK = 285,
+    LOC = 286,
+    SETPIPE = 287,
+    SETPLUS = 288,
+    SETMINUS = 289,
+    SETMULT = 290,
+    SETDIV = 291,
+    SETDEFINEDOR = 292,
+    LESSEQ = 293,
+    GREATEREQ = 294,
+    QQSTRING_START = 295,
+    QQSTRING_TEXT = 296,
+    QQSTRING_INTERP_START = 297,
+    QQSTRING_INTERP_END = 298,
+    QQSTRING_END = 299,
+    FUNCDEF = 300,
+    NONOPT = 301
   };
 #endif
 /* Tokens.  */
@@ -107,47 +116,57 @@ struct lexer_param;
 #define FIELD 260
 #define LITERAL 261
 #define FORMAT 262
-#define Q 263
-#define REC 264
-#define SETMOD 265
-#define EQ 266
-#define NEQ 267
-#define DEFINEDOR 268
-#define AS 269
-#define DEF 270
-#define IF 271
-#define THEN 272
-#define ELSE 273
-#define ELSE_IF 274
-#define REDUCE 275
-#define END 276
-#define AND 277
-#define OR 278
-#define SETPIPE 279
-#define SETPLUS 280
-#define SETMINUS 281
-#define SETMULT 282
-#define SETDIV 283
-#define SETDEFINEDOR 284
-#define LESSEQ 285
-#define GREATEREQ 286
-#define QQSTRING_START 287
-#define QQSTRING_TEXT 288
-#define QQSTRING_INTERP_START 289
-#define QQSTRING_INTERP_END 290
-#define QQSTRING_END 291
+#define REC 263
+#define SETMOD 264
+#define EQ 265
+#define NEQ 266
+#define DEFINEDOR 267
+#define AS 268
+#define DEF 269
+#define MODULE 270
+#define IMPORT 271
+#define INCLUDE 272
+#define IF 273
+#define THEN 274
+#define ELSE 275
+#define ELSE_IF 276
+#define REDUCE 277
+#define FOREACH 278
+#define END 279
+#define AND 280
+#define OR 281
+#define TRY 282
+#define CATCH 283
+#define LABEL 284
+#define BREAK 285
+#define LOC 286
+#define SETPIPE 287
+#define SETPLUS 288
+#define SETMINUS 289
+#define SETMULT 290
+#define SETDIV 291
+#define SETDEFINEDOR 292
+#define LESSEQ 293
+#define GREATEREQ 294
+#define QQSTRING_START 295
+#define QQSTRING_TEXT 296
+#define QQSTRING_INTERP_START 297
+#define QQSTRING_INTERP_END 298
+#define QQSTRING_END 299
+#define FUNCDEF 300
+#define NONOPT 301
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 30 "parser.y" /* yacc.c:1909  */
+#line 31 "src/parser.y" /* yacc.c:1909  */
 
   jv literal;
   block blk;
 
-#line 151 "parser.h" /* yacc.c:1909  */
+#line 170 "src/parser.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -171,4 +190,4 @@ struct YYLTYPE
 
 int yyparse (block* answer, int* errors, struct locfile* locations, struct lexer_param* lexer_param_ptr);
 
-#endif /* !YY_YY_PARSER_H_INCLUDED  */
+#endif /* !YY_YY_SRC_PARSER_H_INCLUDED  */
