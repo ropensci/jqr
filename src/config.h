@@ -1,11 +1,17 @@
+#ifdef WIN32
+#define timegm _mkgmtime
+#define HAVE__ISATTY
+#else
 #define HAVE_MEMMEM
 #define HAVE_MKSTEMP
+#define HAVE_STRPTIME
+#define HAVE_GMTIME_R
+#endif
+
 #define HAVE_ALLOCA
 #define HAVE_ISATTY
-#define HAVE_STRPTIME
 #define HAVE_STRFTIME
 #define HAVE_TIMEGM
-#define HAVE_GMTIME_R
 #define HAVE_GMTIME
 #define HAVE_GETTIMEOFDAY
 #define HAVE_TM_TM_GMT_OFF

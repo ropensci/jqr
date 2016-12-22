@@ -28,6 +28,9 @@ $(SHLIB): libjq.a
 libjq.a: $(LIBJQ)
 	$(AR) rcs libjq.a $(LIBJQ)
 
-PKG_CFLAGS=-include config.h
-PKG_CPPFLAGS = -Ijq
-PKG_LIBS = -L. -ljq
+WINLIBS=$(subst 64,-lshlwapi,$(subst 32,64,$(WIN)))
+
+
+PKG_CFLAGS=-include config.h -Wno-unused
+PKG_CPPFLAGS=-Ijq
+PKG_LIBS=-L. -ljq $(WINLIBS)
