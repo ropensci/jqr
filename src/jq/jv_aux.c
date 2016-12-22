@@ -12,10 +12,14 @@ static int parse_slice(jv j, jv slice, int* pstart, int* pend) {
     start_jv = jv_number(0);
   }
   int len;
-  if (jv_get_kind(j) == JV_KIND_ARRAY)
-    len = jv_array_length(jv_copy(j));
-  else
-    len = jv_string_length_codepoints(jv_copy(j));
+  if (jv_get_kind(j) == JV_KIND_ARRAY) {
+    len = jv_array_length(j);
+  } else if (jv_get_kind(j) == JV_KIND_STRING) {
+    len = jv_string_length_codepoints(j);
+  } else {
+    jv_free(j);
+    return 0;
+  }
   if (jv_get_kind(end_jv) == JV_KIND_NULL) {
     jv_free(end_jv);
     end_jv = jv_number(len);
@@ -57,7 +61,10 @@ jv jv_get(jv t, jv k) {
     }
   } else if (jv_get_kind(t) == JV_KIND_ARRAY && jv_get_kind(k) == JV_KIND_NUMBER) {
     if(jv_is_integer(k)){
-      v = jv_array_get(t, (int)jv_number_value(k));
+      int idx = (int)jv_number_value(k);
+      if (idx < 0)
+        idx += jv_array_length(jv_copy(t));
+      v = jv_array_get(t, idx);
       if (!jv_is_valid(v)) {
         jv_free(v);
         v = jv_null();
@@ -69,35 +76,44 @@ jv jv_get(jv t, jv k) {
     }
   } else if (jv_get_kind(t) == JV_KIND_ARRAY && jv_get_kind(k) == JV_KIND_OBJECT) {
     int start, end;
-    if (parse_slice(t, k, &start, &end)) {
+    if (parse_slice(jv_copy(t), k, &start, &end)) {
       v = jv_array_slice(t, start, end);
     } else {
-      v = jv_invalid_with_msg(jv_string_fmt("Start and end indices of an array slice must be numbers"));
       jv_free(t);
+      v = jv_invalid_with_msg(jv_string_fmt("Start and end indices of an array slice must be numbers"));
     }
   } else if (jv_get_kind(t) == JV_KIND_STRING && jv_get_kind(k) == JV_KIND_OBJECT) {
     int start, end;
-    if (parse_slice(t, k, &start, &end)) {
+    if (parse_slice(jv_copy(t), k, &start, &end)) {
       v = jv_string_slice(t, start, end);
     } else {
       v = jv_invalid_with_msg(jv_string_fmt("Start and end indices of an string slice must be numbers"));
       jv_free(t);
     }
-  } else if (jv_get_kind(t) == JV_KIND_STRING && jv_get_kind(k) == JV_KIND_STRING) {
-    v = jv_string_indexes(t, k);
   } else if (jv_get_kind(t) == JV_KIND_ARRAY && jv_get_kind(k) == JV_KIND_ARRAY) {
     v = jv_array_indexes(t, k);
-  } else if (jv_get_kind(t) == JV_KIND_NULL && 
-             (jv_get_kind(k) == JV_KIND_STRING || 
-              jv_get_kind(k) == JV_KIND_NUMBER || 
+  } else if (jv_get_kind(t) == JV_KIND_NULL &&
+             (jv_get_kind(k) == JV_KIND_STRING ||
+              jv_get_kind(k) == JV_KIND_NUMBER ||
               jv_get_kind(k) == JV_KIND_OBJECT)) {
     jv_free(t);
     jv_free(k);
     v = jv_null();
   } else {
-    v = jv_invalid_with_msg(jv_string_fmt("Cannot index %s with %s",
-                                          jv_kind_name(jv_get_kind(t)),
-                                          jv_kind_name(jv_get_kind(k))));
+    /*
+     * If k is a short string it's probably from a jq .foo expression or
+     * similar, in which case putting it in the invalid msg may help the
+     * user.  The length 30 is arbitrary.
+     */
+    if (jv_get_kind(k) == JV_KIND_STRING && jv_string_length_bytes(jv_copy(k)) < 30) {
+      v = jv_invalid_with_msg(jv_string_fmt("Cannot index %s with string \"%s\"",
+                                            jv_kind_name(jv_get_kind(t)),
+                                            jv_string_value(k)));
+    } else {
+      v = jv_invalid_with_msg(jv_string_fmt("Cannot index %s with %s",
+                                            jv_kind_name(jv_get_kind(t)),
+                                            jv_kind_name(jv_get_kind(k))));
+    }
     jv_free(t);
     jv_free(k);
   }
@@ -111,7 +127,7 @@ jv jv_set(jv t, jv k, jv v) {
     return v;
   }
   int isnull = jv_get_kind(t) == JV_KIND_NULL;
-  if (jv_get_kind(k) == JV_KIND_STRING && 
+  if (jv_get_kind(k) == JV_KIND_STRING &&
       (jv_get_kind(t) == JV_KIND_OBJECT || isnull)) {
     if (isnull) t = jv_object();
     t = jv_object_set(t, k, v);
@@ -123,7 +139,7 @@ jv jv_set(jv t, jv k, jv v) {
              (jv_get_kind(t) == JV_KIND_ARRAY || isnull)) {
     if (isnull) t = jv_array();
     int start, end;
-    if (parse_slice(t, k, &start, &end)) {
+    if (parse_slice(jv_copy(t), k, &start, &end)) {
       if (jv_get_kind(v) == JV_KIND_ARRAY) {
         int array_len = jv_array_length(jv_copy(t));
         assert(0 <= start && start <= end && end <= array_len);
@@ -154,7 +170,6 @@ jv jv_set(jv t, jv k, jv v) {
       }
     } else {
       jv_free(t);
-      jv_free(k);
       jv_free(v);
       t = jv_invalid_with_msg(jv_string_fmt("Start and end indices of an array slice must be numbers"));
     }
@@ -202,7 +217,7 @@ jv jv_has(jv t, jv k) {
 jv jv_dels(jv t, jv keys) {
   assert(jv_get_kind(keys) == JV_KIND_ARRAY);
   assert(jv_is_valid(t));
-  
+
   if (jv_get_kind(t) == JV_KIND_NULL || jv_array_length(jv_copy(keys)) == 0) {
     // no change
   } else if (jv_get_kind(t) == JV_KIND_ARRAY) {
@@ -216,12 +231,11 @@ jv jv_dels(jv t, jv keys) {
         keys = jv_array_append(keys, key);
       } else if (jv_get_kind(key) == JV_KIND_OBJECT) {
         int start, end;
-        if (parse_slice(t, key, &start, &end)) {
+        if (parse_slice(jv_copy(t), key, &start, &end)) {
           starts = jv_array_append(starts, jv_number(start));
           ends = jv_array_append(ends, jv_number(end));
         } else {
           jv_free(new_array);
-          jv_free(key);
           new_array = jv_invalid_with_msg(jv_string_fmt("Start and end indices of an array slice must be numbers"));
           goto arr_out;
         }
@@ -273,7 +287,7 @@ jv jv_dels(jv t, jv keys) {
         jv_free(k);
         break;
       }
-      t = jv_object_delete(t, k);      
+      t = jv_object_delete(t, k);
     }
   } else {
     jv err = jv_invalid_with_msg(jv_string_fmt("Cannot delete fields from %s",
@@ -304,7 +318,7 @@ jv jv_setpath(jv root, jv path, jv value) {
   }
   jv pathcurr = jv_array_get(jv_copy(path), 0);
   jv pathrest = jv_array_slice(path, 1, jv_array_length(jv_copy(path)));
-  return jv_set(root, pathcurr, 
+  return jv_set(root, pathcurr,
                 jv_setpath(jv_get(jv_copy(root), jv_copy(pathcurr)), pathrest, value));
 }
 
@@ -370,7 +384,7 @@ static jv delpaths_sorted(jv object, jv paths, int start) {
   jv_free(paths);
   if (jv_is_valid(object))
     object = jv_dels(object, delkeys);
-  else 
+  else
     jv_free(delkeys);
   return object;
 }
@@ -412,6 +426,18 @@ static int string_cmp(const void* pa, const void* pb){
   int r = memcmp(jv_string_value(*a), jv_string_value(*b), minlen);
   if (r == 0) r = lena - lenb;
   return r;
+}
+
+jv jv_keys_unsorted(jv x) {
+  if (jv_get_kind(x) != JV_KIND_OBJECT)
+    return jv_keys(x);
+  jv answer = jv_array_sized(jv_object_length(jv_copy(x)));
+  jv_object_foreach(x, key, value) {
+    answer = jv_array_append(answer, key);
+    jv_free(value);
+  }
+  jv_free(x);
+  return answer;
 }
 
 jv jv_keys(jv x) {
@@ -464,7 +490,7 @@ int jv_cmp(jv a, jv b) {
 
   case JV_KIND_NUMBER: {
     double da = jv_number_value(a), db = jv_number_value(b);
-    
+
     // handle NaN as though it were null
     if (da != da) r = jv_cmp(jv_null(), jv_number(db));
     else if (db != db) r = jv_cmp(jv_number(da), jv_null());

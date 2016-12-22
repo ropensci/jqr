@@ -1,25 +1,33 @@
 LIBJQ = \
-	jq/builtin.o \
-	jq/bytecode.o \
-	jq/compile.o \
-	jq/execute.o \
-	jq/jv_alloc.o \
-	jq/jv_aux.o \
-	jq/jv_dtoa.o \
-	jq/jv_file.o \
-	jq/jv_parse.o \
-	jq/jv_print.o \
-	jq/jv_unicode.o \
-	jq/jv.o \
-	jq/lexer.o \
-	jq/locfile.o \
-	jq/parser.o
+  jq/locfile.o \
+  jq/bytecode.o \
+  jq/compile.o \
+  jq/execute.o \
+  jq/builtin.o \
+  jq/jv.o \
+  jq/jv_parse.o \
+  jq/jv_print.o \
+  jq/jv_dtoa.o \
+  jq/jv_unicode.o \
+  jq/jv_aux.o \
+  jq/jv_file.o \
+  jq/jv_alloc.o \
+  jq/jq_test.o \
+  jq/util.o \
+  jq/linker.o \
+  jq/parser.o \
+  jq/lexer.o
+
+all: clean
+
+clean:
+	rm -f $(LIBJQ) $(OBJECTS) $(SHLIB)
 
 $(SHLIB): libjq.a
 
 libjq.a: $(LIBJQ)
 	$(AR) rcs libjq.a $(LIBJQ)
 
-PKG_CFLAGS= -include endianfix.h
+PKG_CFLAGS=-include config.h
 PKG_CPPFLAGS = -Ijq
 PKG_LIBS = -L. -ljq
