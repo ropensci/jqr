@@ -6,7 +6,7 @@
 #ifdef WIN32
 #include <windows.h>
 #include <io.h>
-#include <fileapi.h>
+//#include <fileapi.h>
 #endif
 
 #include "jv.h"
