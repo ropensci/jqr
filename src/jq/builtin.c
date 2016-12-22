@@ -1372,7 +1372,7 @@ static block bind_bytecoded_builtins(block b) {
 
 static const char* const jq_builtins =
 #include "libm.h"
-#include "src/builtin.inc"
+#include "builtin.inc"
 ;
 
 #undef LIBM_DDD_NO

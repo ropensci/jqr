@@ -1,3 +1,10 @@
+#ifdef __sun
+#include <time.h>
+#else
+#define HAVE_TIMEGM
+#define HAVE_TM_TM_GMT_OFF
+#endif
+
 #ifdef WIN32
 #define timegm _mkgmtime
 #define HAVE__ISATTY
@@ -11,10 +18,8 @@
 #define HAVE_ALLOCA
 #define HAVE_ISATTY
 #define HAVE_STRFTIME
-#define HAVE_TIMEGM
 #define HAVE_GMTIME
 #define HAVE_GETTIMEOFDAY
-#define HAVE_TM_TM_GMT_OFF
 #define HAVE_ACOS
 #define HAVE_ACOSH
 #define HAVE_ASIN
