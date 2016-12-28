@@ -6,7 +6,6 @@
 #endif
 
 #ifdef WIN32
-#define timegm _mkgmtime
 #define HAVE__ISATTY
 #else
 #define HAVE_MEMMEM
