@@ -13,5 +13,5 @@ man-roxygen
 ^CONDUCT\.md$
 cran-comments.md
 ^src/jq/.*\.o$
-^src/libjq.a$
+^src/.*\.a$
 ^docker$

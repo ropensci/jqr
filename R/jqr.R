@@ -66,3 +66,12 @@ query_from_dots <- function(...)
 
   paste(unlist(dots), collapse = " | ")
 }
+
+#' @useDynLib jqr C_jqr_string
+jqr <- function(json, program, flags = jq_flags()){
+  json <- paste(json, collapse = "\n")
+  stopifnot(is.character(program))
+  stopifnot(is.numeric(flags))
+  out <- .Call(C_jqr_string, json, program, as.integer(flags))
+  rev(as.character(unlist(out, recursive = FALSE)))
+}

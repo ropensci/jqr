@@ -24,15 +24,11 @@ Authors@R: c(person("Rich", "FitzJohn", role = "aut",
 VignetteBuilder: knitr
 URL: https://github.com/ropensci/jqr
 BugReports: https://github.com/ropensci/jqr/issues
-LinkingTo: BH,
-    Rcpp
 Imports:
-    Rcpp,
-    lazyeval,
-    magrittr
+    magrittr,
+    lazyeval
 Suggests:
     jsonlite,
     testthat,
-    knitr,
-    covr
-RoxygenNote: 5.0.1
+    knitr
+RoxygenNote: 5.0.1.9000
