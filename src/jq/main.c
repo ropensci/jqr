@@ -11,7 +11,7 @@
 #include <windows.h>
 #include <io.h>
 #include <fcntl.h>
-//#include <processenv.h>
+#include <processenv.h>
 #include <shellapi.h>
 #include <wchar.h>
 #include <wtypes.h>

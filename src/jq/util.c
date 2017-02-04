@@ -34,7 +34,7 @@ void *alloca (size_t);
 
 #ifdef WIN32
 #include <windows.h>
-//#include <processenv.h>
+#include <processenv.h>
 #include <shellapi.h>
 #include <wchar.h>
 #include <wtypes.h>

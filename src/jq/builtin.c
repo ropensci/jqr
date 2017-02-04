@@ -1,7 +1,12 @@
 #define _BSD_SOURCE
 #define _GNU_SOURCE
-#define _XOPEN_SOURCE
-#define _XOPEN_SOURCE_EXTENDED 1
+#ifndef __sun__
+# define _XOPEN_SOURCE
+# define _XOPEN_SOURCE_EXTENDED 1
+#else
+# define _XPG6
+# define __EXTENSIONS__
+#endif
 #include <sys/time.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -36,28 +41,6 @@ void *alloca (size_t);
 #include "linker.h"
 #include "locfile.h"
 #include "jv_unicode.h"
-
-//Workaround for windows i386: https://sourceforge.net/p/mingw-w64/bugs/473/
-
-#ifdef WIN32
-#ifdef WIN64
-#define timegm _mkgmtime
-#else
-time_t timegm(struct tm * a_tm)
-{
-  time_t ltime = mktime(a_tm);
-  struct tm tm_val;
-  gmtime_s(&tm_val, &ltime);
-  int offset = (tm_val.tm_hour - a_tm->tm_hour);
-  if (offset > 12)
-  {
-    offset = 24 - offset;
-  }
-  time_t utc = mktime(a_tm) - offset * 3600;
-  return utc;
-}
-#endif
-#endif
 
 
 static jv type_error(jv bad, const char* msg) {
@@ -127,9 +110,24 @@ static jv f_ ## name(jq_state *jq, jv input, jv a, jv b) { \
   return ret; \
 }
 #define LIBM_DDD_NO(name)
+
+#define LIBM_DDDD(name) \
+static jv f_ ## name(jq_state *jq, jv input, jv a, jv b, jv c) { \
+  if (jv_get_kind(a) != JV_KIND_NUMBER || jv_get_kind(b) != JV_KIND_NUMBER) \
+    return type_error(input, "number required"); \
+  jv_free(input); \
+  jv ret = jv_number(name(jv_number_value(a), jv_number_value(b), jv_number_value(c))); \
+  jv_free(a); \
+  jv_free(b); \
+  jv_free(c); \
+  return ret; \
+}
+#define LIBM_DDDD_NO(name)
 #include "libm.h"
+#undef LIBM_DDDD_NO
 #undef LIBM_DDD_NO
 #undef LIBM_DD_NO
+#undef LIBM_DDDD
 #undef LIBM_DDD
 #undef LIBM_DD
 
@@ -1249,14 +1247,17 @@ static jv f_now(jq_state *jq, jv a) {
 }
 #endif
 
-static jv f_current_filename(jq_state *jq) {
+static jv f_current_filename(jq_state *jq, jv a) {
+  jv_free(a);
+
   jv r = jq_util_input_get_current_filename(jq);
   if (jv_is_valid(r))
     return r;
   jv_free(r);
   return jv_null();
 }
-static jv f_current_line(jq_state *jq) {
+static jv f_current_line(jq_state *jq, jv a) {
+  jv_free(a);
   return jq_util_input_get_current_line(jq);
 }
 
@@ -1267,6 +1268,10 @@ static jv f_current_line(jq_state *jq) {
 #define LIBM_DDD(name) \
   {(cfunction_ptr)f_ ## name, "_" #name, 3},
 #define LIBM_DDD_NO(name)
+
+#define LIBM_DDDD(name) \
+  {(cfunction_ptr)f_ ## name, "_" #name, 4},
+#define LIBM_DDDD_NO(name)
 
 static const struct cfunction function_list[] = {
 #include "libm.h"
@@ -1335,8 +1340,10 @@ static const struct cfunction function_list[] = {
   {(cfunction_ptr)f_current_filename, "input_filename", 1},
   {(cfunction_ptr)f_current_line, "input_line_number", 1},
 };
+#undef LIBM_DDDD_NO
 #undef LIBM_DDD_NO
 #undef LIBM_DD_NO
+#undef LIBM_DDDD
 #undef LIBM_DDD
 #undef LIBM_DD
 
@@ -1389,16 +1396,37 @@ static block bind_bytecoded_builtins(block b) {
 
 #define LIBM_DD(name) "def " #name ": _" #name ";"
 #define LIBM_DDD(name) "def " #name "(a;b): _" #name "(a;b);"
-#define LIBM_DD_NO(name) "def " #name ": \"Error: " #name "() not found at build time\"|error;"
-#define LIBM_DDD_NO(name) "def " #name "(a;b): \"Error: " #name "() not found at build time\"|error;"
+#define LIBM_DDDD(name) "def " #name "(a;b;c): _" #name "(a;b;c);"
+#define LIBM_DD_NO(name)
+#define LIBM_DDD_NO(name)
+#define LIBM_DDDD_NO(name)
 
 static const char* const jq_builtins =
+/* Include supported math functions first */
 #include "libm.h"
+/* Include jq-coded builtins next (some depend on math) */
 #include "builtin.inc"
-;
 
+/* Include unsupported math functions next */
+#undef LIBM_DDDD_NO
 #undef LIBM_DDD_NO
 #undef LIBM_DD_NO
+#undef LIBM_DDDD
+#undef LIBM_DDD
+#undef LIBM_DD
+#define LIBM_DD(name)
+#define LIBM_DDD(name)
+#define LIBM_DDDD(name)
+#define LIBM_DD_NO(name) "def " #name ": \"Error: " #name "() not found at build time\"|error;"
+#define LIBM_DDD_NO(name) "def " #name "(a;b): \"Error: " #name "() not found at build time\"|error;"
+#define LIBM_DDDD_NO(name) "def " #name "(a;b;c): \"Error: " #name "() not found at build time\"|error;"
+#include "libm.h"
+;
+
+#undef LIBM_DDDD_NO
+#undef LIBM_DDD_NO
+#undef LIBM_DD_NO
+#undef LIBM_DDDD
 #undef LIBM_DDD
 #undef LIBM_DD
 
