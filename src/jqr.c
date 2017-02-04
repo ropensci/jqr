@@ -4,6 +4,11 @@
 #include <Rinternals.h>
 #include <jq.h>
 #include <string.h>
+#include <version.h>
+
+SEXP C_jq_version(){
+  return Rf_mkString(JQ_VERSION);
+}
 
 void error_cb(void * data, jv x) {
   char buf[1000];
