@@ -1,14 +1,15 @@
 #ifdef __sun
 #include <time.h>
 #else
+#define HAVE_MEMMEM
 #define HAVE_TIMEGM
 #define HAVE_TM_TM_GMT_OFF
 #endif
 
 #ifdef WIN32
+#undef HAVE_MEMMEM
 #define HAVE__ISATTY
 #else
-#define HAVE_MEMMEM
 #define HAVE_MKSTEMP
 #define HAVE_STRPTIME
 #define HAVE_GMTIME_R
