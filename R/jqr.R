@@ -73,5 +73,5 @@ jqr <- function(json, program, flags = jq_flags()){
   stopifnot(is.character(program))
   stopifnot(is.numeric(flags))
   out <- .Call(C_jqr_string, json, program, as.integer(flags))
-  rev(as.character(unlist(out, recursive = FALSE)))
+  rev(as.character(unlist(out[[1]], recursive = FALSE)))
 }

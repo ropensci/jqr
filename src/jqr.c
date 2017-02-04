@@ -12,7 +12,7 @@ void error_cb(void * data, jv x) {
   Rf_errorcall(R_NilValue, buf);
 }
 
-// when is this called >1 time?
+// called for each json object within the string
 SEXP jqr_process(jq_state * state, jv value, int flags) {
   SEXP ret = R_NilValue;
   jq_start(state, value, 0);
@@ -43,14 +43,15 @@ SEXP C_jqr_string(SEXP json, SEXP program, SEXP flags) {
   jv_parser_set_buf(parser, CHAR(STRING_ELT(json, 0)), Rf_length(STRING_ELT(json, 0)), is_partial);
 
   // start parsing
-  SEXP out;
+  SEXP out = R_NilValue;
   jv value = jv_parser_next(parser);
 
-  // This loop is not dealt with properly yet; will just take last.
+  // loop over each top level json object within the string
   while (jv_is_valid(value)) {
-    out = jqr_process(state, value, Rf_asInteger(flags));
+    out = PROTECT(Rf_cons(jqr_process(state, value, Rf_asInteger(flags)), out));
     value = jv_parser_next(parser);
   }
+  UNPROTECT(Rf_length(out));
 
   // Check for JSON parsing problems
   if (jv_invalid_has_msg(jv_copy(value))) {
