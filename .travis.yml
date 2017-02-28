@@ -1,33 +1,35 @@
 language: r
 cache: packages
+sudo: required
+dist: trusty
 
 matrix:
   include:
     - os: linux
-      dist: precise
-      sudo: false
+      r: oldrel
     - os: linux
-      dist: trusty
-      sudo: required
+      r: release
+    - os: linux
+      r: devel
       env: R_CODECOV=true
-      r_check_args: '--use-valgrind'
     - os: osx
-      osx_image: xcode8
-      brew_packages: jq # to test for conflicts
+      osx_image: xcode8.1
       latex: false
     - os: osx
-      osx_image: beta-xcode6.1
-      disable_homebrew: true
+      osx_image: xcode6.4
+      latex: false
 
 addons:
   apt:
     packages:
-    - valgrind
+    - r-cran-lazyeval
+    - r-cran-magrittr
+    - r-cran-testthat
+    - r-cran-jsonlite
+    - r-cran-knitr
 
-r_github_packages:
-  - jimhester/covr
-
-warnings_are_errors: true
+after_success:
+  - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi
 
 notifications:
   email:
@@ -35,6 +37,3 @@ notifications:
     on_failure: change
   slack:
     secure: BH89TWt2sC+iF+j3uq0VhQ8weYKhi6/vgOU4Xu4fRnXFb37+lW9F7xI1LzBwhCFe2mri1b8bFF1IV1mFq6NVdkOHLg1/CF7J2C106yMO56zj8qes4KwZ7YHdU2shzYUKovi7uoDyGlUzsAYpKEe2VbL2bSMUQtdBh2nbI47CCu0=
-
-after_success:
-  - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi
