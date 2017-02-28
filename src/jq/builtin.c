@@ -42,6 +42,28 @@ void *alloca (size_t);
 #include "locfile.h"
 #include "jv_unicode.h"
 
+//Workaround for windows i386: https://sourceforge.net/p/mingw-w64/bugs/473/
+
+#ifdef WIN32
+#ifdef WIN64
+#define timegm _mkgmtime
+#else
+time_t timegm(struct tm * a_tm)
+{
+  time_t ltime = mktime(a_tm);
+  struct tm tm_val;
+  gmtime_s(&tm_val, &ltime);
+  int offset = (tm_val.tm_hour - a_tm->tm_hour);
+  if (offset > 12)
+  {
+    offset = 24 - offset;
+  }
+  time_t utc = mktime(a_tm) - offset * 3600;
+  return utc;
+}
+#endif
+#endif
+
 
 static jv type_error(jv bad, const char* msg) {
   char errbuf[15];
