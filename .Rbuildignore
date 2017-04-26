@@ -15,3 +15,5 @@ cran-comments.md
 ^src/jq/.*\.o$
 ^src/.*\.a$
 ^docker$
+.github
+
