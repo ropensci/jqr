@@ -21,4 +21,3 @@ and pretty prints to the console for easier viewing.
 \seealso{
 \code{\link{jq}}.
 }
-

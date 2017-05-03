@@ -37,4 +37,3 @@ str \%>\% index \%>\% dotstr(name)
 '{"foo": 5, "bar": 8}' \%>\% dotstr(foo)
 '{"foo": {"bar": 8}}' \%>\% dotstr(foo.bar)
 }
-

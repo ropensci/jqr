@@ -2,8 +2,8 @@
 % Please edit documentation in R/jqr.R
 \name{jq}
 \alias{jq}
-\alias{jq.character}
 \alias{jq.jqr}
+\alias{jq.character}
 \title{Execute a query with jq}
 \usage{
 jq(x, ...)
@@ -39,4 +39,3 @@ jq('[8,3,null,6]', 'sort')
 \seealso{
 \code{\link{peek}}
 }
-

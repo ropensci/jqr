@@ -34,4 +34,3 @@ x <- '{"name": "/", "children": [
 x \%>\% recurse(.children[]) \%>\% select(name)
 x \%>\% recurse(.children[]) \%>\% select(name) \%>\% string
 }
-

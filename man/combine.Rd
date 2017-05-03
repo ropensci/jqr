@@ -20,4 +20,3 @@ combine(x)
  select(sha = .sha, name = .commit.committer.name))
 combine(x)
 }
-

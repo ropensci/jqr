@@ -38,4 +38,3 @@ x <- index(githubcommits)
 x \%>\% select(message = .commit.message, name = .commit.committer.name)
 x \%>\% select(sha = .sha, name = .commit.committer.name)
 }
-

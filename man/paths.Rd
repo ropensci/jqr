@@ -16,4 +16,3 @@ Outputs paths to all the elements in its input
 '[1,[[],{"a":2}]]' \%>\% paths
 '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\% paths
 }
-

@@ -19,4 +19,3 @@ Give back a character string
 \seealso{
 \code{\link{peek}}
 }
-
