@@ -241,10 +241,10 @@ Select variables by name, and rename
 '{"foo": 5, "bar": 7}' %>% select(a = .foo)
 ```
 
-More complicated `select()`, using the included dataset `githubcommits`
+More complicated `select()`, using the included dataset `commits`
 
 ```{r}
-githubcommits %>%
+commits %>%
   index() %>%
   select(sha = .sha, name = .commit.committer.name)
 ```

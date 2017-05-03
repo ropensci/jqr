@@ -7,13 +7,13 @@
 #' '{"foo": 5, "bar": 7}' %>% select(a = .foo)
 #'
 #' # using json dataset, just first element
-#' x <- githubcommits %>% index(0)
+#' x <- commits %>% index(0)
 #' x %>%
 #'    select(message = .commit.message, name = .commit.committer.name)
 #' x %>% select(sha = .commit.tree.sha, author = .author.login)
 #'
 #' # using json dataset, all elements
-#' x <- index(githubcommits)
+#' x <- index(commits)
 #' x %>% select(message = .commit.message, name = .commit.committer.name)
 #' x %>% select(sha = .sha, name = .commit.committer.name)
 select <- function(.data, ...) {

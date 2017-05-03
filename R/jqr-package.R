@@ -35,6 +35,6 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
-#' @name githubcommits
+#' @name commits
 #' @format A character string of json github commits data for the jq repo.
 NULL

@@ -159,18 +159,19 @@ test_that("maths", {
   expect_equal(ac('{"foo": 1}' %>% do(.foo %+=% 1) %>% jq), '{\"foo\":2}')
 })
 
+
 test_that("select variables", {
   expect_equal(ac('{"foo": 5, "bar": 7}' %>% select(a = .foo) %>% jq), '{"a":5}')
 
   # using json dataset, just first element
-  x <- githubcommits %>% index(0)
+  x <- commits %>% index(0)
   expect_equal(ac(x %>% select(message = .commit.message, name = .commit.committer.name) %>% jq),
                '{\"message\":[\"Add wrapping and clamping to jv_array_slice\\n\\nFix #716.  Fix #717.\"],\"name\":[\"Nicolas Williams\"]}')
   expect_equal(ac(x %>% select(sha = .commit.tree.sha, author = .author.login) %>% jq),
                '{\"sha\":[\"a52a4b412c3ba4bd2e237f37a5f11fd565e74bae\"],\"author\":[\"tgockel\"]}')
 
   # using json dataset, all elements
-  x <- index(githubcommits)
+  x <- index(commits)
   zz <- x %>%
      select(message = .commit.message, name = .commit.committer.name)
   expect_is(zz, "jqson")
