@@ -50,6 +50,21 @@ library("jqr")
 
 ### low level
 
+```{r}
+str <- '[{
+    "foo": 1,
+    "bar": 2
+  },
+  {
+    "foo": 3,
+    "bar": 4
+  },
+  {
+    "foo": 5,
+    "bar": 6
+}]'
+```
+
 There's a low level interface in which you can execute `jq` code just as you would on the command line:
 
 ```{r}
