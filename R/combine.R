@@ -23,3 +23,17 @@ combine <- function(x) {
   }
   structure(x, class = "jqson", pretty = TRUE)
 }
+
+comb_ine <- function(x) {
+  if (!jsonlite::validate(x)) {
+    tmp <- paste0("[", paste0(x, collapse = ", "), "]")
+    tmpval <- jsonlite::validate(tmp)
+    if (tmpval) {
+      x <- tmp
+    } else {
+      stop(attr(tmpval, "err"), call. = FALSE)
+    }
+  }
+  x
+}
+

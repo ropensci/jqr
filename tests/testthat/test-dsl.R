@@ -9,7 +9,7 @@ test_that("index", {
   expect_named(index(x), c("data", "args"))
   expect_is(index(x) %>% jq, "jqson")
   expect_is(jq(index(x)), "jqson")
-  expect_equal(ac(x %>% index() %>% jq)[1], '{"message":"hello","name":"jenn"}')
+  expect_equal(ac(x %>% index() %>% jq), "[{\"message\":\"hello\",\"name\":\"jenn\"}, {\"message\":\"world\",\"name\":\"beth\"}]")
 })
 
 test_that("dot", {
@@ -57,44 +57,53 @@ test_that("split", {
 test_that("ltrimstr", {
   str <- '["fo", "foo", "barfoo", "foobar", "afoo"]'
   expect_is(str %>% index() %>% ltrimstr(foo) %>% jq, "jqson")
-  expect_equal(ac(str %>% index() %>% ltrimstr(foo) %>% jq), c('\"fo\"', '\"\"', '\"barfoo\"', '\"bar\"', '\"afoo\"'))
+  #expect_equal(ac(str %>% index() %>% ltrimstr(foo) %>% jq), c('\"fo\"', '\"\"', '\"barfoo\"', '\"bar\"', '\"afoo\"'))
+  expect_equal(ac(str %>% index() %>% ltrimstr(foo) %>% jq), "[\"fo\", \"\", \"barfoo\", \"bar\", \"afoo\"]")
   expect_named(ltrimstr(str %>% index(), foo), c("data", "args"))
 })
 
 test_that("rtrimstr", {
   str <- '["fo", "foo", "barfoo", "foobar", "foob"]'
   expect_is(str %>% index() %>% rtrimstr(foo) %>% jq, "jqson")
-  expect_equal(ac(str %>% index() %>% rtrimstr(foo) %>% jq), c('\"fo\"', '\"\"', '\"bar\"', '\"foobar\"', '\"foob\"'))
+  expect_equal(ac(str %>% index() %>% rtrimstr(foo) %>% jq), "[\"fo\", \"\", \"bar\", \"foobar\", \"foob\"]")
+  #expect_equal(ac(str %>% index() %>% rtrimstr(foo) %>% jq), c('\"fo\"', '\"\"', '\"bar\"', '\"foobar\"', '\"foob\"'))
   expect_named(rtrimstr(str %>% index(), foo), c("data", "args"))
 })
 
 test_that("startswith", {
   str <- '["fo", "foo", "barfoo", "foobar", "barfoob"]'
   expect_is(str %>% index %>% startswith(foo) %>% jq, "jqson")
-  expect_equal(ac(str %>% index %>% startswith(foo) %>% jq), c("false","true","false","true","false"))
+  expect_equal(ac(str %>% index %>% startswith(foo) %>% jq), "[false, true, false, true, false]")
+  #expect_equal(ac(str %>% index %>% startswith(foo) %>% jq), c("false","true","false","true","false"))
 })
 
 test_that("endswith", {
   str <- '["fo", "foo", "barfoo", "foobar", "barfoob"]'
   expect_is(str %>% index %>% endswith(foo) %>% jq, "jqson")
-  expect_equal(ac(str %>% index %>% endswith(foo) %>% jq), c("false","true","true","false","false"))
-  expect_equal(ac(str %>% index %>% endswith(bar) %>% jq), c("false","false","false","true","false"))
+  expect_equal(ac(str %>% index %>% endswith(foo) %>% jq), "[false, true, true, false, false]")
+  #expect_equal(ac(str %>% index %>% endswith(foo) %>% jq), c("false","true","true","false","false"))
+  expect_equal(ac(str %>% index %>% endswith(bar) %>% jq), "[false, false, false, true, false]")
+  #expect_equal(ac(str %>% index %>% endswith(bar) %>% jq), c("false","false","false","true","false"))
 })
 
 test_that("tojson, fromjson, tostring, tonumber", {
   str <- '[1, "foo", ["foo"]]'
 
   expect_is(str %>% index %>% tostring %>% jq, "jqson")
-  expect_equal(ac(str %>% index %>% tostring %>% jq)[1], '\"1\"')
+  expect_equal(ac(str %>% index %>% tostring %>% jq), "[\"1\", \"foo\", \"[\\\"foo\\\"]\"]")
+  #expect_equal(ac(str %>% index %>% tostring %>% jq)[1], '\"1\"')
 
   expect_is('[1, "1"]' %>% index %>% tonumber %>% jq, "jqson")
-  expect_equal(ac('[1, "1"]' %>% index %>% tonumber %>% jq)[1], '1')
+  expect_equal(ac('[1, "1"]' %>% index %>% tonumber %>% jq), "[1, 1]")
+  #expect_equal(ac('[1, "1"]' %>% index %>% tonumber %>% jq)[1], '1')
 
   expect_is(str %>% index %>% tojson %>% jq, "jqson")
-  expect_equal(ac(str %>% index %>% tojson %>% jq)[2], '\"\\\"foo\\\"\"')
+  expect_equal(ac(str %>% index %>% tojson %>% jq), "[\"1\", \"\\\"foo\\\"\", \"[\\\"foo\\\"]\"]")
+  #expect_equal(ac(str %>% index %>% tojson %>% jq)[2], '\"\\\"foo\\\"\"')
 
   expect_is(str %>% index %>% tojson %>% fromjson %>% jq, "jqson")
-  expect_equal(ac(str %>% index %>% tojson %>% fromjson %>% jq)[3], '[\"foo\"]')
+  expect_equal(ac(str %>% index %>% tojson %>% fromjson %>% jq), "[1, \"foo\", [\"foo\"]]")
+  #expect_equal(ac(str %>% index %>% tojson %>% fromjson %>% jq)[3], '[\"foo\"]')
 })
 
 test_that("contains", {
@@ -138,10 +147,12 @@ test_that("maths", {
   expect_equal(ac('{"a": [1,2], "b": [3,4]}' %>%  do(.a - .b) %>% jq), "[1,2]")
 
   # comparisons
-  expect_equal(ac('[5,4,2,7]' %>% index() %>% do(. < 4) %>% jq), c("false","false","true","false"))
+  expect_equal(ac('[5,4,2,7]' %>% index() %>% do(. < 4) %>% jq), "[false, false, true, false]")
+  #expect_equal(ac('[5,4,2,7]' %>% index() %>% do(. < 4) %>% jq), c("false","false","true","false"))
 
   # length
-  expect_equal(ac('[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj %>% jq), c("2","6","1","0"))
+  expect_equal(ac('[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj %>% jq), "[2, 6, 1, 0]")
+  #expect_equal(ac('[[1,2], "string", {"a":2}, null]' %>% index %>% lengthj %>% jq), c("2","6","1","0"))
 
   # sqrt
   expect_equal(ac('9' %>% sqrtj %>% jq), "3")
@@ -175,7 +186,8 @@ test_that("select variables", {
   zz <- x %>%
      select(message = .commit.message, name = .commit.committer.name)
   expect_is(zz, "jqson")
-  expect_equal(base::length(zz), 5)
+  expect_equal(base::length(zz), 1)
+  #expect_equal(base::length(zz), 5)
 })
 
 test_that("paths", {
@@ -183,12 +195,14 @@ test_that("paths", {
   str2 <- '[{"name":"JqSON", "good":true}, {"name":"XML", "good":false}]'
 
   expect_is(str1 %>% paths %>% jq, 'jqson')
-  expect_equal(ac(str1 %>% paths %>% jq), c("[0]", "[1]", "[1,0]", "[1,1]", "[1,1,\"a\"]"))
+  expect_equal(ac(str1 %>% paths %>% jq), "[[0], [1], [1,0], [1,1], [1,1,\"a\"]]")
+  #expect_equal(ac(str1 %>% paths %>% jq), c("[0]", "[1]", "[1,0]", "[1,1]", "[1,1,\"a\"]"))
   expect_is(str1 %>% paths, 'jqson')
 
   expect_is(str2 %>% paths %>% jq, 'jqson')
   expect_is(str2 %>% paths, 'jqson')
-  expect_equal(ac(str2 %>% paths %>% jq), c("[0]", "[0,\"name\"]", "[0,\"good\"]", "[1]", "[1,\"name\"]", "[1,\"good\"]"))
+  expect_equal(ac(str2 %>% paths %>% jq), "[[0], [0,\"name\"], [0,\"good\"], [1], [1,\"name\"], [1,\"good\"]]")
+  #expect_equal(ac(str2 %>% paths %>% jq), c("[0]", "[0,\"name\"]", "[0,\"good\"]", "[1]", "[1,\"name\"]", "[1,\"good\"]"))
   expect_is(str2 %>% paths, 'jqson')
 })
 
@@ -196,9 +210,10 @@ test_that("recurse", {
   x <- '{"foo":[{"foo": []}, {"foo":[{"foo":[]}]}]}'
 
   expect_is(x %>% recurse(.foo[]) %>% jq, 'jqson')
-  expect_equal(ac(x %>% recurse(.foo[]) %>% jq),
-               c("{\"foo\":[{\"foo\":[]},{\"foo\":[{\"foo\":[]}]}]}",
-                 "{\"foo\":[]}", "{\"foo\":[{\"foo\":[]}]}", "{\"foo\":[]}"))
+  expect_equal(ac(x %>% recurse(.foo[]) %>% jq), "[{\"foo\":[{\"foo\":[]},{\"foo\":[{\"foo\":[]}]}]}, {\"foo\":[]}, {\"foo\":[{\"foo\":[]}]}, {\"foo\":[]}]")
+  # expect_equal(ac(x %>% recurse(.foo[]) %>% jq),
+  #              c("{\"foo\":[{\"foo\":[]},{\"foo\":[{\"foo\":[]}]}]}",
+  #                "{\"foo\":[]}", "{\"foo\":[{\"foo\":[]}]}", "{\"foo\":[]}"))
   expect_is(x %>% recurse(.foo[]), 'jqson')
   expect_is(x %>% recurse(.foo[]) %>% jq, 'jqson')
 

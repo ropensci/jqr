@@ -6,17 +6,20 @@
 \alias{jq.character}
 \title{Execute a query with jq}
 \usage{
-jq(x, ...)
+jq(x, ..., jsonify = TRUE)
 
-\method{jq}{jqr}(x, ...)
+\method{jq}{jqr}(x, ..., jsonify = TRUE)
 
-\method{jq}{character}(x, ..., flags = jq_flags())
+\method{jq}{character}(x, ..., flags = jq_flags(), jsonify = TRUE)
 }
 \arguments{
 \item{x}{\code{json} object or character string with json data.}
 
 \item{...}{character specification of jq query. Each element in code{...}
 will be combined with " | ", which is convenient for long queries.}
+
+\item{jsonify}{combine all outputs into a valid JSON object.
+Default: \code{TRUE}}
 
 \item{flags}{See \code{\link{jq_flags}}}
 }

@@ -10,6 +10,8 @@
 #' @param ... character specification of jq query. Each element in code{...}
 #'   will be combined with " | ", which is convenient for long queries.
 #' @param flags See \code{\link{jq_flags}}
+#' @param jsonify combine all outputs into a valid JSON object.
+#' Default: \code{TRUE}
 #' @seealso \code{\link{peek}}
 #' @examples
 #' '{"a": 7}' %>%  do(.a + 1)
@@ -20,29 +22,29 @@
 #'
 #' jq('{"a": 7, "b": 4}', 'keys')
 #' jq('[8,3,null,6]', 'sort')
-jq <- function(x, ...) {
+jq <- function(x, ..., jsonify = TRUE) {
   UseMethod("jq", x)
 }
 
 #' @rdname jq
 #' @export
-jq.jqr <- function(x, ...) {
+jq.jqr <- function(x, ..., jsonify = TRUE) {
   pipe_autoexec(toggle = FALSE)
   flags <- `if`(is.null(attr(x, "jq_flags")), jq_flags(), attr(x, "jq_flags"))
   res <- structure(jqr(x$data, make_query(x), flags),
                    class = c("jqson", "character"))
   query <- query_from_dots(...)
   if (query != "")
-    jq(res, query)
+    jq(res, query, jsonify = jsonify)
   else
     res
 }
 
 #' @rdname jq
 #' @export
-jq.character <- function(x, ..., flags = jq_flags()) {
+jq.character <- function(x, ..., flags = jq_flags(), jsonify = TRUE) {
   query <- query_from_dots(...)
-  structure(jqr(x, query, flags),
+  structure(jqr(x, query, flags = flags, jsonify = jsonify),
             class = c("jqson", "character"))
 }
 
@@ -51,10 +53,10 @@ jq.default <- function(x, ...) {
   stop(sprintf("jq method not implemented for %s.", class(x)[1]))
 }
 
-#' @export
-print.jqson <- function(x, ...) {
-  cat(jsonlite::prettify(combine(x)))
-}
+# @export
+# print.jqson <- function(x, ...) {
+#   cat(jsonlite::prettify(combine(x)))
+# }
 
 #' Helper function for createing a jq query string from ellipses.
 #' @noRd
@@ -77,7 +79,8 @@ jqr_apply <- function(json, program, flags){
   rev(out)
 }
 
-jqr <- function(json, program, flags = jq_flags()){
+jqr <- function(json, program, flags = jq_flags(), jsonify = TRUE){
   out <- jqr_apply(json, program, flags)
-  as.character(unlist(out[[1]], recursive = FALSE))
+  tmp <- as.character(unlist(out[[1]], recursive = FALSE))
+  if (jsonify) return(comb_ine(tmp)) else return(tmp)
 }

@@ -4,7 +4,7 @@ Description: Client for 'jq', a JSON processor (<http://stedolan.github.io/jq/>)
     in C. 'jq' allows the following with JSON data: index into, parse, do calculations,
     cut up and filter, change key names and values, perform conditionals and comparisons,
     and more.
-Version: 0.2.9200
+Version: 0.2.9241
 Depends:
     R (>= 3.1.2)
 License: MIT + file LICENSE

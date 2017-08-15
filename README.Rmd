@@ -44,26 +44,13 @@ devtools::install_github("ropensci/jqr")
 library("jqr")
 ```
 
+
+
 ## Interfaces
 
 ### low level
 
 There's a low level interface in which you can execute `jq` code just as you would on the command line:
-
-```{r}
-str <- '[{
-    "foo": 1,
-    "bar": 2
-  },
-  {
-    "foo": 3,
-    "bar": 4
-  },
-  {
-    "foo": 5,
-    "bar": 6
-}]'
-```
 
 ```{r}
 jq(str, ".[]")
@@ -115,7 +102,7 @@ x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
 jq(x, '{user, title: .titles[]}')
 x %>% index()
 x %>% select(user, title = `.titles[]`)
-jq(x, '{user, title: .titles[]}') %>% jsonlite::toJSON() %>% jsonlite::validate()
+jq(x, '{user, title: .titles[]}') %>% jsonlite::validate()
 ```
 
 #### string operations
@@ -219,7 +206,7 @@ Select variables by name, and rename
 More complicated `select()`, using the included dataset `githubcommits`
 
 ```{r}
-githubcommits %>%
+commits %>%
   index() %>%
   select(sha = .sha, name = .commit.committer.name)
 ```
@@ -282,7 +269,7 @@ find maximum
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(bar)
 ```
 
-#### Combine into valid JSON
+## Combine into valid JSON
 
 `jq` sometimes creates pieces of JSON that are valid in themselves, but together are not.
 `combine()` is a way to make valid JSON.
@@ -290,7 +277,7 @@ find maximum
 This outputs a few pieces of JSON
 
 ```{r}
-(x <- githubcommits %>%
+(x <- commits %>%
   index() %>%
   select(sha = .sha, name = .commit.committer.name))
 ```
@@ -300,6 +287,69 @@ Use `combine()` to put them together.
 ```{r}
 combine(x)
 ```
+
+## return valid JSON or not
+
+You can toggle whether you get back valid JSON as a single string or 
+a vector of strings which are individually valid, but are not valid 
+all together.
+
+```{r}
+str <- '[{
+    "foo": 1,
+    "bar": 2
+  },
+  {
+    "foo": 3,
+    "bar": 4
+  },
+  {
+    "foo": 5,
+    "bar": 6
+}]'
+```
+
+By default in low and high level interfaces `jsonify = TRUE`, such that you 
+get back a single valid JSON string. Compare these two outcomes:
+
+```{r}
+jq(str, ".[]", jsonify = TRUE)
+jq(str, ".[]", jsonify = FALSE)
+```
+
+Where the first can be read directly by e.g., `jsonlite::fromJSON`:
+
+```{r}
+jq(str, ".[]", jsonify = TRUE) %>% jsonlite::fromJSON()
+```
+
+Whereas the second can not:
+
+```{r eval=FALSE}
+jq(str, ".[]", jsonify = FALSE) %>% jsonlite::fromJSON()
+#> Error: parse error: trailing garbage
+#>                      {"foo":1,"bar":2} {"foo":3,"bar":4} {"foo":5,"bar
+#>                      (right here) ------^
+```
+
+Note that toggling `jsonify` with the low level interface works out of the box, 
+but with the high level interface:
+
+* if you are using pipes, you have to assign the result to an object first, 
+then use `jsonlite::fromJSON` or similar
+
+```{r}
+x <- '[8,3,null,6]' %>% sortj() 
+x %>% jsonlite::fromJSON()
+```
+
+* you can avoid pipes and use `jsonlite::fromJSON` in a more straight-forward 
+way:
+
+```{r}
+jsonlite::fromJSON(jq(sortj_('[8,3,null,6]')))
+```
+
 
 ## Meta
 

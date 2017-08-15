@@ -84,8 +84,10 @@ test_that("each value", {
 }}
 '
 
-  expect_that(jqr(src, '.menu.popup.menuitem[].value', 0),
-              equals(c('"New"', '"Open"', '"Close"')))
+  expect_equal(jqr(src, '.menu.popup.menuitem[].value', 0),
+               "[\"New\", \"Open\", \"Close\"]")
+  # expect_that(jqr(src, '.menu.popup.menuitem[].value', 0),
+  #             equals(c('"New"', '"Open"', '"Close"')))
 })
 
 test_that("compile error", {
@@ -107,13 +109,17 @@ test_that("runtime error", {
 
 test_that("query for hash", {
   src <- list(FOO=100L, BAR=c(200L, 200L))
-  expect_that(jqr(jsonlite::toJSON(src), ".BAR[]", 0),
-              equals(c("200", "200")))
+  expect_equal(jqr(jsonlite::toJSON(src), ".BAR[]", 0),
+               "[200, 200]")
+  # expect_that(jqr(jsonlite::toJSON(src), ".BAR[]", 0),
+  #             equals(c("200", "200")))
 })
 
 test_that("query for array", {
   src <- list('FOO', 100L, 'BAR', c(200L, 200L))
 
-  expect_that(jqr(jsonlite::toJSON(src), ".[3][]", 0),
-              equals(c("200", "200")))
+  expect_equal(jqr(jsonlite::toJSON(src), ".[3][]", 0),
+              "[200, 200]")
+  # expect_that(jqr(jsonlite::toJSON(src), ".[3][]", 0),
+  #             equals(c("200", "200")))
 })
