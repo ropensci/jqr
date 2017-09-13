@@ -1,14 +1,26 @@
-R CMD CHECK passed on my local OS X install with R 3.3.0 and
-R development version, Ubuntu running on Travis-CI, and WinBuilder.
+## Test environments
 
-This version actually includes fixes for pedantic warnings and Solaris
-errors that we said were included last submission, but were not as 
-we accidentally had included some files in .gitignore we did not 
-mean to include.
+* local OS X install, R 3.4.1 patched
+* ubuntu 12.04 (on travis-ci), R 3.4.1
+* win-builder (devel and release)
 
-This submission fixes pedantic warnings from the included C library jq.
+## R CMD check results
 
-In addition, this submission includes fixes for failing tests on 
-Solaris.
+0 errors | 0 warnings | 1 note
 
-Thanks! Scott Chamberlain
+## Reverse dependencies
+
+We've checked the 1 reverse dependency, and no problems resulted.
+
+---
+
+This version upates the `jq` version and includes the mandatory 
+addition of R_registerRoutines and 
+R_useDynamicSymbols for packages with compiled code.
+
+There may be build failures on R-devel - As far as I can tell though, this
+is due to problems with the stringi package used inside the knitr package - 
+that is, it's not a problem in this package.
+
+Thanks!
+Scott Chamberlain
