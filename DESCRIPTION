@@ -1,9 +1,9 @@
 Package: jqr
-Title: Client for 'jq', a JSON Processor
-Description: Client for 'jq', a JSON processor (<http://stedolan.github.io/jq/>), written
-    in C. 'jq' allows the following with JSON data: index into, parse, do calculations,
-    cut up and filter, change key names and values, perform conditionals and comparisons,
-    and more.
+Title: Client for 'jq', a 'JSON' Processor
+Description: Client for 'jq', a 'JSON' processor (<https://stedolan.github.io/jq/>), 
+    written in C. 'jq' allows the following with 'JSON' data: index into, parse, 
+    do calculations, cut up and filter, change key names and values, perform 
+    conditionals and comparisons, and more.
 Version: 0.3.0
 Depends:
     R (>= 3.1.2)

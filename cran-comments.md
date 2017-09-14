@@ -15,12 +15,8 @@ We've checked the 1 reverse dependency, and no problems resulted.
 ---
 
 This version upates the `jq` version and includes the mandatory 
-addition of R_registerRoutines and 
-R_useDynamicSymbols for packages with compiled code.
-
-There may be build failures on R-devel - As far as I can tell though, this
-is due to problems with the stringi package used inside the knitr package - 
-that is, it's not a problem in this package.
+addition of R_registerRoutines and R_useDynamicSymbols for 
+packages with compiled code.
 
 Thanks!
 Scott Chamberlain
