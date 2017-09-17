@@ -18,18 +18,20 @@ LIBJQ = \
   jq/parser.o \
   jq/lexer.o
 
+STATLIB=jq/libstatjq.a
+
 all: clean
 
 clean:
-	rm -f $(LIBJQ) $(OBJECTS) $(SHLIB) libstatjq.a
+	rm -f $(LIBJQ) $(OBJECTS) $(SHLIB) $(STATLIB)
 
-$(SHLIB): libstatjq.a
+$(SHLIB): $(STATLIB)
 
-libstatjq.a: $(LIBJQ)
-	$(AR) rcs libstatjq.a $(LIBJQ)
+$(STATLIB): $(LIBJQ)
+	$(AR) rcs $(STATLIB) $(LIBJQ)
 
 PKG_CFLAGS=-include config.h
-PKG_CPPFLAGS=-Ijq
+PKG_CPPFLAGS=-Ijq $(C_VISIBILITY)
 
 WINLIBS=$(subst 64,-lshlwapi,$(subst 32,64,$(WIN)))
-PKG_LIBS=-L. -lstatjq $(WINLIBS)
+PKG_LIBS=-Ljq -lstatjq $(WINLIBS)

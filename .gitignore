@@ -4,7 +4,7 @@
 src/*.o
 src/jq/*.o
 src/*.so
-src/*.a
+*.a
 jq-*.tar.gz
 jqr_*.tar.gz
 notes.md

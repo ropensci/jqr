@@ -1,6 +1,7 @@
 jqr 0.3.0
 =========
 
+* Hide internal libjq symbols from the shlib on supported platforms
 * Update bundled libjq to stedolan/jq@0b82185 (1.5-patched), specifically
 jq `v1.5rc2-174-g597c1f6`
 * Use `R_registerRoutines` and `R_useDynamicSymbols` as required for 

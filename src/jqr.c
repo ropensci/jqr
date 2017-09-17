@@ -2,11 +2,12 @@
 #define STRICT_R_HEADERS
 
 #include <Rinternals.h>
+#include <R_ext/Visibility.h>
 #include <jq.h>
 #include <string.h>
 #include <version.h>
 
-SEXP C_jq_version(){
+attribute_visible SEXP C_jq_version(){
   return Rf_mkString(JQ_VERSION);
 }
 
@@ -18,7 +19,7 @@ void error_cb(void * data, jv x) {
 }
 
 // called for each json object within the string
-SEXP jqr_process(jq_state * state, jv value, int flags) {
+attribute_visible SEXP jqr_process(jq_state * state, jv value, int flags) {
   SEXP ret = R_NilValue;
   jq_start(state, value, 0);
   jv result = jq_next(state);
