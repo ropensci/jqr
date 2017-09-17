@@ -1,6 +1,6 @@
 language: r
 cache: packages
-sudo: required
+latex: false
 dist: trusty
 
 matrix:
@@ -13,11 +13,9 @@ matrix:
       r: devel
       env: R_CODECOV=true
     - os: osx
-      osx_image: xcode8.1
-      latex: false
+      osx_image: xcode8.3
     - os: osx
-      osx_image: xcode6.4
-      latex: false
+      osx_image: xcode7.3
 
 addons:
   apt:
