@@ -19,7 +19,7 @@ void error_cb(void * data, jv x) {
 }
 
 // called for each json object within the string
-attribute_visible SEXP jqr_process(jq_state * state, jv value, int flags) {
+SEXP jqr_process(jq_state * state, jv value, int flags) {
   SEXP ret = R_NilValue;
   jq_start(state, value, 0);
   jv result = jq_next(state);
@@ -36,7 +36,7 @@ attribute_visible SEXP jqr_process(jq_state * state, jv value, int flags) {
   return ret;
 }
 
-SEXP C_jqr_string(SEXP json, SEXP program, SEXP flags) {
+attribute_visible SEXP C_jqr_string(SEXP json, SEXP program, SEXP flags) {
   // compile the 'jq' string
   jq_state * state = jq_init();
   jq_set_error_cb(state, error_cb, NULL);
