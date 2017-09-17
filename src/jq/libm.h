@@ -144,10 +144,10 @@ LIBM_DD(y1)
 LIBM_DD_NO(y1)
 #endif
 #ifdef HAVE_JN
-LIBM_DID(jn)
+LIBM_DDD(jn)
 #endif
 #ifdef HAVE_YN
-LIBM_DID(yn)
+LIBM_DDD(yn)
 #endif
 #ifdef HAVE_CEIL
 LIBM_DD(ceil)
@@ -159,7 +159,7 @@ LIBM_DDD(copysign)
 #else
 LIBM_DDD_NO(copysign)
 #endif
-#ifdef HAVE_DREM
+#if defined(HAVE_DREM) && !defined(WIN32)
 LIBM_DDD(drem)
 #else
 LIBM_DDD_NO(drem)
@@ -174,7 +174,7 @@ LIBM_DD(erfc)
 #else
 LIBM_DD_NO(erfc)
 #endif
-#ifdef HAVE_EXP10
+#if defined(HAVE_EXP10) && !defined(WIN32)
 LIBM_DD(exp10)
 #else
 LIBM_DD_NO(exp10)
@@ -214,11 +214,6 @@ LIBM_DDD(fmod)
 #else
 LIBM_DDD_NO(fmod)
 #endif
-#ifdef HAVE_FREXP
-LIBM_DDD(frexp)
-#else
-LIBM_DDD_NO(frexp)
-#endif
 #ifdef HAVE_GAMMA
 LIBM_DD(gamma)
 #else
@@ -239,11 +234,6 @@ LIBM_DD(logb)
 #else
 LIBM_DD_NO(logb)
 #endif
-#ifdef HAVE_MODF
-LIBM_DDD(modf)
-#else
-LIBM_DDD_NO(modf)
-#endif
 #ifdef HAVE_NEARBYINT
 LIBM_DD(nearbyint)
 #else
@@ -259,7 +249,7 @@ LIBM_DDD(nexttoward)
 #else
 LIBM_DDD_NO(nexttoward)
 #endif
-#ifdef HAVE_POW10
+#if defined(HAVE_POW10) && !defined(WIN32)
 LIBM_DD(pow10)
 #else
 LIBM_DD_NO(pow10)
@@ -284,7 +274,7 @@ LIBM_DDD(scalbln)
 #else
 LIBM_DDD_NO(scalbln)
 #endif
-#ifdef HAVE_SIGNIFICAND
+#if defined(HAVE_SIGNIFICAND) && !defined(WIN32)
 LIBM_DD(significand)
 #else
 LIBM_DD_NO(significand)

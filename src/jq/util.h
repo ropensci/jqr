@@ -5,6 +5,7 @@
 /* For WriteFile() below */
 #include <windows.h>
 #include <io.h>
+#include <processenv.h>
 #include <shellapi.h>
 #include <wchar.h>
 #include <wtypes.h>

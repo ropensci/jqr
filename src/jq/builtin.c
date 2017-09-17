@@ -29,7 +29,7 @@ void *alloca (size_t);
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
-#ifdef HAVE_ONIGURUMA
+#ifdef HAVE_LIBONIG
 #include <oniguruma.h>
 #endif
 #include <string.h>
@@ -41,28 +41,7 @@ void *alloca (size_t);
 #include "linker.h"
 #include "locfile.h"
 #include "jv_unicode.h"
-
-//Workaround for windows i386: https://sourceforge.net/p/mingw-w64/bugs/473/
-
-#ifdef WIN32
-#ifdef WIN64
-#define timegm _mkgmtime
-#else
-time_t timegm(struct tm * a_tm)
-{
-  time_t ltime = mktime(a_tm);
-  struct tm tm_val;
-  gmtime_s(&tm_val, &ltime);
-  int offset = (tm_val.tm_hour - a_tm->tm_hour);
-  if (offset > 12)
-  {
-    offset = 24 - offset;
-  }
-  time_t utc = mktime(a_tm) - offset * 3600;
-  return utc;
-}
-#endif
-#endif
+#include "jv_alloc.h"
 
 
 static jv type_error(jv bad, const char* msg) {
@@ -123,9 +102,15 @@ static jv f_ ## name(jq_state *jq, jv input) { \
 
 #define LIBM_DDD(name) \
 static jv f_ ## name(jq_state *jq, jv input, jv a, jv b) { \
-  if (jv_get_kind(a) != JV_KIND_NUMBER || jv_get_kind(b) != JV_KIND_NUMBER) \
-    return type_error(input, "number required"); \
   jv_free(input); \
+  if (jv_get_kind(a) != JV_KIND_NUMBER) { \
+    jv_free(b); \
+    return type_error(a, "number required"); \
+  } \
+  if (jv_get_kind(b) != JV_KIND_NUMBER) { \
+    jv_free(a); \
+    return type_error(b, "number required"); \
+  } \
   jv ret = jv_number(name(jv_number_value(a), jv_number_value(b))); \
   jv_free(a); \
   jv_free(b); \
@@ -135,9 +120,22 @@ static jv f_ ## name(jq_state *jq, jv input, jv a, jv b) { \
 
 #define LIBM_DDDD(name) \
 static jv f_ ## name(jq_state *jq, jv input, jv a, jv b, jv c) { \
-  if (jv_get_kind(a) != JV_KIND_NUMBER || jv_get_kind(b) != JV_KIND_NUMBER) \
-    return type_error(input, "number required"); \
   jv_free(input); \
+  if (jv_get_kind(a) != JV_KIND_NUMBER) { \
+    jv_free(b); \
+    jv_free(c); \
+    return type_error(a, "number required"); \
+  } \
+  if (jv_get_kind(b) != JV_KIND_NUMBER) { \
+    jv_free(a); \
+    jv_free(c); \
+    return type_error(b, "number required"); \
+  } \
+  if (jv_get_kind(c) != JV_KIND_NUMBER) { \
+    jv_free(a); \
+    jv_free(b); \
+    return type_error(c, "number required"); \
+  } \
   jv ret = jv_number(name(jv_number_value(a), jv_number_value(b), jv_number_value(c))); \
   jv_free(a); \
   jv_free(b); \
@@ -152,6 +150,41 @@ static jv f_ ## name(jq_state *jq, jv input, jv a, jv b, jv c) { \
 #undef LIBM_DDDD
 #undef LIBM_DDD
 #undef LIBM_DD
+
+#ifdef HAVE_FREXP
+static jv f_frexp(jq_state *jq, jv input) {
+  if (jv_get_kind(input) != JV_KIND_NUMBER) {
+    return type_error(input, "number required");
+  }
+  int exp;
+  double d = frexp(jv_number_value(input), &exp);
+  jv ret = JV_ARRAY(jv_number(d), jv_number(exp));
+  jv_free(input);
+  return ret;
+}
+#endif
+#ifdef HAVE_MODF
+static jv f_modf(jq_state *jq, jv input) {
+  if (jv_get_kind(input) != JV_KIND_NUMBER) {
+    return type_error(input, "number required");
+  }
+  double i;
+  jv ret = JV_ARRAY(jv_number(modf(jv_number_value(input), &i)));
+  jv_free(input);
+  return jv_array_append(ret, jv_number(i));
+}
+#endif
+#ifdef HAVE_LGAMMA_R
+static jv f_lgamma_r(jq_state *jq, jv input) {
+  if (jv_get_kind(input) != JV_KIND_NUMBER) {
+    return type_error(input, "number required");
+  }
+  int sign;
+  jv ret = JV_ARRAY(jv_number(lgamma_r(jv_number_value(input), &sign)));
+  jv_free(input);
+  return jv_array_append(ret, jv_number(sign));
+}
+#endif
 
 static jv f_negate(jq_state *jq, jv input) {
   if (jv_get_kind(input) != JV_KIND_NUMBER) {
@@ -418,6 +451,24 @@ static jv f_utf8bytelength(jq_state *jq, jv input) {
 
 #define CHARS_ALPHANUM "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
+static const unsigned char BASE64_ENCODE_TABLE[64 + 1] = CHARS_ALPHANUM "+/";
+static const unsigned char BASE64_INVALID_ENTRY = 0xFF;
+static const unsigned char BASE64_DECODE_TABLE[255] = {
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+  62, // +
+  0xFF, 0xFF, 0xFF,
+  63, // /
+  52, 53, 54, 55, 56, 57, 58, 59, 60, 61, // 0-9
+  0xFF, 0xFF, 0xFF,
+  99, // =
+  0xFF, 0xFF, 0xFF,
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, // A-Z
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+  26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,  // a-z
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+};
+
+
 static jv escape_string(jv input, const char* escapings) {
 
   assert(jv_get_kind(input) == JV_KIND_STRING);
@@ -570,7 +621,6 @@ static jv f_format(jq_state *jq, jv input, jv fmt) {
     jv_free(fmt);
     input = f_tostring(jq, input);
     jv line = jv_string("");
-    const char b64[64 + 1] = CHARS_ALPHANUM "+/";
     const unsigned char* data = (const unsigned char*)jv_string_value(input);
     int len = jv_string_length_bytes(jv_copy(input));
     for (int i=0; i<len; i+=3) {
@@ -582,13 +632,56 @@ static jv f_format(jq_state *jq, jv input, jv fmt) {
       }
       char buf[4];
       for (int j=0; j<4; j++) {
-        buf[j] = b64[(code >> (18 - j*6)) & 0x3f];
+        buf[j] = BASE64_ENCODE_TABLE[(code >> (18 - j*6)) & 0x3f];
       }
       if (n < 3) buf[3] = '=';
       if (n < 2) buf[2] = '=';
       line = jv_string_append_buf(line, buf, sizeof(buf));
     }
     jv_free(input);
+    return line;
+  } else if (!strcmp(fmt_s, "base64d")) {
+    jv_free(fmt);
+    input = f_tostring(jq, input);
+    const unsigned char* data = (const unsigned char*)jv_string_value(input);
+    int len = jv_string_length_bytes(jv_copy(input));
+    size_t decoded_len = (3 * len) / 4; // 3 usable bytes for every 4 bytes of input
+    char *result = jv_mem_calloc(decoded_len, sizeof(char));
+    memset(result, 0, decoded_len * sizeof(char));
+    uint32_t ri = 0;
+    int input_bytes_read=0;
+    uint32_t code = 0;
+    for (int i=0; i<len && data[i] != '='; i++) {
+      if (BASE64_DECODE_TABLE[data[i]] == BASE64_INVALID_ENTRY) {
+        free(result);
+        return type_error(input, "is not valid base64 data");
+      }
+
+      code <<= 6;
+      code |= BASE64_DECODE_TABLE[data[i]];
+      input_bytes_read++;
+
+      if (input_bytes_read == 4) {
+        result[ri++] = (code >> 16) & 0xFF;
+        result[ri++] = (code >> 8) & 0xFF;
+        result[ri++] = code & 0xFF;
+        input_bytes_read = 0;
+        code = 0;
+      }
+    }
+    if (input_bytes_read == 3) {
+      result[ri++] = (code >> 10) & 0xFF;
+      result[ri++] = (code >> 2) & 0xFF;
+    } else if (input_bytes_read == 2) {
+      result[ri++] = (code >> 4) & 0xFF;
+    } else if (input_bytes_read == 1) {
+      free(result);
+      return type_error(input, "trailing base64 byte found");
+    }
+
+    jv line = jv_string_sized(result, ri);
+    jv_free(input);
+    free(result);
     return line;
   } else {
     jv_free(input);
@@ -640,7 +733,7 @@ static jv f_group_by_impl(jq_state *jq, jv input, jv keys) {
   }
 }
 
-#ifdef HAVE_ONIGURUMA
+#ifdef HAVE_LIBONIG
 static int f_match_name_iter(const UChar* name, const UChar *name_end, int ngroups,
     int *groups, regex_t *reg, void *arg) {
   jv captures = *(jv*)arg;
@@ -844,11 +937,11 @@ static jv f_match(jq_state *jq, jv input, jv regex, jv modifiers, jv testmode) {
   jv_free(regex);
   return result;
 }
-#else /* ! HAVE_ONIGURUMA */
+#else /* !HAVE_LIBONIG */
 static jv f_match(jq_state *jq, jv input, jv regex, jv modifiers, jv testmode) {
   return jv_invalid_with_msg(jv_string("jq was compiled without ONIGURUMA regex libary. match/test/sub and related functions are not available."));
 }
-#endif /* HAVE_ONIGURUMA */
+#endif /* HAVE_LIBONIG */
 
 static jv minmax_by(jv values, jv keys, int is_min) {
   if (jv_get_kind(values) != JV_KIND_ARRAY)
@@ -956,14 +1049,14 @@ static jv f_error(jq_state *jq, jv input, jv msg) {
 
 // FIXME Should autoconf check for this!
 #ifndef WIN32
-extern const char **environ;
+extern char **environ;
 #endif
 
 static jv f_env(jq_state *jq, jv input) {
   jv_free(input);
   jv env = jv_object();
   const char *var, *val;
-  for (const char **e = environ; *e != NULL; e++) {
+  for (char **e = environ; *e != NULL; e++) {
     var = e[0];
     val = strchr(e[0], '=');
     if (val == NULL)
@@ -972,6 +1065,19 @@ static jv f_env(jq_state *jq, jv input) {
       env = jv_object_set(env, jv_string_sized(var, val - var), jv_string(val + 1));
   }
   return env;
+}
+
+static jv f_halt(jq_state *jq, jv input) {
+  jv_free(input);
+  jq_halt(jq, jv_invalid(), jv_invalid());
+  return jv_true();
+}
+
+static jv f_halt_error(jq_state *jq, jv input, jv a) {
+  if (jv_get_kind(a) != JV_KIND_NUMBER)
+    return type_error(input, "halt_error/1: number required"); \
+  jq_halt(jq, a, input);
+  return jv_true();
 }
 
 static jv f_get_search_list(jq_state *jq, jv input) {
@@ -1019,7 +1125,10 @@ static jv f_string_implode(jq_state *jq, jv a) {
 }
 
 static jv f_setpath(jq_state *jq, jv a, jv b, jv c) { return jv_setpath(a, b, c); }
-static jv f_getpath(jq_state *jq, jv a, jv b) { return jv_getpath(a, b); }
+extern jv _jq_path_append(jq_state *, jv, jv, jv);
+static jv f_getpath(jq_state *jq, jv a, jv b) {
+  return _jq_path_append(jq, a, b, jv_getpath(jv_copy(a), jv_copy(b)));
+}
 static jv f_delpaths(jq_state *jq, jv a, jv b) { return jv_delpaths(a, b); }
 static jv f_has(jq_state *jq, jv a, jv b) { return jv_has(a, b); }
 
@@ -1055,7 +1164,6 @@ static jv f_debug(jq_state *jq, jv input) {
 
 static jv f_stderr(jq_state *jq, jv input) {
   jv_dumpf(jv_copy(input), stderr, 0);
-  fprintf(stderr, "\n");
   return input;
 }
 
@@ -1085,21 +1193,89 @@ static jv tm2jv(struct tm *tm) {
  *
  * Returns (time_t)-2 if mktime()'s side-effects cannot be corrected.
  */
-static time_t my_mktime(struct tm *tm) {
+static time_t my_timegm(struct tm *tm) {
 #ifdef HAVE_TIMEGM
   return timegm(tm);
 #else /* HAVE_TIMEGM */
+  char *tz;
+
+  tz = (tz = getenv("TZ")) != NULL ? strdup(tz) : NULL;
+  if (tz != NULL)
+    setenv("TZ", "", 1);
+  time_t t = mktime(tm);
+  if (tz != NULL)
+    setenv("TZ", tz, 1);
+  return t;
+#endif /* !HAVE_TIMEGM */
+}
+static time_t my_mktime(struct tm *tm) {
   time_t t = mktime(tm);
   if (t == (time_t)-1)
     return t;
 #ifdef HAVE_TM_TM_GMT_OFF
-  return t + tm.tm_gmtoff;
-#elif defined(HAVE_TM_TM_GMT_OFF)
-  return t + tm.__tm_gmtoff;
+  return t + tm->tm_gmtoff;
+#elif HAVE_TM___TM_GMT_OFF
+  return t + tm->__tm_gmtoff;
 #else
   return (time_t)-2; /* Not supported */
 #endif
-#endif /* !HAVE_TIMEGM */
+}
+
+/* Compute and set tm_wday */
+static void set_tm_wday(struct tm *tm) {
+  /*
+   * https://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week#Gauss.27s_algorithm
+   * https://cs.uwaterloo.ca/~alopez-o/math-faq/node73.html
+   *
+   * Tested with dates from 1900-01-01 through 2100-01-01.  This
+   * algorithm produces the wrong day-of-the-week number for dates in
+   * the range 1900-01-01..1900-02-28, and for 2100-01-01..2100-02-28.
+   * Since this is only needed on OS X and *BSD, we might just document
+   * this.
+   */
+  int century = (1900 + tm->tm_year) / 100;
+  int year = (1900 + tm->tm_year) % 100;
+  if (tm->tm_mon < 2)
+    year--;
+  /*
+   * The month value in the wday computation below is shifted so that
+   * March is 1, April is 2, .., January is 11, and February is 12.
+   */
+  int mon = tm->tm_mon - 1;
+  if (mon < 1)
+    mon += 12;
+  int wday =
+    (tm->tm_mday + (int)floor((2.6 * mon - 0.2)) + year + (int)floor(year / 4.0) + (int)floor(century / 4.0) - 2 * century) % 7;
+  if (wday < 0)
+    wday += 7;
+#if 0
+  /* See commentary above */
+  assert(wday == tm->tm_wday || tm->tm_wday == 8);
+#endif
+  tm->tm_wday = wday;
+}
+/*
+ * Compute and set tm_yday.
+ *
+ */
+static void set_tm_yday(struct tm *tm) {
+  static const int d[] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+  int mon = tm->tm_mon;
+  int year = 1900 + tm->tm_year;
+  int leap_day = 0;
+  if (tm->tm_mon > 1 &&
+      ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)))
+    leap_day = 1;
+
+  /* Bound check index into d[] */
+  if (mon < 0)
+    mon = -mon;
+  if (mon > 11)
+    mon %= 12;
+
+  int yday = d[mon] + leap_day + tm->tm_mday - 1;
+  assert(yday == tm->tm_yday || tm->tm_yday == 367);
+  tm->tm_yday = yday;
 }
 
 #ifdef HAVE_STRPTIME
@@ -1109,6 +1285,8 @@ static jv f_strptime(jq_state *jq, jv a, jv b) {
 
   struct tm tm;
   memset(&tm, 0, sizeof(tm));
+  tm.tm_wday = 8; // sentinel
+  tm.tm_yday = 367; // sentinel
   const char *input = jv_string_value(a);
   const char *fmt = jv_string_value(b);
   const char *end = strptime(input, fmt, &tm);
@@ -1120,10 +1298,19 @@ static jv f_strptime(jq_state *jq, jv a, jv b) {
     return e;
   }
   jv_free(b);
-  if (tm.tm_wday == 0 && tm.tm_yday == 0 && my_mktime(&tm) == (time_t)-2) {
-    jv_free(a);
-    return jv_invalid_with_msg(jv_string("strptime/1 not supported on this platform"));
-  }
+  /*
+   * This is OS X or some *BSD whose strptime() is just not that
+   * helpful!
+   *
+   * We don't know that the format string did involve parsing a
+   * year, or a month (if tm->tm_mon == 0).  But with our invalid
+   * day-of-week and day-of-year sentinel checks above, the worst
+   * this can do is produce garbage.
+   */
+  if (tm.tm_wday == 8 && tm.tm_mday != 0 && tm.tm_mon >= 0 && tm.tm_mon <= 11)
+    set_tm_wday(&tm);
+  if (tm.tm_yday == 367 && tm.tm_mday != 0 && tm.tm_mon >= 0 && tm.tm_mon <= 11)
+    set_tm_yday(&tm);
   jv r = tm2jv(&tm);
   if (*end != '\0')
     r = jv_array_append(r, jv_string(end));
@@ -1226,6 +1413,43 @@ static jv f_gmtime(jq_state *jq, jv a) {
 }
 #endif
 
+#ifdef HAVE_LOCALTIME_R
+static jv f_localtime(jq_state *jq, jv a) {
+  if (jv_get_kind(a) != JV_KIND_NUMBER)
+    return jv_invalid_with_msg(jv_string("localtime() requires numeric inputs"));
+  struct tm tm, *tmp;
+  memset(&tm, 0, sizeof(tm));
+  double fsecs = jv_number_value(a);
+  time_t secs = fsecs;
+  jv_free(a);
+  tmp = localtime_r(&secs, &tm);
+  if (tmp == NULL)
+    return jv_invalid_with_msg(jv_string("errror converting number of seconds since epoch to datetime"));
+  a = tm2jv(tmp);
+  return jv_array_set(a, 5, jv_number(jv_number_value(jv_array_get(jv_copy(a), 5)) + (fsecs - floor(fsecs))));
+}
+#elif defined HAVE_GMTIME
+static jv f_localtime(jq_state *jq, jv a) {
+  if (jv_get_kind(a) != JV_KIND_NUMBER)
+    return jv_invalid_with_msg(jv_string("localtime requires numeric inputs"));
+  struct tm tm, *tmp;
+  memset(&tm, 0, sizeof(tm));
+  double fsecs = jv_number_value(a);
+  time_t secs = fsecs;
+  jv_free(a);
+  tmp = localtime(&secs);
+  if (tmp == NULL)
+    return jv_invalid_with_msg(jv_string("errror converting number of seconds since epoch to datetime"));
+  a = tm2jv(tmp);
+  return jv_array_set(a, 5, jv_number(jv_number_value(jv_array_get(jv_copy(a), 5)) + (fsecs - floor(fsecs))));
+}
+#else
+static jv f_localtime(jq_state *jq, jv a) {
+  jv_free(a);
+  return jv_invalid_with_msg(jv_string("localtime not implemented on this platform"));
+}
+#endif
+
 #ifdef HAVE_STRFTIME
 static jv f_strftime(jq_state *jq, jv a, jv b) {
   if (jv_get_kind(a) == JV_KIND_NUMBER) {
@@ -1251,6 +1475,34 @@ static jv f_strftime(jq_state *jq, jv a) {
   jv_free(a);
   jv_free(b);
   return jv_invalid_with_msg(jv_string("strftime/1 not implemented on this platform"));
+}
+#endif
+
+#ifdef HAVE_STRFTIME
+static jv f_strflocaltime(jq_state *jq, jv a, jv b) {
+  if (jv_get_kind(a) == JV_KIND_NUMBER) {
+    a = f_localtime(jq, a);
+  } else if (jv_get_kind(a) != JV_KIND_ARRAY) {
+    return jv_invalid_with_msg(jv_string("strflocaltime/1 requires parsed datetime inputs"));
+  }
+  struct tm tm;
+  if (!jv2tm(a, &tm))
+    return jv_invalid_with_msg(jv_string("strflocaltime/1 requires parsed datetime inputs")); \
+  const char *fmt = jv_string_value(b);
+  size_t alloced = strlen(fmt) + 100;
+  char *buf = alloca(alloced);
+  size_t n = strftime(buf, alloced, fmt, &tm);
+  jv_free(b);
+  /* POSIX doesn't provide errno values for strftime() failures; weird */
+  if (n == 0 || n > alloced)
+    return jv_invalid_with_msg(jv_string("strflocaltime/1: unknown system failure"));
+  return jv_string(buf);
+}
+#else
+static jv f_strflocaltime(jq_state *jq, jv a) {
+  jv_free(a);
+  jv_free(b);
+  return jv_invalid_with_msg(jv_string("strflocaltime/1 not implemented on this platform"));
 }
 #endif
 
@@ -1284,19 +1536,28 @@ static jv f_current_line(jq_state *jq, jv a) {
 }
 
 #define LIBM_DD(name) \
-  {(cfunction_ptr)f_ ## name, "_" #name, 1},
+  {(cfunction_ptr)f_ ## name,  #name, 1},
 #define LIBM_DD_NO(name)
 
 #define LIBM_DDD(name) \
-  {(cfunction_ptr)f_ ## name, "_" #name, 3},
+  {(cfunction_ptr)f_ ## name, #name, 3},
 #define LIBM_DDD_NO(name)
 
 #define LIBM_DDDD(name) \
-  {(cfunction_ptr)f_ ## name, "_" #name, 4},
+  {(cfunction_ptr)f_ ## name, #name, 4},
 #define LIBM_DDDD_NO(name)
 
 static const struct cfunction function_list[] = {
 #include "libm.h"
+#ifdef HAVE_FREXP
+  {(cfunction_ptr)f_frexp,"frexp", 1},
+#endif
+#ifdef HAVE_MODF
+  {(cfunction_ptr)f_modf,"modf", 1},
+#endif
+#ifdef HAVE_LGAMMA_R
+  {(cfunction_ptr)f_lgamma_r,"lgamma_r", 1},
+#endif
   {(cfunction_ptr)f_plus, "_plus", 3},
   {(cfunction_ptr)f_negate, "_negate", 1},
   {(cfunction_ptr)f_minus, "_minus", 3},
@@ -1346,6 +1607,8 @@ static const struct cfunction function_list[] = {
   {(cfunction_ptr)f_error, "error", 2},
   {(cfunction_ptr)f_format, "format", 2},
   {(cfunction_ptr)f_env, "env", 1},
+  {(cfunction_ptr)f_halt, "halt", 1},
+  {(cfunction_ptr)f_halt_error, "halt_error", 2},
   {(cfunction_ptr)f_get_search_list, "get_search_list", 1},
   {(cfunction_ptr)f_get_prog_origin, "get_prog_origin", 1},
   {(cfunction_ptr)f_get_jq_origin, "get_jq_origin", 1},
@@ -1356,8 +1619,10 @@ static const struct cfunction function_list[] = {
   {(cfunction_ptr)f_stderr, "stderr", 1},
   {(cfunction_ptr)f_strptime, "strptime", 2},
   {(cfunction_ptr)f_strftime, "strftime", 2},
+  {(cfunction_ptr)f_strflocaltime, "strflocaltime", 2},
   {(cfunction_ptr)f_mktime, "mktime", 1},
   {(cfunction_ptr)f_gmtime, "gmtime", 1},
+  {(cfunction_ptr)f_localtime, "localtime", 1},
   {(cfunction_ptr)f_now, "now", 1},
   {(cfunction_ptr)f_current_filename, "input_filename", 1},
   {(cfunction_ptr)f_current_line, "input_line_number", 1},
@@ -1412,37 +1677,341 @@ static block bind_bytecoded_builtins(block b) {
                                             BLOCK(gen_param("start"), gen_param("end")),
                                             range));
   }
-
-  return block_bind_referenced(builtins, b, OP_IS_CALL_PSEUDO);
+  return block_bind(builtins, b, OP_IS_CALL_PSEUDO);
 }
 
-#define LIBM_DD(name) "def " #name ": _" #name ";"
-#define LIBM_DDD(name) "def " #name "(a;b): _" #name "(a;b);"
-#define LIBM_DDDD(name) "def " #name "(a;b;c): _" #name "(a;b;c);"
-#define LIBM_DD_NO(name)
-#define LIBM_DDD_NO(name)
-#define LIBM_DDDD_NO(name)
+
 
 static const char* const jq_builtins =
-/* Include supported math functions first */
-#include "libm.h"
-/* Include jq-coded builtins next (some depend on math) */
+/* Include jq-coded builtins */
 #include "builtin.inc"
+"def halt_error: halt_error(5);\n"
+"def error: error(.);\n"
+"def map(f): [.[] | f];\n"
+"def select(f): if f then . else empty end;\n"
+"def sort_by(f): _sort_by_impl(map([f]));\n"
+"def group_by(f): _group_by_impl(map([f]));\n"
+"def unique: group_by(.) | map(.[0]);\n"
+"def unique_by(f): group_by(f) | map(.[0]);\n"
+"def max_by(f): _max_by_impl(map([f]));\n"
+"def min_by(f): _min_by_impl(map([f]));\n"
+"def add: reduce .[] as $x (null; . + $x);\n"
+"def del(f): delpaths([path(f)]);\n"
+"def _assign(paths; value): value as $v | reduce path(paths) as $p (.; setpath($p; $v));\n"
+"def _modify(paths; update): reduce path(paths) as $p (.; label $out | (setpath($p; getpath($p) | update) | ., break $out), delpaths([$p]));\n"
+"def map_values(f): .[] |= f;\n"
+"\n"
+"# recurse\n"
+"def recurse(f): def r: ., (f | r); r;\n"
+"def recurse(f; cond): def r: ., (f | select(cond) | r); r;\n"
+"def recurse: recurse(.[]?);\n"
+"def recurse_down: recurse;\n"
+"\n"
+"def to_entries: [keys_unsorted[] as $k | {key: $k, value: .[$k]}];\n"
+"def from_entries: map({(.key // .Key // .name // .Name): (if has(\"value\") then .value else .Value end)}) | add | .//={};\n"
+"def with_entries(f): to_entries | map(f) | from_entries;\n"
+"def reverse: [.[length - 1 - range(0;length)]];\n"
+"def indices($i): if type == \"array\" and ($i|type) == \"array\" then .[$i]\n"
+"  elif type == \"array\" then .[[$i]]\n"
+"  elif type == \"string\" and ($i|type) == \"string\" then _strindices($i)\n"
+"  else .[$i] end;\n"
+"def index($i):   indices($i) | .[0];       # TODO: optimize\n"
+"def rindex($i):  indices($i) | .[-1:][0];  # TODO: optimize\n"
+"def paths: path(recurse(if (type|. == \"array\" or . == \"object\") then .[] else empty end))|select(length > 0);\n"
+"def paths(node_filter): . as $dot|paths|select(. as $p|$dot|getpath($p)|node_filter);\n"
+"def any(generator; condition):\n"
+"        [label $out | foreach generator as $i\n"
+"                 (false;\n"
+"                  if . then break $out elif $i | condition then true else . end;\n"
+"                  if . then . else empty end)] | length == 1;\n"
+"def any(condition): any(.[]; condition);\n"
+"def any: any(.);\n"
+"def all(generator; condition):\n"
+"        [label $out | foreach generator as $i\n"
+"                 (true;\n"
+"                  if .|not then break $out elif $i | condition then . else false end;\n"
+"                  if .|not then . else empty end)] | length == 0;\n"
+"def all(condition): all(.[]; condition);\n"
+"def all: all(.);\n"
+"def isfinite: type == \"number\" and (isinfinite | not);\n"
+"def arrays: select(type == \"array\");\n"
+"def objects: select(type == \"object\");\n"
+"def iterables: arrays, objects;\n"
+"def booleans: select(type == \"boolean\");\n"
+"def numbers: select(type == \"number\");\n"
+"def normals: select(isnormal);\n"
+"def finites: select(isfinite);\n"
+"def strings: select(type == \"string\");\n"
+"def nulls: select(type == \"null\");\n"
+"def values: select(. != null);\n"
+"def scalars: select(. == null or . == true or . == false or type == \"number\" or type == \"string\");\n"
+"def scalars_or_empty: select(. == null or . == true or . == false or type == \"number\" or type == \"string\" or ((type==\"array\" or type==\"object\") and length==0));\n"
+"def leaf_paths: paths(scalars);\n"
+"def join($x): reduce .[] as $i (null;\n"
+"            (if .==null then \"\" else .+$x end) +\n"
+"            ($i | if type==\"boolean\" or type==\"number\" then tostring else .//\"\" end)\n"
+"        ) // \"\";\n"
+"def _flatten($x): reduce .[] as $i ([]; if $i | type == \"array\" and $x != 0 then . + ($i | _flatten($x-1)) else . + [$i] end);\n"
+"def flatten($x): if $x < 0 then error(\"flatten depth must not be negative\") else _flatten($x) end;\n"
+"def flatten: _flatten(-1);\n"
+"def range($x): range(0;$x);\n"
+"def fromdateiso8601: strptime(\"%Y-%m-%dT%H:%M:%SZ\")|mktime;\n"
+"def todateiso8601: strftime(\"%Y-%m-%dT%H:%M:%SZ\");\n"
+"def fromdate: fromdateiso8601;\n"
+"def todate: todateiso8601;\n"
+"def match(re; mode): _match_impl(re; mode; false)|.[];\n"
+"def match($val): ($val|type) as $vt | if $vt == \"string\" then match($val; null)\n"
+"   elif $vt == \"array\" and ($val | length) > 1 then match($val[0]; $val[1])\n"
+"   elif $vt == \"array\" and ($val | length) > 0 then match($val[0]; null)\n"
+"   else error( $vt + \" not a string or array\") end;\n"
+"def test(re; mode): _match_impl(re; mode; true);\n"
+"def test($val): ($val|type) as $vt | if $vt == \"string\" then test($val; null)\n"
+"   elif $vt == \"array\" and ($val | length) > 1 then test($val[0]; $val[1])\n"
+"   elif $vt == \"array\" and ($val | length) > 0 then test($val[0]; null)\n"
+"   else error( $vt + \" not a string or array\") end;\n"
+"def capture(re; mods): match(re; mods) | reduce ( .captures | .[] | select(.name != null) | { (.name) : .string } ) as $pair ({}; . + $pair);\n"
+"def capture($val): ($val|type) as $vt | if $vt == \"string\" then capture($val; null)\n"
+"   elif $vt == \"array\" and ($val | length) > 1 then capture($val[0]; $val[1])\n"
+"   elif $vt == \"array\" and ($val | length) > 0 then capture($val[0]; null)\n"
+"   else error( $vt + \" not a string or array\") end;\n"
+"def scan(re):\n"
+"  match(re; \"g\")\n"
+"  |  if (.captures|length > 0)\n"
+"      then [ .captures | .[] | .string ]\n"
+"      else .string\n"
+"      end ;\n"
+"#\n"
+"# If input is an array, then emit a stream of successive subarrays of length n (or less),\n"
+"# and similarly for strings.\n"
+"def _nwise(a; $n): if a|length <= $n then a else a[0:$n] , _nwise(a[$n:]; $n) end;\n"
+"def _nwise($n): _nwise(.; $n);\n"
+"#\n"
+"# splits/1 produces a stream; split/1 is retained for backward compatibility.\n"
+"def splits($re; flags): . as $s\n"
+"#  # multiple occurrences of \"g\" are acceptable\n"
+"  | [ match($re; \"g\" + flags) | (.offset, .offset + .length) ]\n"
+"  | [0] + . +[$s|length]\n"
+"  | _nwise(2)\n"
+"  | $s[.[0]:.[1] ] ;\n"
+"def splits($re): splits($re; null);\n"
+"#\n"
+"# split emits an array for backward compatibility\n"
+"def split($re; flags): [ splits($re; flags) ];\n"
+"#\n"
+"# If s contains capture variables, then create a capture object and pipe it to s\n"
+"def sub($re; s):\n"
+"  . as $in\n"
+"  | [match($re)]\n"
+"  | if length == 0 then $in\n"
+"    else .[0]\n"
+"    | . as $r\n"
+"#  # create the \"capture\" object:\n"
+"    | reduce ( $r | .captures | .[] | select(.name != null) | { (.name) : .string } ) as $pair\n"
+"        ({}; . + $pair)\n"
+"    | $in[0:$r.offset] + s + $in[$r.offset+$r.length:]\n"
+"    end ;\n"
+"#\n"
+"# If s contains capture variables, then create a capture object and pipe it to s\n"
+"def sub($re; s; flags):\n"
+"  def subg: [explode[] | select(. != 103)] | implode;\n"
+"  # \"fla\" should be flags with all occurrences of g removed; gs should be non-nil if flags has a g\n"
+"  def sub1(fla; gs):\n"
+"    def mysub:\n"
+"      . as $in\n"
+"      | [match($re; fla)]\n"
+"      | if length == 0 then $in\n"
+"        else .[0] as $edit\n"
+"        | ($edit | .offset + .length) as $len\n"
+"        # create the \"capture\" object:\n"
+"        | reduce ( $edit | .captures | .[] | select(.name != null) | { (.name) : .string } ) as $pair\n"
+"            ({}; . + $pair)\n"
+"        | $in[0:$edit.offset]\n"
+"          + s\n"
+"          + ($in[$len:] | if length > 0 and gs then mysub else . end)\n"
+"        end ;\n"
+"    mysub ;\n"
+"    (flags | index(\"g\")) as $gs\n"
+"    | (flags | if $gs then subg else . end) as $fla\n"
+"    | sub1($fla; $gs);\n"
+"#\n"
+"def sub($re; s): sub($re; s; \"\");\n"
+"# repeated substitution of re (which may contain named captures)\n"
+"def gsub($re; s; flags): sub($re; s; flags + \"g\");\n"
+"def gsub($re; s): sub($re; s; \"g\");\n"
+"\n"
+"########################################################################\n"
+"# range/3, with a `by` expression argument\n"
+"def range($init; $upto; $by):\n"
+"    def _range:\n"
+"        if ($by > 0 and . < $upto) or ($by < 0 and . > $upto) then ., ((.+$by)|_range) else . end;\n"
+"    if $by == 0 then $init else $init|_range end | select(($by > 0 and . < $upto) or ($by < 0 and . > $upto));\n"
+"# generic iterator/generator\n"
+"def while(cond; update):\n"
+"     def _while:\n"
+"         if cond then ., (update | _while) else empty end;\n"
+"     _while;\n"
+"def until(cond; next):\n"
+"     def _until:\n"
+"         if cond then . else (next|_until) end;\n"
+"     _until;\n"
+"def limit($n; exp): if $n < 0 then exp else label $out | foreach exp as $item ([$n, null]; if .[0] < 1 then break $out else [.[0] -1, $item] end; .[1]) end;\n"
+"def isempty(g): 0 == ((label $go | g | (1, break $go)) // 0);\n"
+"def first(g): label $out | g | ., break $out;\n"
+"def last(g): reduce g as $item (null; $item);\n"
+"def nth($n; g): if $n < 0 then error(\"nth doesn't support negative indices\") else last(limit($n + 1; g)) end;\n"
+"def first: .[0];\n"
+"def last: .[-1];\n"
+"def nth($n): .[$n];\n"
+"def combinations:\n"
+"    if length == 0 then [] else\n"
+"        .[0][] as $x\n"
+"          | (.[1:] | combinations) as $y\n"
+"          | [$x] + $y\n"
+"    end;\n"
+"def combinations(n):\n"
+"    . as $dot\n"
+"      | [range(n) | $dot]\n"
+"      | combinations;\n"
+"# transpose a possibly jagged matrix, quickly;\n"
+"# rows are padded with nulls so the result is always rectangular.\n"
+"def transpose:\n"
+"  if . == [] then []\n"
+"  else . as $in\n"
+"  | (map(length) | max) as $max\n"
+"  | length as $length\n"
+"  | reduce range(0; $max) as $j\n"
+"      ([]; . + [reduce range(0;$length) as $i ([]; . + [ $in[$i][$j] ] )] )\n"
+"	        end;\n"
+"def in(xs): . as $x | xs | has($x);\n"
+"def inside(xs): . as $x | xs | contains($x);\n"
+"def input: _input;\n"
+"def repeat(exp):\n"
+"     def _repeat:\n"
+"         exp, _repeat;\n"
+"     _repeat;\n"
+"def inputs: try repeat(_input) catch if .==\"break\" then empty else .|error end;\n"
+"# like ruby's downcase - only characters A to Z are affected\n"
+"def ascii_downcase:\n"
+"  explode | map( if 65 <= . and . <= 90 then . + 32  else . end) | implode;\n"
+"# like ruby's upcase - only characters a to z are affected\n"
+"def ascii_upcase:\n"
+"  explode | map( if 97 <= . and . <= 122 then . - 32  else . end) | implode;\n"
+"\n"
+"# Streaming utilities\n"
+"def truncate_stream(stream):\n"
+"  . as $n | null | stream | . as $input | if (.[0]|length) > $n then setpath([0];$input[0][$n:]) else empty end;\n"
+"def fromstream(i):\n"
+"  foreach i as $item (\n"
+"    [null,false,null,false];\n"
+"    if ($item[0]|length) == 0 then [null,false,.[2],.[3]]\n"
+"    elif ($item|length) == 1 and ($item[0]|length) < 2 then [null,false,.[0],.[1]]\n"
+"    else . end |\n"
+"    . as $state |\n"
+"    if ($item|length) > 1 and ($item[0]|length) > 0 then\n"
+"      [.[0]|setpath(($item|.[0]); ($item|.[1])),\n"
+"      true,\n"
+"      $state[2],\n"
+"      $state[3]]\n"
+"    else .\n"
+"    end;\n"
+"    if ($item[0]|length) == 1 and ($item|length == 1) and .[3] then .[2] else empty end,\n"
+"    if ($item[0]|length) == 0 then $item[1] else empty end\n"
+"    );\n"
+"def tostream:\n"
+"  {string:true,number:true,boolean:true,null:true} as $leaf_types |\n"
+"  . as $dot |\n"
+"  if $leaf_types[$dot|type] or length==0 then [[],$dot]\n"
+"  else\n"
+"    # We really need a _streaming_ form of `keys`.\n"
+"    # We can use `range` for arrays, but not for objects.\n"
+"    keys as $keys |\n"
+"    $keys[-1] as $last|\n"
+"    ((# for each key\n"
+"      $keys[] | . as $key |\n"
+"      $dot[$key] | . as $dot |\n"
+"      # recurse on each key/value\n"
+"      tostream|.[0]|=[$key]+.),\n"
+"     # then add the closing marker\n"
+"     [[$last]])\n"
+"  end;\n"
+"\n"
+"\n"
+"# Assuming the input array is sorted, bsearch/1 returns\n"
+"# the index of the target if the target is in the input array; and otherwise\n"
+"#  (-1 - ix), where ix is the insertion point that would leave the array sorted.\n"
+"# If the input is not sorted, bsearch will terminate but with irrelevant results.\n"
+"def bsearch(target):\n"
+"  if length == 0 then -1\n"
+"  elif length == 1 then\n"
+"     if target == .[0] then 0 elif target < .[0] then -1 else -2 end\n"
+"  else . as $in\n"
+"    # state variable: [start, end, answer]\n"
+"    # where start and end are the upper and lower offsets to use.\n"
+"    | [0, length-1, null]\n"
+"    | until( .[0] > .[1] ;\n"
+"             if .[2] != null then (.[1] = -1)               # i.e. break\n"
+"             else\n"
+"               ( ( (.[1] + .[0]) / 2 ) | floor ) as $mid\n"
+"               | $in[$mid] as $monkey\n"
+"               | if $monkey == target  then (.[2] = $mid)   # success\n"
+"                 elif .[0] == .[1]     then (.[1] = -1)     # failure\n"
+"                 elif $monkey < target then (.[0] = ($mid + 1))\n"
+"                 else (.[1] = ($mid - 1))\n"
+"                 end\n"
+"             end )\n"
+"    | if .[2] == null then          # compute the insertion point\n"
+"         if $in[ .[0] ] < target then (-2 -.[0])\n"
+"         else (-1 -.[0])\n"
+"         end\n"
+"      else .[2]\n"
+"      end\n"
+"  end;\n"
+"\n"
+"# Apply f to composite entities recursively, and to atoms\n"
+"def walk(f):\n"
+"  . as $in\n"
+"  | if type == \"object\" then\n"
+"      reduce keys_unsorted[] as $key\n"
+"        ( {}; . + { ($key):  ($in[$key] | walk(f)) } ) | f\n"
+"  elif type == \"array\" then map( walk(f) ) | f\n"
+"  else f\n"
+"  end;\n"
+"\n"
+"# SQL-ish operators here:\n"
+"def INDEX(stream; idx_expr):\n"
+"  reduce stream as $row ({};\n"
+"    .[$row|idx_expr|\n"
+"      if type != \"string\" then tojson\n"
+"      else .\n"
+"      end] |= $row);\n"
+"def INDEX(idx_expr): INDEX(.[]; idx_expr);\n"
+"def JOIN($idx; idx_expr):\n"
+"  [.[] | [., $idx[idx_expr]]];\n"
+"def JOIN($idx; stream; idx_expr):\n"
+"  stream | [., $idx[idx_expr]];\n"
+"def JOIN($idx; stream; idx_expr; join_expr):\n"
+"  stream | [., $idx[idx_expr]] | join_expr;\n"
+"def IN(s): reduce (first(select(. == s)) | true) as $v (false; if . or $v then true else false end);\n"
+"def IN(src; s): reduce (src|IN(s)) as $v (false; if . or $v then true else false end);\n"
+
 
 /* Include unsupported math functions next */
-#undef LIBM_DDDD_NO
-#undef LIBM_DDD_NO
-#undef LIBM_DD_NO
-#undef LIBM_DDDD
-#undef LIBM_DDD
-#undef LIBM_DD
 #define LIBM_DD(name)
 #define LIBM_DDD(name)
 #define LIBM_DDDD(name)
-#define LIBM_DD_NO(name) "def " #name ": \"Error: " #name "() not found at build time\"|error;"
-#define LIBM_DDD_NO(name) "def " #name "(a;b): \"Error: " #name "() not found at build time\"|error;"
-#define LIBM_DDDD_NO(name) "def " #name "(a;b;c): \"Error: " #name "() not found at build time\"|error;"
+#define LIBM_DD_NO(name) "def " #name ": \"Error: " #name "/0 not found at build time\"|error;"
+#define LIBM_DDD_NO(name) "def " #name "(a;b): \"Error: " #name "/2 not found at build time\"|error;"
+#define LIBM_DDDD_NO(name) "def " #name "(a;b;c): \"Error: " #name "/3 not found at build time\"|error;"
 #include "libm.h"
+#ifndef HAVE_FREXP
+  "def frexp: \"Error: frexp/0 not found found at build time\"|error;"
+#endif
+#ifndef HAVE_MODF
+  "def modf: \"Error: modf/0 not found found at build time\"|error;"
+#endif
+#ifndef HAVE_LGAMMA_R
+  "def lgamma_r: \"Error: lgamma_r/0 not found found at build time\"|error;"
+#endif
 ;
 
 #undef LIBM_DDDD_NO
@@ -1453,13 +2022,18 @@ static const char* const jq_builtins =
 #undef LIBM_DD
 
 
+static block gen_builtin_list(block builtins) {
+  jv list = jv_array_append(block_list_funcs(builtins, 1), jv_string("builtins/0"));
+  return BLOCK(builtins, gen_function("builtins", gen_noop(), gen_const(list)));
+}
+
 static int builtins_bind_one(jq_state *jq, block* bb, const char* code) {
   struct locfile* src;
   src = locfile_init(jq, "<builtin>", code, strlen(code));
   block funcs;
   int nerrors = jq_parse_library(src, &funcs);
   if (nerrors == 0) {
-    *bb = block_bind_referenced(funcs, *bb, OP_IS_CALL_PSEUDO);
+    *bb = block_bind(funcs, *bb, OP_IS_CALL_PSEUDO);
   }
   locfile_free(src);
   return nerrors;
@@ -1481,14 +2055,18 @@ static int slurp_lib(jq_state *jq, block* bb) {
 }
 
 int builtins_bind(jq_state *jq, block* bb) {
+  block builtins = gen_noop();
   int nerrors = slurp_lib(jq, bb);
   if (nerrors) {
     block_free(*bb);
     return nerrors;
   }
-  nerrors = builtins_bind_one(jq, bb, jq_builtins);
+  nerrors = builtins_bind_one(jq, &builtins, jq_builtins);
   assert(!nerrors);
-  *bb = bind_bytecoded_builtins(*bb);
-  *bb = gen_cbinding(function_list, sizeof(function_list)/sizeof(function_list[0]), *bb);
+  builtins = bind_bytecoded_builtins(builtins);
+  builtins = gen_cbinding(function_list, sizeof(function_list)/sizeof(function_list[0]), builtins);
+  builtins = gen_builtin_list(builtins);
+  *bb = block_bind(builtins, *bb, OP_IS_CALL_PSEUDO);
+  *bb = block_drop_unreferenced(*bb);
   return nerrors;
 }

@@ -34,6 +34,7 @@ void *alloca (size_t);
 
 #ifdef WIN32
 #include <windows.h>
+#include <processenv.h>
 #include <shellapi.h>
 #include <wchar.h>
 #include <wtypes.h>
@@ -51,7 +52,7 @@ FILE *fopen(const char *fname, const char *mode) {
   MultiByteToWideChar(CP_UTF8, 0, fname, -1, wfname, sz);
 
   sz = sizeof(wchar_t) * MultiByteToWideChar(CP_UTF8, 0, mode, -1, NULL, 0);
-  wchar_t *wmode = alloca(sz); // +2 is not needed, but just in case
+  wchar_t *wmode = alloca(sz + 2); // +2 is not needed, but just in case
   MultiByteToWideChar(CP_UTF8, 0, mode, -1, wmode, sz);
   return _wfopen(wfname, wmode);
 }
@@ -138,7 +139,7 @@ jv jq_realpath(jv path) {
   path_max = PATH_MAX;
 #endif
   if (path_max > 0) {
-     buf = malloc(sizeof(char) * path_max);
+     buf = jv_mem_alloc(path_max);
   }
 #ifdef WIN32
   char *tmp = _fullpath(buf, jv_string_value(path), path_max);
