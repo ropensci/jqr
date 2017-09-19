@@ -19,25 +19,57 @@ means that the eventual loading into R can be quicker.
 
 [Introduction](vignettes/jqr_vignette.md)
 
-## Install
+## Installation
 
-Stable version:
-
+Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
 
 ```r
 install.packages("jqr")
 ```
 
-Development version:
+Installation from source on Linux or OSX requires [`libjq`](https://stedolan.github.io/jq/). On __Ubuntu 14.04 and 16.04 lower__ use [libjq-dev](https://launchpad.net/~opencpu/+archive/ubuntu/jq) from Launchpad:
 
+```
+sudo add-apt-repository -y ppa:opencpu/jq
+sudo apt-get update -q
+sudo apt-get install -y libjq-dev
+```
 
-```r
-devtools::install_github("ropensci/jqr")
+More __recent Debian or Ubuntu__ install [libjq-dev](https://packages.debian.org/testing/libjq-dev) directly from Universe:
+
+```
+sudo apt-get install -y libjq-dev
+```
+
+On __Fedora__ we need [jq-devel](https://apps.fedoraproject.org/packages/jq-devel):
+
+```
+sudo yum install jq-devel
+````
+
+On __CentOS / RHEL__ we install [libsodium-devel](https://apps.fedoraproject.org/packages/jq-devel) via EPEL:
+
+```
+sudo yum install epel-release
+sudo yum install jq-devel
+```
+
+On __OS-X__ use [jq](https://github.com/Homebrew/homebrew-core/blob/master/Formula/jq.rb) from Homebrew:
+
+```
+brew install jq
+```
+
+On __Solaris__ we can have [libjq_dev](https://www.opencsw.org/packages/libjq_dev) from [OpenCSW](https://www.opencsw.org/):
+```
+pkgadd -d http://get.opencsw.org/now
+/opt/csw/bin/pkgutil -U
+/opt/csw/bin/pkgutil -y -i libjq_dev
 ```
 
 
 ```r
-library("jqr")
+library(jqr)
 ```
 
 ## Interfaces
@@ -381,11 +413,11 @@ Select variables by name, and rename
 #> }
 ```
 
-More complicated `select()`, using the included dataset `githubcommits`
+More complicated `select()`, using the included dataset `commits`
 
 
 ```r
-githubcommits %>%
+commits %>%
   index() %>%
   select(sha = .sha, name = .commit.committer.name)
 #> [
@@ -590,7 +622,7 @@ This outputs a few pieces of JSON
 
 
 ```r
-(x <- githubcommits %>%
+(x <- commits %>%
   index() %>%
   select(sha = .sha, name = .commit.committer.name))
 #> [
@@ -693,4 +725,4 @@ combine(x)
 * Get citation information for `jqr` in R doing `citation(package = 'jqr')`
 * Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-[![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
+[![rofooter](http://www.ropensci.org/public_images/github_footer.png)](http://ropensci.org)
