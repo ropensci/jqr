@@ -2,6 +2,7 @@ language: r
 cache: packages
 dist: trusty
 latex: false
+sudo: required
 
 matrix:
   include:
@@ -20,12 +21,12 @@ matrix:
       disable_homebrew: true
 
 addons:
-  sources:
-    - sourceline: 'ppa:opencpu/jq'
   apt:
+    sources:
+      - sourceline: 'ppa:opencpu/jq'
     packages:
-    - libjq-dev
-    - valgrind
+      - libjq-dev
+      - valgrind
 
 after_success:
   - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi
