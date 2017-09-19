@@ -54,7 +54,7 @@ On __Fedora__ we need [jq-devel](https://apps.fedoraproject.org/packages/jq-deve
 sudo yum install jq-devel
 ````
 
-On __CentOS / RHEL__ we install [libsodium-devel](https://apps.fedoraproject.org/packages/jq-devel) via EPEL:
+On __CentOS / RHEL__ we install [jq-devel](https://apps.fedoraproject.org/packages/jq-devel) via EPEL:
 
 ```
 sudo yum install epel-release
