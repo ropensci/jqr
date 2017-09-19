@@ -14,7 +14,8 @@ We've checked the 1 reverse dependency, and no problems resulted.
 
 ---
 
-This version upates the `jq` version and includes the mandatory 
+This version unbundles `jq` as `libjq` library and headers are now 
+available on all major platforms, and includes the mandatory 
 addition of R_registerRoutines and R_useDynamicSymbols for 
 packages with compiled code.
 

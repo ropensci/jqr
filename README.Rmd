@@ -105,6 +105,39 @@ jq(str, ".[]")
 jq(str, "[.[] | {name: .foo} | keys]")
 ```
 
+Note that we print the output to look like a valid JSON object to make it
+easier to look at. However, it's a simple character string or vector of strings. 
+A trick you can do is to wrap your jq program in brackets like `[.[]]` instead 
+of `.[]`, e.g., 
+
+```{r}
+jq(str, ".[]") %>% unclass
+# vs.
+jq(str, "[.[]]") %>% unclass
+```
+
+Combine many jq arguments - they are internally combined with a pipe ` | `
+
+(note how these are identical)
+
+```{r}
+jq(str, ".[] | {name: .foo} | keys")
+jq(str, ".[]", "{name: .foo}", "keys")
+```
+
+Also accepts many JSON inputs now
+
+```{r}
+jq("[123, 456]   [77, 88, 99]", ".[]")
+jq('{"foo": 77} {"bar": 45}', ".[]")
+jq('[{"foo": 77, "stuff": "things"}] [{"bar": 45}] [{"n": 5}]', ".[] | keys")
+
+# if you have jsons in a vector
+jsons <- c('[{"foo": 77, "stuff": "things"}]', '[{"bar": 45}]', '[{"n": 5}]')
+jq(paste0(jsons, collapse = " "), ".[]")
+```
+
+
 ### high level
 
 The other is higher level, and uses a suite of functions to construct queries. Queries are constucted, then excuted internally with `jq()` after the last piped command.
@@ -134,15 +167,13 @@ reverse order
 
 Show the query to be used using `peek()`
 
-FIXME - broken right now
-
-```{r eval=FALSE}
+```{r}
 '[1,2,3,4]' %>% reverse %>% peek
 ```
 
 #### get multiple outputs for array w/ > 1 element
 
-```{r eval=FALSE}
+```{r}
 x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
 jq(x, '{user, title: .titles[]}')
 x %>% index()
@@ -175,6 +206,7 @@ startswith
 
 ```{r}
 '["fo", "foo", "barfoo", "foobar", "barfoob"]' %>% index %>% startswith(foo)
+'["fo", "foo"] ["barfoo", "foobar", "barfoob"]' %>% index %>% startswith(foo)
 ```
 
 endswith

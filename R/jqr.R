@@ -1,12 +1,14 @@
 #' Execute a query with jq
 #'
-#' \code{jq} is meant to work with the high level interface in this package. \code{jq}
-#' also provides access to the low level interface in which you can use jq query strings just
-#' as you would on the command line. Output gets class of json, and pretty prints to
-#' the console for easier viewing. \code{jqr} doesn't do pretty printing.
+#' \code{jq} is meant to work with the high level interface in this package.
+#' \code{jq} also provides access to the low level interface in which you can
+#' use jq query strings just as you would on the command line. Output gets
+#' class of json, and pretty prints to the console for easier viewing.
+#' \code{jqr} doesn't do pretty printing.
 #'
 #' @export
-#' @param x \code{json} object or character string with json data.
+#' @param x \code{json} object or character string with json data. this can
+#' be one or more valid json objects
 #' @param ... character specification of jq query. Each element in code{...}
 #'   will be combined with " | ", which is convenient for long queries.
 #' @param flags See \code{\link{jq_flags}}
@@ -15,11 +17,15 @@
 #' '{"a": 7}' %>%  do(.a + 1)
 #' '[8,3,null,6]' %>% sortj
 #'
-#' x <- '[{"message": "hello", "name": "jenn"}, {"message": "world", "name": "beth"}]'
+#' x <- '[{"message": "hello", "name": "jenn"},
+#'   {"message": "world", "name": "beth"}]'
 #' jq(index(x))
 #'
 #' jq('{"a": 7, "b": 4}', 'keys')
 #' jq('[8,3,null,6]', 'sort')
+#'
+#' # many json inputs
+#' jq("[123, 456] [77, 88, 99]", ".[]")
 jq <- function(x, ...) {
   UseMethod("jq", x)
 }
@@ -79,5 +85,5 @@ jqr_apply <- function(json, program, flags){
 
 jqr <- function(json, program, flags = jq_flags()){
   out <- jqr_apply(json, program, flags)
-  as.character(unlist(out[[1]], recursive = FALSE))
+  as.character(unlist(out, recursive = FALSE))
 }

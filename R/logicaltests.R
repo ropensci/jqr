@@ -15,6 +15,10 @@
 #' '[true, false]' %>% allj
 #' '[true, true]' %>% allj
 #' '[]' %>% allj
+#'
+#' ## many JSON inputs
+#' '[true, false] [true, true] [false, false]' %>% anyj
+#' '[true, false] [true, true] [false, false]' %>% allj
 
 #' @export
 #' @rdname logicaltests

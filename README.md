@@ -127,6 +127,101 @@ jq(str, "[.[] | {name: .foo} | keys]")
 #> ]
 ```
 
+Note that we print the output to look like a valid JSON object to make it
+easier to look at. However, it's a simple character string or vector of strings. 
+A trick you can do is to wrap your jq program in brackets like `[.[]]` instead 
+of `.[]`, e.g., 
+
+
+```r
+jq(str, ".[]") %>% unclass
+#> [1] "{\"foo\":1,\"bar\":2}" "{\"foo\":3,\"bar\":4}" "{\"foo\":5,\"bar\":6}"
+# vs.
+jq(str, "[.[]]") %>% unclass
+#> [1] "[{\"foo\":1,\"bar\":2},{\"foo\":3,\"bar\":4},{\"foo\":5,\"bar\":6}]"
+```
+
+Combine many jq arguments - they are internally combined with a pipe ` | `
+
+(note how these are identical)
+
+
+```r
+jq(str, ".[] | {name: .foo} | keys")
+#> [
+#>     [
+#>         "name"
+#>     ],
+#>     [
+#>         "name"
+#>     ],
+#>     [
+#>         "name"
+#>     ]
+#> ]
+jq(str, ".[]", "{name: .foo}", "keys")
+#> [
+#>     [
+#>         "name"
+#>     ],
+#>     [
+#>         "name"
+#>     ],
+#>     [
+#>         "name"
+#>     ]
+#> ]
+```
+
+Also accepts many JSON inputs now
+
+
+```r
+jq("[123, 456]   [77, 88, 99]", ".[]")
+#> [
+#>     123,
+#>     456,
+#>     77,
+#>     88,
+#>     99
+#> ]
+jq('{"foo": 77} {"bar": 45}', ".[]")
+#> [
+#>     77,
+#>     45
+#> ]
+jq('[{"foo": 77, "stuff": "things"}] [{"bar": 45}] [{"n": 5}]', ".[] | keys")
+#> [
+#>     [
+#>         "foo",
+#>         "stuff"
+#>     ],
+#>     [
+#>         "bar"
+#>     ],
+#>     [
+#>         "n"
+#>     ]
+#> ]
+
+# if you have jsons in a vector
+jsons <- c('[{"foo": 77, "stuff": "things"}]', '[{"bar": 45}]', '[{"n": 5}]')
+jq(paste0(jsons, collapse = " "), ".[]")
+#> [
+#>     {
+#>         "foo": 77,
+#>         "stuff": "things"
+#>     },
+#>     {
+#>         "bar": 45
+#>     },
+#>     {
+#>         "n": 5
+#>     }
+#> ]
+```
+
+
 ### high level
 
 The other is higher level, and uses a suite of functions to construct queries. Queries are constucted, then excuted internally with `jq()` after the last piped command.
@@ -181,11 +276,11 @@ reverse order
 
 Show the query to be used using `peek()`
 
-FIXME - broken right now
-
 
 ```r
 '[1,2,3,4]' %>% reverse %>% peek
+#> <jq query>
+#>   query: reverse
 ```
 
 #### get multiple outputs for array w/ > 1 element
@@ -194,9 +289,37 @@ FIXME - broken right now
 ```r
 x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
 jq(x, '{user, title: .titles[]}')
+#> [
+#>     {
+#>         "user": "stedolan",
+#>         "title": "JQ Primer"
+#>     },
+#>     {
+#>         "user": "stedolan",
+#>         "title": "More JQ"
+#>     }
+#> ]
 x %>% index()
+#> [
+#>     "stedolan",
+#>     [
+#>         "JQ Primer",
+#>         "More JQ"
+#>     ]
+#> ]
 x %>% select(user, title = `.titles[]`)
+#> [
+#>     {
+#>         "user": "stedolan",
+#>         "title": "JQ Primer"
+#>     },
+#>     {
+#>         "user": "stedolan",
+#>         "title": "More JQ"
+#>     }
+#> ]
 jq(x, '{user, title: .titles[]}') %>% jsonlite::toJSON() %>% jsonlite::validate()
+#> [1] TRUE
 ```
 
 #### string operations

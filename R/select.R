@@ -16,6 +16,10 @@
 #' x <- index(commits)
 #' x %>% select(message = .commit.message, name = .commit.committer.name)
 #' x %>% select(sha = .sha, name = .commit.committer.name)
+#'
+#' # many JSON inputs
+#' '{"foo": 5, "bar": 7} {"foo": 50, "bar": 7} {"foo": 500, "bar": 7}' %>%
+#'   select(hello = .foo)
 select <- function(.data, ...) {
   select_(.data, .dots = lazyeval::lazy_dots(...))
 }
