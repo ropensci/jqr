@@ -5,10 +5,10 @@
 #include <R_ext/Visibility.h>
 #include <jq.h>
 #include <string.h>
-#include <version.h>
 
 attribute_visible SEXP C_jq_version(){
-  return Rf_mkString(JQ_VERSION);
+  //return Rf_mkString(JQ_VERSION);
+  return R_NilValue;
 }
 
 void error_cb(void * data, jv x) {

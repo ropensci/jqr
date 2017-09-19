@@ -16,5 +16,5 @@ cran-comments.md
 ^src/.*\.a$
 ^docker$
 .github
-
+$src/Makevars$
 ^cran-comments\.md$
