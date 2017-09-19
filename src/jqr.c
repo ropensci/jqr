@@ -6,11 +6,6 @@
 #include <jq.h>
 #include <string.h>
 
-attribute_visible SEXP C_jq_version(){
-  //return Rf_mkString(JQ_VERSION);
-  return R_NilValue;
-}
-
 void error_cb(void * data, jv x) {
   char buf[1000];
   strncpy(buf, jv_string_value(x), 1000);

@@ -1,9 +1,8 @@
-jqr 0.3.0
+jqr 1.0
 =========
 
-* Hide internal libjq symbols from the shlib on supported platforms
-* Update bundled libjq to stedolan/jq@0b82185 (1.5-patched), specifically
-jq `v1.5rc2-174-g597c1f6`
+* Unbundle jq: the libjq library and headers are now available on all major platforms.
+  See https://stedolan.github.io/jq/download/ for details.
 * Use `R_registerRoutines` and `R_useDynamicSymbols` as required for 
 packages with compiled code. (#57)
 
