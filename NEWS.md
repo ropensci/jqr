@@ -1,5 +1,5 @@
-jqr 1.0
-=======
+jqr 1.0.0
+=========
 
 * Unbundle jq: the libjq library and headers are now available on all major platforms.
   See https://stedolan.github.io/jq/download/ for details. (#59)
