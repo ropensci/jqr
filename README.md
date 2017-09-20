@@ -15,7 +15,7 @@ R interface to jq, a JSON processor http://stedolan.github.io/jq/
 convert from json to R, or without using regular expressions.  This
 means that the eventual loading into R can be quicker.
 
- - [Introduction vignette](https://cran.r-project.org/web/packages/jqr/vignettes/jqr_vignette.html)
+ - Introduction vignette at <https://cran.r-project.org/package=jqr>
 
 ## Installation
 
@@ -128,9 +128,9 @@ jq(str, "[.[] | {name: .foo} | keys]")
 ```
 
 Note that we print the output to look like a valid JSON object to make it
-easier to look at. However, it's a simple character string or vector of strings. 
-A trick you can do is to wrap your jq program in brackets like `[.[]]` instead 
-of `.[]`, e.g., 
+easier to look at. However, it's a simple character string or vector of strings.
+A trick you can do is to wrap your jq program in brackets like `[.[]]` instead
+of `.[]`, e.g.,
 
 
 ```r
