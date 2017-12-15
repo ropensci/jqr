@@ -52,6 +52,12 @@ jq.character <- function(x, ..., flags = jq_flags()) {
             class = c("jqson", "character"))
 }
 
+#' @rdname jq
+#' @export
+jq.json <- function(x, ..., flags = jq_flags()) {
+  jq(unclass(x), ..., flags = flags)
+}
+
 #' @export
 jq.default <- function(x, ...) {
   stop(sprintf("jq method not implemented for %s.", class(x)[1]))

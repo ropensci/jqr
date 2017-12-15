@@ -3,6 +3,7 @@
 S3method(jq,character)
 S3method(jq,default)
 S3method(jq,jqr)
+S3method(jq,json)
 S3method(print,jq_query)
 S3method(print,jqson)
 export("%>%")

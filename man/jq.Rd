@@ -4,6 +4,7 @@
 \alias{jq}
 \alias{jq.jqr}
 \alias{jq.character}
+\alias{jq.json}
 \title{Execute a query with jq}
 \usage{
 jq(x, ...)
@@ -11,6 +12,8 @@ jq(x, ...)
 \method{jq}{jqr}(x, ...)
 
 \method{jq}{character}(x, ..., flags = jq_flags())
+
+\method{jq}{json}(x, ..., flags = jq_flags())
 }
 \arguments{
 \item{x}{\code{json} object or character string with json data. this can
