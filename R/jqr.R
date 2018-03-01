@@ -26,6 +26,15 @@
 #'
 #' # many json inputs
 #' jq("[123, 456] [77, 88, 99]", ".[]")
+#' 
+#' # file path
+#' cat('{"a": 7, "b": 4}\n', file = (f=tempfile(fileext = ".json")))
+#' jq(f, "keys")
+#' 
+#' # URL
+#' x <- 'https://api.github.com/'
+#' jq(x, "keys")
+#' jq(x, ".meta | keys")
 jq <- function(x, ...) {
   UseMethod("jq", x)
 }
@@ -81,6 +90,7 @@ query_from_dots <- function(...)
 
 #' @useDynLib jqr C_jqr_string
 jqr_apply <- function(json, program, flags){
+  json <- consume_input(json)
   json <- paste(json, collapse = "\n")
   stopifnot(is.character(program))
   stopifnot(is.numeric(flags))
@@ -92,4 +102,8 @@ jqr_apply <- function(json, program, flags){
 jqr <- function(json, program, flags = jq_flags()){
   out <- jqr_apply(json, program, flags)
   as.character(unlist(out, recursive = FALSE))
+}
+
+consume_input <- function(x) {
+  if (file.exists(x) || grepl("https?://.+", x)) readLines(x, warn = FALSE) else x
 }

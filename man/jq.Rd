@@ -44,6 +44,15 @@ jq('[8,3,null,6]', 'sort')
 
 # many json inputs
 jq("[123, 456] [77, 88, 99]", ".[]")
+
+# file path
+cat('{"a": 7, "b": 4}\\n', file = (f=tempfile(fileext = ".json")))
+jq(f, "keys")
+
+# URL
+x <- 'https://api.github.com/'
+jq(x, "keys")
+jq(x, ".meta | keys")
 }
 \seealso{
 \code{\link{peek}}
