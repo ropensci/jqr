@@ -17,7 +17,7 @@
 #' x %>% dotstr(posts[])
 #' x %>% dotstr(posts[]) %>% string
 #' x %>% vars(realnames = names) %>% dotstr(posts[]) %>%
-#'    select(title, author = "$names[.author]")
+#'    build_object(title, author = "$names[.author]")
 vars <- function(.data, ...) {
   vars_(.data, .dots = lazyeval::lazy_dots(...))
 }

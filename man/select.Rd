@@ -3,7 +3,7 @@
 \name{select}
 \alias{select}
 \alias{select_}
-\title{Select variables}
+\title{Select - filtering}
 \usage{
 select(.data, ...)
 
@@ -21,24 +21,33 @@ from function to function when using the jqr DSL.}
 \item{dots}{dots}
 }
 \description{
-Select variables
+The function \code{select(foo)} produces its input unchanged if 
+\code{foo} returns TRUE for that input, and produces no output otherwise
+}
+\note{
+this function has changed what it does dramatically. we were 
+using this function for object construction, which is now done with 
+\code{\link{build_object}}
 }
 \examples{
-'{"foo": 5, "bar": 7}' \%>\% select(a = .foo) \%>\% peek
-'{"foo": 5, "bar": 7}' \%>\% select(a = .foo)
+jq('[1,5,3,0,7]', 'map(select(. >= 2))')
+'[1,5,3,0,7]' \%>\% map(select(. >= 2)) 
 
-# using json dataset, just first element
-x <- commits \%>\% index(0)
-x \%>\%
-   select(message = .commit.message, name = .commit.committer.name)
-x \%>\% select(sha = .commit.tree.sha, author = .author.login)
 
-# using json dataset, all elements
-x <- index(commits)
-x \%>\% select(message = .commit.message, name = .commit.committer.name)
-x \%>\% select(sha = .sha, name = .commit.committer.name)
+'{"foo": 4, "bar": 7}' \%>\% select(.foo == 4)
+'{"foo": 5, "bar": 7} {"foo": 4, "bar": 7}' \%>\% select(.foo == 4)
+'[{"foo": 5, "bar": 7}, {"foo": 4, "bar": 7}]' \%>\% index() \%>\% 
+  select(.foo == 4)
+'{"foo": 4, "bar": 7} {"foo": 5, "bar": 7} {"foo": 8, "bar": 7}' \%>\% 
+  select(.foo < 6)
 
-# many JSON inputs
-'{"foo": 5, "bar": 7} {"foo": 50, "bar": 7} {"foo": 500, "bar": 7}' \%>\%
-  select(hello = .foo)
+x <- '{"foo": 4, "bar": 2} {"foo": 5, "bar": 4} {"foo": 8, "bar": 12}'
+jq(x, 'select((.foo < 6) and (.bar > 3))')
+jq(x, 'select((.foo < 6) or (.bar > 3))')
+x \%>\% select((.foo < 6) && (.bar > 3))
+x \%>\% select((.foo < 6) || (.bar > 3))
+
+x <- '[{"foo": 5, "bar": 7}, {"foo": 4, "bar": 7}, {"foo": 4, "bar": 9}]'
+jq(x, '.[] | select(.foo == 4) | {user: .bar}')
+x \%>\% index() \%>\% select(.foo == 4) \%>\% build_object(user = .bar)
 }
