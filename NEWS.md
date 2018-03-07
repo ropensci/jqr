@@ -1,3 +1,8 @@
+jqr 1.1.0
+=========
+
+* All functions now support connection objects as input types for streaming
+
 jqr 1.0.0
 =========
 
