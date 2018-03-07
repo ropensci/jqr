@@ -91,7 +91,7 @@ query_from_dots <- function(...)
 #'
 jq.connection <- function(x, ..., flags = jq_flags(), out = NULL) {
   query <- query_from_dots(...)
-  res <- jqr.connection(x, filter = query, flags = flags, out = out)
+  res <- jqr.connection(x, query = query, flags = flags, out = out)
   if(!is.null(res))
     structure(res, class = c("jqson", "character"))
 }

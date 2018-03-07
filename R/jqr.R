@@ -1,17 +1,17 @@
 #' JQ Streaming API
 #'
-#' Low level JQ API. First create a program using a `filter` and `flags` and then
+#' Low level JQ API. First create a program using a `query` and `flags` and then
 #' feed pieces of data.
 #'
 #' @export
 #' @rdname jqr_core
 #' @useDynLib jqr C_jqr_new
-#' @param filter string with a valid jq program
+#' @param query string with a valid jq program
 #' @inheritParams jq
-jqr_new <- function(filter, flags = jq_flags()){
-  stopifnot(is.character(filter))
+jqr_new <- function(query, flags = jq_flags()){
+  stopifnot(is.character(query))
   stopifnot(is.numeric(flags))
-  .Call(C_jqr_new, filter, as.integer(flags))
+  .Call(C_jqr_new, query, as.integer(flags))
 }
 
 #' @export
@@ -44,15 +44,15 @@ jqr <- function(x, ...) {
   UseMethod("jqr", x)
 }
 
-jqr.default <- function(json, filter, flags){
+jqr.default <- function(json, query, flags){
   #json <- paste(json, collapse = "\n")
-  stopifnot(is.character(filter))
+  stopifnot(is.character(query))
   stopifnot(is.numeric(flags))
-  program <- jqr_new(filter, flags = flags)
+  program <- jqr_new(query, flags = flags)
   jqr_feed(program, json = json, unlist = TRUE, finalize = TRUE)
 }
 
-jqr.connection <- function(con, filter, flags, out = NULL){
+jqr.connection <- function(con, query, flags, out = NULL){
   val <- invisible()
   stopifnot(inherits(con, 'connection'))
   if(is.character(out))
@@ -75,7 +75,7 @@ jqr.connection <- function(con, filter, flags, out = NULL){
   } else {
     stop("Argument 'out' must be connection or callback function")
   }
-  program <- jqr_new(filter, flags = flags)
+  program <- jqr_new(query, flags = flags)
   if(!isOpen(con)){
     open(con, 'r')
     on.exit(close(con), add = TRUE)

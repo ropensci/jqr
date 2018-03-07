@@ -5,12 +5,12 @@
 \alias{jqr_feed}
 \title{JQ Streaming API}
 \usage{
-jqr_new(filter, flags = jq_flags())
+jqr_new(query, flags = jq_flags())
 
 jqr_feed(jqr_program, json, unlist = TRUE, finalize = FALSE)
 }
 \arguments{
-\item{filter}{string with a valid jq program}
+\item{query}{string with a valid jq program}
 
 \item{flags}{See \code{\link{jq_flags}}}
 
@@ -26,7 +26,7 @@ each string in `json` input}
 this to `TRUE` when feeding the final piece of data.}
 }
 \description{
-Low level JQ API. First create a program using a `filter` and `flags` and then
+Low level JQ API. First create a program using a `query` and `flags` and then
 feed pieces of data.
 }
 \examples{
