@@ -79,14 +79,15 @@ query_from_dots <- function(...)
   paste(unlist(dots), collapse = " | ")
 }
 
-jqr_apply <- function(json, filter, flags){
-  #json <- paste(json, collapse = "\n")
-  stopifnot(is.character(filter))
-  stopifnot(is.numeric(flags))
-  program <- jqr_new(filter, flags = flags)
-  jqr_feed(program, json = json, unlist = TRUE, finalize = TRUE)
-}
-
-jqr <- function(json, program, flags = jq_flags()){
-  jqr_apply(json, program, flags)
+#' @rdname jq
+#' @param out a filename, callback function, connection object to stream output.
+#' Set to `NULL` to buffer all output and return a character vector.
+#' @export
+#' @examples # Stream from connection
+#' tmp <- tempfile()
+#' writeLines(c("[123, 456]", "[77, 88, 99]", "[41]"), tmp)
+#' jq(file(tmp), ".[]")
+jq.connection <- function(x, ..., flags = jq_flags(), out = stdout()) {
+  query <- query_from_dots(...)
+  jqr_stream(x, filter = query, flags = flags, out = out)
 }

@@ -39,3 +39,49 @@ jqr_feed <- function(jqr_program, json, unlist = TRUE, finalize = FALSE){
     return(as.character(unlist(out, recursive = FALSE)))
   return(out)
 }
+
+jqr <- function(json, filter, flags){
+  #json <- paste(json, collapse = "\n")
+  stopifnot(is.character(filter))
+  stopifnot(is.numeric(flags))
+  program <- jqr_new(filter, flags = flags)
+  jqr_feed(program, json = json, unlist = TRUE, finalize = TRUE)
+}
+
+jqr_stream <- function(con, filter, flags, out){
+  val <- invisible()
+  stopifnot(inherits(con, 'connection'))
+  if(is.character(out))
+    out <- file(out)
+  get_output <- if(!length(out)){
+    out <- rawConnection(raw(0), "r+")
+    on.exit(close(out), add = TRUE)
+    TRUE
+  }
+  callback <- if(is.function(out)){
+    out
+  } else if(inherits(out, 'connection')){
+    if(!isOpen(out)){
+      open(out, 'w')
+      on.exit(close(out), add = TRUE)
+    }
+    function(buf){
+      writeLines(buf, out, useBytes = TRUE)
+    }
+  } else {
+    stop("Argument 'out' must be connection or callback function")
+  }
+  program <- jqr_new(filter, flags = flags)
+  if(!isOpen(con)){
+    open(con, 'r')
+    on.exit(close(con), add = TRUE)
+  }
+  while(length(json <- readLines(con, n = 1, warn = FALSE, encoding = 'UTF-8')))
+    callback(jqr_feed(program, json))
+  jqr_feed(program, "", finalize = TRUE)
+  if(length(get_output)){
+    seek(out, 0)
+    structure(readLines(out, encoding = 'UTF-8'), class = c("jqson", "character"))
+  }
+}
+
