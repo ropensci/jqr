@@ -40,7 +40,11 @@ jqr_feed <- function(jqr_program, json, unlist = TRUE, finalize = FALSE){
   return(out)
 }
 
-jqr <- function(json, filter, flags){
+jqr <- function(x, ...) {
+  UseMethod("jqr", x)
+}
+
+jqr.default <- function(json, filter, flags){
   #json <- paste(json, collapse = "\n")
   stopifnot(is.character(filter))
   stopifnot(is.numeric(flags))
@@ -48,7 +52,7 @@ jqr <- function(json, filter, flags){
   jqr_feed(program, json = json, unlist = TRUE, finalize = TRUE)
 }
 
-jqr_stream <- function(con, filter, flags, out){
+jqr.connection <- function(con, filter, flags, out = NULL){
   val <- invisible()
   stopifnot(inherits(con, 'connection'))
   if(is.character(out))
@@ -79,9 +83,8 @@ jqr_stream <- function(con, filter, flags, out){
   while(length(json <- readLines(con, n = 1, warn = FALSE, encoding = 'UTF-8')))
     callback(jqr_feed(program, json))
   jqr_feed(program, "", finalize = TRUE)
-  if(length(get_output)){
+  if(isTRUE(get_output)){
     seek(out, 0)
-    structure(readLines(out, encoding = 'UTF-8'), class = c("jqson", "character"))
+    readLines(out, encoding = 'UTF-8')
   }
 }
-

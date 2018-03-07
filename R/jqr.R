@@ -35,8 +35,8 @@ jq <- function(x, ...) {
 jq.jqr <- function(x, ...) {
   pipe_autoexec(toggle = FALSE)
   flags <- `if`(is.null(attr(x, "jq_flags")), jq_flags(), attr(x, "jq_flags"))
-  res <- structure(jqr(x$data, make_query(x), flags),
-                   class = c("jqson", "character"))
+  res <- jqr(x$data, make_query(x), flags = flags)
+  class(res) <- c("jqson", "character")
   query <- query_from_dots(...)
   if (query != "")
     jq(res, query)
@@ -87,7 +87,11 @@ query_from_dots <- function(...)
 #' tmp <- tempfile()
 #' writeLines(c("[123, 456]", "[77, 88, 99]", "[41]"), tmp)
 #' jq(file(tmp), ".[]")
-jq.connection <- function(x, ..., flags = jq_flags(), out = stdout()) {
+#'
+#'
+jq.connection <- function(x, ..., flags = jq_flags(), out = NULL) {
   query <- query_from_dots(...)
-  jqr_stream(x, filter = query, flags = flags, out = out)
+  res <- jqr.connection(x, filter = query, flags = flags, out = out)
+  if(!is.null(res))
+    structure(res, class = c("jqson", "character"))
 }

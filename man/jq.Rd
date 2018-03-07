@@ -16,7 +16,7 @@ jq(x, ...)
 
 \method{jq}{json}(x, ..., flags = jq_flags())
 
-\method{jq}{connection}(x, ..., flags = jq_flags(), out = stdout())
+\method{jq}{connection}(x, ..., flags = jq_flags(), out = NULL)
 }
 \arguments{
 \item{x}{\code{json} object or character string with json data. this can
@@ -54,6 +54,8 @@ jq(c("[123, 456]", "[77, 88, 99]", "[41]"), ".[]")
 tmp <- tempfile()
 writeLines(c("[123, 456]", "[77, 88, 99]", "[41]"), tmp)
 jq(file(tmp), ".[]")
+
+
 }
 \seealso{
 \code{\link{peek}}
