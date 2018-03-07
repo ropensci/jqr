@@ -43,7 +43,7 @@ jq('{"a": 7, "b": 4}', 'keys')
 jq('[8,3,null,6]', 'sort')
 
 # many json inputs
-jq("[123, 456] [77, 88, 99]", ".[]")
+jq(c("[123, 456]", "[77, 88, 99]", "[41]"), ".[]")
 }
 \seealso{
 \code{\link{peek}}

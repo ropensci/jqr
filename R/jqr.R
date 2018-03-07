@@ -25,7 +25,7 @@
 #' jq('[8,3,null,6]', 'sort')
 #'
 #' # many json inputs
-#' jq("[123, 456] [77, 88, 99]", ".[]")
+#' jq(c("[123, 456]", "[77, 88, 99]", "[41]"), ".[]")
 jq <- function(x, ...) {
   UseMethod("jq", x)
 }
@@ -80,11 +80,11 @@ query_from_dots <- function(...)
 }
 
 jqr_apply <- function(json, filter, flags){
-  json <- paste(json, collapse = "\n")
+  #json <- paste(json, collapse = "\n")
   stopifnot(is.character(filter))
   stopifnot(is.numeric(flags))
   program <- jqr_new(filter, output_flags = flags)
-  out <- jqr_feed(program, json = json, is_partial = FALSE)
+  out <- jqr_feed(program, json = json, finalize = TRUE)
   out <- lapply(out, rev);
   rev(out)
 }

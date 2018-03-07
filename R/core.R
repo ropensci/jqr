@@ -6,9 +6,9 @@ jqr_new <- function(filter, output_flags){
 }
 
 #' @useDynLib jqr C_jqr_feed
-jqr_feed <- function(ptr, json, is_partial){
+jqr_feed <- function(ptr, json, finalize){
   stopifnot(inherits(ptr, 'jqr_program'))
   stopifnot(is.character(json))
-  stopifnot(is.logical(is_partial))
-  .Call(C_jqr_feed, ptr, json, is_partial)
+  stopifnot(is.logical(finalize))
+  .Call(C_jqr_feed, ptr, json, finalize)
 }

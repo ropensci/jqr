@@ -60,13 +60,14 @@ static void fin_jqr_program(SEXP ptr){
  *  2. over each json object within the string
  *  3. over each output element after running the program on the json
  */
-attribute_visible SEXP C_jqr_feed(SEXP ptr, SEXP json, SEXP is_partial){
+attribute_visible SEXP C_jqr_feed(SEXP ptr, SEXP json, SEXP finalize){
   SEXP out = R_NilValue;
   jqr_program * program = get_program(ptr);
   for(R_xlen_t i = 0; i < Rf_length(json); i++){
     // load the json string
     SEXP str = STRING_ELT(json, i);
-    jv_parser_set_buf(program->parser, CHAR(str), Rf_length(str), Rf_asLogical(is_partial));
+    int is_final = Rf_asLogical(finalize) && (i == Rf_length(json) - 1);
+    jv_parser_set_buf(program->parser, CHAR(str), Rf_length(str), !is_final);
 
     // loop over each json object within a string
     jv value = jv_parser_next(program->parser);
