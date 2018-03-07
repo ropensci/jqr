@@ -4,10 +4,11 @@ Description: Client for 'jq', a 'JSON' processor (<https://stedolan.github.io/jq
     written in C. 'jq' allows the following with 'JSON' data: index into, parse, 
     do calculations, cut up and filter, change key names and values, perform 
     conditionals and comparisons, and more.
-Version: 1.0.1.9210
+Version: 1.0.9000
 Depends:
     R (>= 3.1.2)
 License: MIT + file LICENSE
+Encoding: UTF-8
 LazyData: true
 Authors@R: c(person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gmail.com"),
     person("Jeroen", "Ooms", role = "aut", email = "jeroen@berkeley.edu"),
@@ -25,4 +26,4 @@ Suggests:
     jsonlite,
     testthat,
     knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000

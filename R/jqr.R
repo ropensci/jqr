@@ -1,95 +1,90 @@
-#' Execute a query with jq
+#' JQ Streaming API
 #'
-#' \code{jq} is meant to work with the high level interface in this package.
-#' \code{jq} also provides access to the low level interface in which you can
-#' use jq query strings just as you would on the command line. Output gets
-#' class of json, and pretty prints to the console for easier viewing.
-#' \code{jqr} doesn't do pretty printing.
+#' Low level JQ API. First create a program using a `query` and `flags` and then
+#' feed pieces of data.
 #'
 #' @export
-#' @param x \code{json} object or character string with json data. this can
-#' be one or more valid json objects
-#' @param ... character specification of jq query. Each element in code{...}
-#'   will be combined with " | ", which is convenient for long queries.
-#' @param flags See \code{\link{jq_flags}}
-#' @seealso \code{\link{peek}}
-#' @examples
-#' '{"a": 7}' %>%  do(.a + 1)
-#' '[8,3,null,6]' %>% sortj
-#'
-#' x <- '[{"message": "hello", "name": "jenn"},
-#'   {"message": "world", "name": "beth"}]'
-#' jq(index(x))
-#'
-#' jq('{"a": 7, "b": 4}', 'keys')
-#' jq('[8,3,null,6]', 'sort')
-#'
-#' # many json inputs
-#' jq("[123, 456] [77, 88, 99]", ".[]")
-jq <- function(x, ...) {
-  UseMethod("jq", x)
-}
-
-#' @rdname jq
-#' @export
-jq.jqr <- function(x, ...) {
-  pipe_autoexec(toggle = FALSE)
-  flags <- `if`(is.null(attr(x, "jq_flags")), jq_flags(), attr(x, "jq_flags"))
-  res <- structure(jqr(x$data, make_query(x), flags),
-                   class = c("jqson", "character"))
-  query <- query_from_dots(...)
-  if (query != "")
-    jq(res, query)
-  else
-    res
-}
-
-#' @rdname jq
-#' @export
-jq.character <- function(x, ..., flags = jq_flags()) {
-  query <- query_from_dots(...)
-  structure(jqr(x, query, flags),
-            class = c("jqson", "character"))
-}
-
-#' @rdname jq
-#' @export
-jq.json <- function(x, ..., flags = jq_flags()) {
-  jq(unclass(x), ..., flags = flags)
-}
-
-#' @export
-jq.default <- function(x, ...) {
-  stop(sprintf("jq method not implemented for %s.", class(x)[1]))
-}
-
-#' @export
-print.jqson <- function(x, ...) {
-  cat(jsonlite::prettify(combine(x)))
-}
-
-#' Helper function for createing a jq query string from ellipses.
-#' @noRd
-query_from_dots <- function(...)
-{
-  dots <- list(...)
-  if (!all(vapply(dots, is.character, logical(1))))
-    stop("jq query specification must be character.")
-
-  paste(unlist(dots), collapse = " | ")
-}
-
-#' @useDynLib jqr C_jqr_string
-jqr_apply <- function(json, program, flags){
-  json <- paste(json, collapse = "\n")
-  stopifnot(is.character(program))
+#' @rdname jqr_core
+#' @useDynLib jqr C_jqr_new
+#' @param query string with a valid jq program
+#' @inheritParams jq
+jqr_new <- function(query, flags = jq_flags()){
+  stopifnot(is.character(query))
   stopifnot(is.numeric(flags))
-  out <- .Call(C_jqr_string, json, program, as.integer(flags))
-  out <- lapply(out, rev);
-  rev(out)
+  .Call(C_jqr_new, query, as.integer(flags))
 }
 
-jqr <- function(json, program, flags = jq_flags()){
-  out <- jqr_apply(json, program, flags)
-  as.character(unlist(out, recursive = FALSE))
+#' @export
+#' @rdname jqr_core
+#' @useDynLib jqr C_jqr_feed
+#' @param jqr_program object returned by [jqr_new]
+#' @param json character vector with json data. If the JSON object is incomplete, you
+#' must set `finalize` to `FALSE` otherwise you get an error.
+#' @param finalize completes the parsing and verifies that the JSON string is valid. Set
+#' this to `TRUE` when feeding the final piece of data.
+#' @param unlist if `TRUE` returns a single character vector with all output for each
+#' each string in `json` input
+#' @examples program <- jqr_new(".[]")
+#' jqr_feed(program, c("[123, 456]", "[77, 88, 99]"))
+#' jqr_feed(program, c("[41, 234]"))
+#' jqr_feed(program, "", finalize = TRUE)
+jqr_feed <- function(jqr_program, json, unlist = TRUE, finalize = FALSE){
+  stopifnot(inherits(jqr_program, 'jqr_program'))
+  stopifnot(is.character(json))
+  stopifnot(is.logical(finalize))
+  out <- .Call(C_jqr_feed, jqr_program, json, finalize)
+  out <- lapply(out, rev);
+  out <- rev(out)
+  if(isTRUE(unlist))
+    return(as.character(unlist(out, recursive = FALSE)))
+  return(out)
+}
+
+jqr <- function(x, ...) {
+  UseMethod("jqr", x)
+}
+
+jqr.default <- function(json, query, flags){
+  #json <- paste(json, collapse = "\n")
+  stopifnot(is.character(query))
+  stopifnot(is.numeric(flags))
+  program <- jqr_new(query, flags = flags)
+  jqr_feed(program, json = json, unlist = TRUE, finalize = TRUE)
+}
+
+jqr.connection <- function(con, query, flags, out = NULL){
+  val <- invisible()
+  stopifnot(inherits(con, 'connection'))
+  if(is.character(out))
+    out <- file(out)
+  get_output <- if(!length(out)){
+    out <- rawConnection(raw(0), "r+")
+    on.exit(close(out), add = TRUE)
+    TRUE
+  }
+  callback <- if(is.function(out)){
+    out
+  } else if(inherits(out, 'connection')){
+    if(!isOpen(out)){
+      open(out, 'w')
+      on.exit(close(out), add = TRUE)
+    }
+    function(buf){
+      writeLines(buf, out, useBytes = TRUE)
+    }
+  } else {
+    stop("Argument 'out' must be connection or callback function")
+  }
+  program <- jqr_new(query, flags = flags)
+  if(!isOpen(con)){
+    open(con, 'r')
+    on.exit(close(con), add = TRUE)
+  }
+  while(length(json <- readLines(con, n = 1, warn = FALSE, encoding = 'UTF-8')))
+    callback(jqr_feed(program, json))
+  jqr_feed(program, "", finalize = TRUE)
+  if(isTRUE(get_output)){
+    seek(out, 0)
+    readLines(out, encoding = 'UTF-8')
+  }
 }
