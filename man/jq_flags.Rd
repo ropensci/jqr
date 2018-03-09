@@ -9,7 +9,7 @@ jq_flags(pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALSE,
   stream = FALSE, seq = FALSE)
 
 flags(.data, pretty = FALSE, ascii = FALSE, color = FALSE,
-  sorted = FALSE)
+  sorted = FALSE, stream = FALSE, seq = FALSE)
 }
 \arguments{
 \item{pretty}{Pretty print the json (different to jsonlite's

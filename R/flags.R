@@ -34,13 +34,13 @@ jq_flags <- function(pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALS
 #' @rdname jq_flags
 #' @param .data A \code{jqr} object.
 #' @export
-flags <- function(.data, pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALSE)
+flags <- function(.data, pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALSE, stream = FALSE, seq = FALSE)
 {
   jq_obj <- `if`(inherits(.data, "jqr"), .data, dot_(.data, dots = "."))
 
   pipe_autoexec(toggle = TRUE)
 
-  attr(jq_obj, "jq_flags") <- jq_flags(pretty, ascii, color, sorted)
+  attr(jq_obj, "jq_flags") <- jq_flags(pretty, ascii, color, sorted, stream, seq)
 
   jq_obj
 }
