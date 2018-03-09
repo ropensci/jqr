@@ -26,8 +26,8 @@ jq_flags <- function(pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALS
         if (ascii)  2L,
         if (color)  4L,
         if (sorted) 8L,
-        if (seq) 64L,
-        if (stream) 128L))
+        if (seq) 2048L,
+        if (stream) 4096L))
 }
 
 

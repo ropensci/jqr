@@ -11,7 +11,7 @@
 jqr_new <- function(query, flags = jq_flags()){
   stopifnot(is.character(query))
   stopifnot(is.numeric(flags))
-  .Call(C_jqr_new, query, as.integer(flags %% 64), as.integer(flags %/% 64))
+  .Call(C_jqr_new, query, as.integer(flags %% 2048), as.integer(flags %/% 2048))
 }
 
 #' @export
