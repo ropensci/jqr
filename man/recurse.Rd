@@ -31,6 +31,6 @@ x <- '{"name": "/", "children": [
   {"name": "/home", "children": [
     {"name": "/home/stephen", "children": [
       {"name": "/home/stephen/jq", "children": []}]}]}]}'
-x \%>\% recurse(.children[]) \%>\% select(name)
-x \%>\% recurse(.children[]) \%>\% select(name) \%>\% string
+x \%>\% recurse(.children[]) \%>\% build_object(name)
+x \%>\% recurse(.children[]) \%>\% build_object(name) \%>\% string
 }

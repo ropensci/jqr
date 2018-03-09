@@ -177,7 +177,7 @@ Show the query to be used using `peek()`
 x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
 jq(x, '{user, title: .titles[]}')
 x %>% index()
-x %>% select(user, title = `.titles[]`)
+x %>% build_object(user, title = `.titles[]`)
 jq(x, '{user, title: .titles[]}') %>% jsonlite::toJSON() %>% jsonlite::validate()
 ```
 
@@ -236,6 +236,28 @@ unique
 '[1,2,5,3,5,3,1,3]' %>% uniquej
 ```
 
+
+#### filter
+
+With filtering via `select()` you can use various operators, like `==`, 
+`&&`, `||`. We translate these internally for you to what `jq` wants 
+to see (`==`, `and`, `or`).
+
+Simple, one condition
+
+```{r}
+'{"foo": 4, "bar": 7}' %>% select(.foo == 4)
+```
+
+More complicated. Combine more than one condition; combine each individual
+filtering task in parentheses
+
+```{r}
+x <- '{"foo": 4, "bar": 2} {"foo": 5, "bar": 4} {"foo": 8, "bar": 12}'
+x %>% select((.foo < 6) && (.bar > 3))
+x %>% select((.foo < 6) || (.bar > 3))
+```
+
 #### types
 
 get type information for each element
@@ -274,18 +296,18 @@ str3 %>% haskey(2)
 str3 %>% haskey(1,2)
 ```
 
-Select variables by name, and rename
+Build an object, selecting variables by name, and rename
 
 ```{r}
-'{"foo": 5, "bar": 7}' %>% select(a = .foo)
+'{"foo": 5, "bar": 7}' %>% build_object(a = .foo)
 ```
 
-More complicated `select()`, using the included dataset `commits`
+More complicated `build_object()`, using the included dataset `commits`
 
 ```{r}
 commits %>%
   index() %>%
-  select(sha = .sha, name = .commit.committer.name)
+  build_object(sha = .sha, name = .commit.committer.name)
 ```
 
 #### Maths
@@ -356,7 +378,7 @@ This outputs a few pieces of JSON
 ```{r}
 (x <- commits %>%
   index() %>%
-  select(sha = .sha, name = .commit.committer.name))
+  build_object(sha = .sha, name = .commit.committer.name))
 ```
 
 Use `combine()` to put them together.
