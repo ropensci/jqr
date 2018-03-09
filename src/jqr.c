@@ -91,9 +91,9 @@ attribute_visible SEXP C_jqr_feed(SEXP ptr, SEXP json, SEXP finalize){
   return out;
 }
 
-attribute_visible SEXP C_jqr_new(SEXP jq_filter, SEXP output_flags){
+attribute_visible SEXP C_jqr_new(SEXP jq_filter, SEXP output_flags, SEXP parser_flags){
   jqr_program * program = calloc(1, sizeof(jqr_program));
-  program->parser = jv_parser_new(0);
+  program->parser = jv_parser_new(Rf_asInteger(parser_flags));
   program->state = jq_init();
   program->output_flags = Rf_asInteger(output_flags);
   jq_set_error_cb(program->state, error_cb, NULL);
