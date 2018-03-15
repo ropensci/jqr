@@ -55,7 +55,18 @@ tmp <- tempfile()
 writeLines(c("[123, 456]", "[77, 88, 99]", "[41]"), tmp)
 jq(file(tmp), ".[]")
 
+\dontrun{
+# from a url
+x <- 'http://jeroen.github.io/data/diamonds.json'
+jq(url(x), ".[]")
 
+# from a file
+file <- file.path(tempdir(), "diamonds_nd.json")
+download.file(x, destfile = file)
+jq(file(file), ".carat")
+jq(file(file), "select(.carat > 1.5)")
+jq(file(file), 'select(.carat > 4 and .cut == "Fair")')
+}
 }
 \seealso{
 \code{\link{peek}}

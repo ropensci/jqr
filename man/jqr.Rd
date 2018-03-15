@@ -4,6 +4,7 @@
 \name{jqr}
 \alias{jqr}
 \alias{jqr-package}
+\alias{jqr-package}
 \title{jqr: An R client for the C library jq}
 \description{
 jqr: An R client for the C library jq
