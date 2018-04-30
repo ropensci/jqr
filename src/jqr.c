@@ -21,6 +21,10 @@ static void error_cb(void * data, jv x) {
   Rf_errorcall(R_NilValue, buf);
 }
 
+static SEXP make_string(const char * str){
+  return Rf_ScalarString(Rf_mkCharCE(str, CE_UTF8));
+}
+
 // called for each json object within the string
 static SEXP jqr_process(jqr_program * program, jv value) {
   SEXP ret = R_NilValue;
@@ -29,7 +33,7 @@ static SEXP jqr_process(jqr_program * program, jv value) {
   while (jv_is_valid(result)) {
     jv x = jv_dump_string(result, program->output_flags);
     const char *str = jv_string_value(x);
-    ret = PROTECT(Rf_cons(Rf_mkString(str), ret));
+    ret = PROTECT(Rf_cons(make_string(str), ret));
     jv_free(x);
     result = jq_next(program->state);
   }
