@@ -32,7 +32,7 @@ jqr_feed <- function(jqr_program, json, unlist = TRUE, finalize = FALSE){
   stopifnot(inherits(jqr_program, 'jqr_program'))
   stopifnot(is.character(json))
   stopifnot(is.logical(finalize))
-  out <- .Call(C_jqr_feed, jqr_program, json, finalize)
+  out <- .Call(C_jqr_feed, jqr_program, enc2utf8(json), finalize)
   out <- lapply(out, rev);
   out <- rev(out)
   if(isTRUE(unlist))
