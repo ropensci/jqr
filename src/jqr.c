@@ -100,7 +100,7 @@ attribute_visible SEXP C_jqr_new(SEXP jq_filter, SEXP output_flags, SEXP parser_
   const char * str = CHAR(STRING_ELT(jq_filter, 0));
   if(!jq_compile(program->state, str))
     Rf_errorcall(R_NilValue, "Invalid jq filter: '%s'", str);
-  SEXP ptr = PROTECT(R_MakeExternalPtr(program, R_NilValue, R_NilValue));
+  SEXP ptr = PROTECT(R_MakeExternalPtr(program, R_NilValue, jq_filter));
   R_RegisterCFinalizerEx(ptr, fin_jqr_program, 1);
   Rf_setAttrib(ptr, R_ClassSymbol, Rf_mkString("jqr_program"));
   UNPROTECT(1);
