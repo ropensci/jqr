@@ -80,9 +80,9 @@ jqr.connection <- function(con, query, flags, out = NULL){
     open(con, 'r')
     on.exit(close(con), add = TRUE)
   }
-  while(length(json <- readLines(con, n = 1, warn = FALSE, encoding = 'UTF-8')))
+  while(length(json <- readLines(con, n = 100, warn = FALSE, encoding = 'UTF-8')))
     callback(jqr_feed(program, json))
-  jqr_feed(program, "", finalize = TRUE)
+  jqr_feed(program, character(0), finalize = TRUE)
   if(isTRUE(get_output)){
     seek(out, 0)
     readLines(out, encoding = 'UTF-8')
