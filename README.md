@@ -17,6 +17,42 @@ means that the eventual loading into R can be quicker.
 
  - Introduction vignette at <https://cran.r-project.org/package=jqr>
 
+## Quickstart Tutorial
+
+The `jq` command line examples from the [jq tutorial](https://stedolan.github.io/jq/tutorial/) work exactly the same in R! 
+
+
+```r
+library(curl)
+library(jqr)
+curl('https://api.github.com/repos/ropensci/jqr/commits?per_page=5') %>%
+  jq('.[] | {message: .commit.message, name: .commit.committer.name}')
+#> [
+#>     {
+#>         "message": "Try to make things a bit faster",
+#>         "name": "Jeroen"
+#>     },
+#>     {
+#>         "message": "Also force input as UTF-8, fixes #71 for realz",
+#>         "name": "Jeroen Ooms"
+#>     },
+#>     {
+#>         "message": "Set encoding to UTF-8, fixes #71",
+#>         "name": "Jeroen"
+#>     },
+#>     {
+#>         "message": "Protect input string",
+#>         "name": "Jeroen"
+#>     },
+#>     {
+#>         "message": "add a few examples for streaming from a file or url in addition to string #51",
+#>         "name": "Scott Chamberlain"
+#>     }
+#> ]
+```
+
+Try running some of the [other examples](https://stedolan.github.io/jq/tutorial/).
+
 ## Installation
 
 Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
