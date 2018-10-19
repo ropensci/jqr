@@ -1,29 +1,23 @@
 Package: jqr
-Title: Client for 'jq', a JSON Processor
-Description: Client for 'jq', a JSON processor (<http://stedolan.github.io/jq/>), written
-    in C. 'jq' allows the following with JSON data: index into, parse, do calculations,
-    cut up and filter, change key names and values, perform conditionals and comparisons,
-    and more.
-Version: 0.2.9241
+Title: Client for 'jq', a 'JSON' Processor
+Description: Client for 'jq', a 'JSON' processor (<https://stedolan.github.io/jq/>), 
+    written in C. 'jq' allows the following with 'JSON' data: index into, parse, 
+    do calculations, cut up and filter, change key names and values, perform 
+    conditionals and comparisons, and more.
+Version: 1.0.9200
 Depends:
     R (>= 3.1.2)
 License: MIT + file LICENSE
+Encoding: UTF-8
 LazyData: true
-Authors@R: c(person("Rich", "FitzJohn", role = "aut",
-    email = "rich.fitzjohn@gmail.com"),
-    person("Jeroen", "Ooms", role = "aut"),
-    person("Scott", "Chamberlain", role = c("aut", "cre"),
-    email = "myrmecocystus@gmail.com"),
-    person("Stefan Milton Bache", role = "aut",
-    email = "stefan@stefanbache.dk"),
-    person("Stephen", "Dolan", role = c("aut","cph"), comment = "jq library"),
-    person(family = "jq contributors", role = "ctb",
-         comment = "jq library; authors listed in inst/AUTHORS.jq"),
-    person("Free Software Foundation", role = c("ctb","cph"), comment = "parser code in src/parser.c"),
-    person("David M", "Gay", role = c("ctb","cph"), comment = "code in src/jv_dtoa.c"))
+Authors@R: c(person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gmail.com"),
+    person("Jeroen", "Ooms", role = "aut", email = "jeroen@berkeley.edu"),
+    person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com"),
+    person("Stefan Milton Bache", role = "aut", email = "stefan@stefanbache.dk"))
 VignetteBuilder: knitr
 URL: https://github.com/ropensci/jqr
 BugReports: https://github.com/ropensci/jqr/issues
+SystemRequirements: libjq: jq-devel (rpm) or libjq-dev (deb)
 Imports:
     magrittr,
     lazyeval
@@ -32,4 +26,4 @@ Suggests:
     jsonlite,
     testthat,
     knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000

@@ -18,7 +18,7 @@ dot <- function(.data) {
 dot_ <- function(.data, dots = ".") {
   pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure(dots, type = "dot"))
-  structure(list(data = .data, args = dots), class = "jqr")
+  structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
 #' @export

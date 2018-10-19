@@ -36,13 +36,31 @@ for interactive use as well as programming.
 
 \section{jq version}{
 
-\code{jqr} is currenlty using \code{jq v1.4}
+We link to \code{jq} through the installed version on your system,
+so the version can vary. Run \code{jq --version} to get your jq version
 }
 
 \section{indexing}{
 
 note that \code{jq} indexing starts at \code{0}, whereas R indexing
-starts at \code{1}. So when you want the first thing in an array using \code{jq},
-for example, you want \code{0}, not \code{1}
+starts at \code{1}. So when you want the first thing in an array using
+\code{jq}, for example, you want \code{0}, not \code{1}
+}
+
+\section{output data format}{
+
+Note that with both the low level interface and the high level DSL, we
+print the output to look like a valid JSON object to make it easier to
+look at. However, it's important to know that the output is really just a
+simple character string or vector of strings - it's just the print function
+that pretty prints it and makes it look like a single JSON object. What jq
+is giving you often is a stream of valid JSON objects, each one of which is
+valid, but altogether are not valid. However, a trick you can do is to
+wrap your jq program in brackets like \code{[.[]]} instead of \code{.[]}
+to give a single JSON object
+
+Related to above, you can use the function provided \code{\link{string}}
+with the high level DSL to get back a character string instead of
+pretty printed version
 }
 

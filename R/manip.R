@@ -11,6 +11,8 @@
 #' str %>% join
 #' str %>% join(`;`)
 #' str %>% join(`yep`)
+#' ## many JSON inputs
+#' '["a","b,c,d","e"] ["a","f,e,f"]' %>% join(`---`)
 #'
 #' # split
 #' jq('"a, b,c,d, e"', 'split(", ")')
@@ -27,6 +29,8 @@
 #' str <- '["fo", "foo", "barfoo", "foobar", "barfoob"]'
 #' jq(str, '[.[]|startswith("foo")]')
 #' str %>% index %>% startswith(foo)
+#' ## many JSON inputs
+#' '["fo", "foo"] ["barfoo", "foobar", "barfoob"]' %>% index %>% startswith(foo)
 #'
 #' # endswith
 #' jq(str, '[.[]|endswith("foo")]')
@@ -34,6 +38,8 @@
 #' str %>% index %>% endswith_("foo")
 #' str %>% index %>% endswith(bar)
 #' str %>% index %>% endswith_("bar")
+#' ## many JSON inputs
+#' '["fo", "foo"] ["barfoo", "foobar", "barfoob"]' %>% index %>% endswith(foo)
 #'
 #' # get index (location) of a character
 #' ## input has to be quoted

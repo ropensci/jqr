@@ -37,17 +37,17 @@ index and related functions
 }
 \details{
 \itemize{
- \item \code{index}/\code{index_} - queries like: \code{.[]}, \code{.[0]}, \code{.[1:5]},
+ \item \code{index}/\code{index_} - queries like: \code{.[]}, \code{.[0]},
+ \code{.[1:5]},
  \code{.["foo"]}
- \item \code{indexif}/\code{indexif_} - queries like: \code{.[foo?]}
- \item \code{dotindex}/\code{dotindex_} - queries like: \code{.[].foo}, \code{.[].foo.bar}
+ \item \code{indexif}/\code{indexif_} - queries like: \code{.["foo"]?}
+ \item \code{dotindex}/\code{dotindex_} - queries like: \code{.[].foo},
+ \code{.[].foo.bar}
 }
 }
 \examples{
 str <- '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]'
 str \%>\% index
-str \%>\% indexif
-str \%>\% indexif(name)
 '{"name":"JSON", "good":true}' \%>\% indexif(name)
 '{"name":"JSON", "good":true}' \%>\% indexif(good)
 '{"name":"JSON", "good":true}' \%>\% indexif(that)
@@ -62,8 +62,12 @@ str \%>\% indexif(name)
 
 str \%>\% index \%>\% select(bad = .name)
 
-'[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\% dotindex(name)
-'[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\% dotindex(good)
-'[{"name":"JSON", "good":{"foo":5}}, {"name":"XML", "good":{"foo":6}}]' \%>\% dotindex(good)
-'[{"name":"JSON", "good":{"foo":5}}, {"name":"XML", "good":{"foo":6}}]' \%>\% dotindex(good.foo)
+'[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\%
+  dotindex(name)
+'[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' \%>\%
+  dotindex(good)
+'[{"name":"JSON", "good":{"foo":5}}, {"name":"XML", "good":{"foo":6}}]' \%>\%
+  dotindex(good)
+'[{"name":"JSON", "good":{"foo":5}}, {"name":"XML", "good":{"foo":6}}]' \%>\%
+  dotindex(good.foo)
 }

@@ -1,7 +1,6 @@
 language: r
-cache: packages
-sudo: required
-dist: trusty
+latex: false
+fortran: false
 
 matrix:
   include:
@@ -9,24 +8,21 @@ matrix:
       r: oldrel
     - os: linux
       r: release
-    - os: linux
-      r: devel
       env: R_CODECOV=true
     - os: osx
-      osx_image: xcode8.1
-      latex: false
+      osx_image: xcode9.2
+      brew_packages: jq
     - os: osx
-      osx_image: xcode6.4
-      latex: false
+      osx_image: xcode7.3
+      disable_homebrew: true
 
 addons:
   apt:
+    sources:
+      - sourceline: 'ppa:opencpu/jq'
     packages:
-    - r-cran-lazyeval
-    - r-cran-magrittr
-    - r-cran-testthat
-    - r-cran-jsonlite
-    - r-cran-knitr
+      - libjq-dev
+      - valgrind
 
 after_success:
   - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi

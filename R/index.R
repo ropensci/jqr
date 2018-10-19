@@ -4,16 +4,16 @@
 #' @template args
 #' @details
 #' \itemize{
-#'  \item \code{index}/\code{index_} - queries like: \code{.[]}, \code{.[0]}, \code{.[1:5]},
+#'  \item \code{index}/\code{index_} - queries like: \code{.[]}, \code{.[0]},
+#'  \code{.[1:5]},
 #'  \code{.["foo"]}
-#'  \item \code{indexif}/\code{indexif_} - queries like: \code{.[foo?]}
-#'  \item \code{dotindex}/\code{dotindex_} - queries like: \code{.[].foo}, \code{.[].foo.bar}
+#'  \item \code{indexif}/\code{indexif_} - queries like: \code{.["foo"]?}
+#'  \item \code{dotindex}/\code{dotindex_} - queries like: \code{.[].foo},
+#'  \code{.[].foo.bar}
 #' }
 #' @examples
 #' str <- '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]'
 #' str %>% index
-#' str %>% indexif
-#' str %>% indexif(name)
 #' '{"name":"JSON", "good":true}' %>% indexif(name)
 #' '{"name":"JSON", "good":true}' %>% indexif(good)
 #' '{"name":"JSON", "good":true}' %>% indexif(that)
@@ -28,10 +28,14 @@
 #'
 #' str %>% index %>% select(bad = .name)
 #'
-#' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>% dotindex(name)
-#' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>% dotindex(good)
-#' '[{"name":"JSON", "good":{"foo":5}}, {"name":"XML", "good":{"foo":6}}]' %>% dotindex(good)
-#' '[{"name":"JSON", "good":{"foo":5}}, {"name":"XML", "good":{"foo":6}}]' %>% dotindex(good.foo)
+#' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>%
+#'   dotindex(name)
+#' '[{"name":"JSON", "good":true}, {"name":"XML", "good":false}]' %>%
+#'   dotindex(good)
+#' '[{"name":"JSON", "good":{"foo":5}}, {"name":"XML", "good":{"foo":6}}]' %>%
+#'   dotindex(good)
+#' '[{"name":"JSON", "good":{"foo":5}}, {"name":"XML", "good":{"foo":6}}]' %>%
+#'   dotindex(good.foo)
 index <- function(.data, ...) {
   index_(.data, .dots = lazyeval::lazy_dots(...))
 }
@@ -47,7 +51,7 @@ index_ <- function(.data, ..., .dots) {
     z <- paste0(".[", collapse_vec(tmp[[1]]$expr), "]")
   }
   dots <- comb(tryargs(.data), structure(z, type = "index"))
-  structure(list(data = .data, args = dots), class = "jqr")
+  structure(list(data = getdata(.data), args = dots), class = "jqr")
 }
 
 #' @export
@@ -68,7 +72,7 @@ indexif_ <- function(.data, ..., .dots) {
     # z <- sprintf('.[%s?]', as.character(tmp[[1]]$expr))
   }
   dots <- comb(tryargs(.data), structure(z, type = "indexif"))
-  structure(list(data = .data, dots), class = "jqr")
+  structure(list(data = getdata(.data), dots), class = "jqr")
 }
 
 #' @export
@@ -82,9 +86,10 @@ dotindex <- function(.data, ...) {
 dotindex_ <- function(.data, ..., .dots) {
   pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
+  if (length(tmp) == 0) stop("no input supplied")
   z <- sprintf(".[].%s", as.character(tmp[[1]]$expr))
   dots <- comb(tryargs(.data), structure(z, type = "dotindex"))
-  structure(list(data = .data, dots), class = "jqr")
+  structure(list(data = getdata(.data), dots), class = "jqr")
 }
 
 # helpers ----------------------

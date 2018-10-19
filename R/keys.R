@@ -1,7 +1,8 @@
 #' Operations on keys, or by keys
 #'
-#' \code{keys} takes no input, and retrieves keys. \code{del} deletes provided keys.
-#' \code{haskey} checks if a json string has a key or keys.
+#' \code{keys} takes no input, and retrieves keys. \code{del} deletes
+#' provided keys. \code{haskey} checks if a json string has a key, or the
+#' input array has an element at the given index.
 #'
 #' @export
 #' @template args
@@ -21,10 +22,14 @@
 #' str3 %>% haskey(2)
 #' jq(str3, "map(has(1,2))")
 #' str3 %>% haskey(1,2)
+#'
+#' ## many JSON inputs
+#' '{"foo": 5, "bar": 7} {"hello": 5, "world": 7}' %>% keys
+#' '{"foo": 5, "bar": 7} {"hello": 5, "bar": 7}' %>% del(bar)
 keys <- function(.data) {
   pipe_autoexec(toggle = TRUE)
   dots <- comb(tryargs(.data), structure("keys", type="keys"))
-  structure(list(data=.data, args=dots), class="jqr")
+  structure(list(data=getdata(.data), args=dots), class="jqr")
 }
 
 #' @export
@@ -54,7 +59,8 @@ haskey <- function(.data, ...) {
 haskey_ <- function(.data, ..., .dots) {
   pipe_autoexec(toggle = TRUE)
   tmp <- lazyeval::all_dots(.dots, ...)
-  z <- paste0("map(has(", paste0(unlist(pluck(tmp, "expr")), collapse = ","), "))", collapse = "")
+  z <- paste0("map(has(", paste0(unlist(pluck(tmp, "expr")),
+                                 collapse = ","), "))", collapse = "")
   dots <- comb(tryargs(.data), structure(z, type="del"))
   structure(list(data=getdata(.data), args=dots), class="jqr")
 }

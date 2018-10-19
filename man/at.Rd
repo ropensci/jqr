@@ -25,7 +25,7 @@ Format strings and escaping
 }
 \examples{
 x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
-# x \%>\% at(base64) \%>\% peek
+x \%>\% at(base64) \%>\% peek
 x \%>\% at(base64)
 x \%>\% index() \%>\% at(base64)
 

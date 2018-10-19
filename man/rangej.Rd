@@ -15,9 +15,8 @@ rangej(x, array = FALSE)
 Produce range of numbers
 }
 \examples{
-rangej(2:4)
 2:4 \%>\% rangej
 2:1000 \%>\% rangej
-# errors, correctly though
-# 2 \%>\% rangej
+1 \%>\% rangej
+4 \%>\% rangej
 }

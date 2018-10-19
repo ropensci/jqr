@@ -5,10 +5,11 @@
 \alias{flags}
 \title{Flags for use with jq}
 \usage{
-jq_flags(pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALSE)
+jq_flags(pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALSE,
+  stream = FALSE, seq = FALSE)
 
 flags(.data, pretty = FALSE, ascii = FALSE, color = FALSE,
-  sorted = FALSE)
+  sorted = FALSE, stream = FALSE, seq = FALSE)
 }
 \arguments{
 \item{pretty}{Pretty print the json (different to jsonlite's
@@ -20,6 +21,12 @@ characters replaced by equivalent escape sequences.}
 \item{color}{Add ANSI escape sequences for coloured output}
 
 \item{sorted}{Output fields of each object with keys in sorted order}
+
+\item{stream}{Parse the input in streaming fashion, outputing arrays
+of path and leaf values like \code{jq --stream} command line.}
+
+\item{seq}{Use the application/json-seq MIME type scheme for separating
+JSON like the \code{jq --seq} command line.}
 
 \item{.data}{A \code{jqr} object.}
 }

@@ -1,0 +1,70 @@
+#!/bin/bash
+# Anticonf (tm) script by Jeroen Ooms (2017)
+# This script will query 'pkg-config' for the required cflags and ldflags.
+# If pkg-config is unavailable or does not find the library, try setting
+# INCLUDE_DIR and LIB_DIR manually via e.g:
+# R CMD INSTALL --configure-vars='INCLUDE_DIR=/.../include LIB_DIR=/.../lib'
+
+# Library settings
+PKG_DEB_NAME="libjq-dev"
+PKG_RPM_NAME="jq-devel"
+PKG_CSW_NAME="libjq_dev"
+PKG_BREW_NAME="jq"
+PKG_TEST_HEADER="<jq.h>"
+PKG_LIBS="-ljq"
+PKG_LIBS_STATIC="-ljq -lonig"
+PKG_CFLAGS=""
+
+# Note that cflags may be empty in case of success
+if [ "$INCLUDE_DIR" ] || [ "$LIB_DIR" ]; then
+  echo "Found INCLUDE_DIR and/or LIB_DIR!"
+  PKG_CFLAGS="-I$INCLUDE_DIR $PKG_CFLAGS"
+  PKG_LIBS="-L$LIB_DIR $PKG_LIBS"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  if [ $(command -v brew) ]; then
+    BREWDIR=$(brew --prefix)
+  else
+    # autobrew in /tmp
+    curl -sfL "https://jeroen.github.io/autobrew/$PKG_BREW_NAME" > autobrew
+    source autobrew
+  fi
+  PKG_CFLAGS="-I$BREWDIR/opt/$PKG_BREW_NAME/include"
+  PKG_LIBS="-L$BREWDIR/lib $PKG_LIBS"
+fi
+
+# For debugging
+echo "Using PKG_CFLAGS=$PKG_CFLAGS"
+echo "Using PKG_LIBS=$PKG_LIBS"
+
+# Find compiler
+CC=$(${R_HOME}/bin/R CMD config CC)
+CFLAGS=$(${R_HOME}/bin/R CMD config CFLAGS)
+CPPFLAGS=$(${R_HOME}/bin/R CMD config CPPFLAGS)
+
+# Test configuration
+echo "#include $PKG_TEST_HEADER" | ${CC} ${CPPFLAGS} ${PKG_CFLAGS} ${CFLAGS} -E -xc - >/dev/null 2>&1
+
+# Customize the error
+if [ $? -ne 0 ]; then
+  echo "------------------------- ANTICONF ERROR ---------------------------"
+  echo "Configuration failed because libjq was not found."
+  echo "On Ubuntu 14.04 or 16.04 you can use the PPA:"
+  echo "  sudo add-apt-repository -y ppa:opencpu/jq"
+  echo "  sudo apt-get update"
+  echo "  sudo apt-get install libjq-dev"
+  echo "On other sytems try installing:"
+  echo " * deb: $PKG_DEB_NAME (Debian, Ubuntu 16.10 and up)".
+  echo " * rpm: $PKG_RPM_NAME (Fedora, EPEL)"
+  echo " * csw: $PKG_CSW_NAME (Solaris)"
+  echo " * brew: $PKG_BREW_NAME (OSX)"
+  echo "If $PKG_CONFIG_NAME is already installed set INCLUDE_DIR and LIB_DIR manually via:"
+  echo "R CMD INSTALL --configure-vars='INCLUDE_DIR=... LIB_DIR=...'"
+  echo "--------------------------------------------------------------------"
+  exit 1;
+fi
+
+# Write to Makevars
+sed -e "s|@cflags@|$PKG_CFLAGS|" -e "s|@libs@|$PKG_LIBS|" src/Makevars.in > src/Makevars
+
+# Success
+exit 0

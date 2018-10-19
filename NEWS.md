@@ -1,7 +1,19 @@
-jqr 0.3.0
+jqr 1.1.0
 =========
 
-* Update bundled libjq to stedolan/jq@0b82185 (1.5-patched)
+* All functions now support connection objects as input types for streaming
+
+jqr 1.0.0
+=========
+
+* Unbundle jq: the libjq library and headers are now available on all major platforms.
+  See https://stedolan.github.io/jq/download/ for details. (#59)
+* Removed a few authors due to n longer including jq in package
+* No longer linking to BH and Rcpp. No longer using/importing Rcpp
+* Use `R_registerRoutines` and `R_useDynamicSymbols` as required for 
+packages with compiled code. (#57)
+* Internal dataset changed name from "githubcommits" to "commits"
+* Multiple JSON inputs now supported (see #53)
 
 jqr 0.2.4
 =========
