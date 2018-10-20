@@ -1,7 +1,7 @@
 ## Test environments
 
-* local OS X install, R 3.4.1 patched
-* ubuntu 12.04 (on travis-ci), R 3.4.1
+* local OS X install, R 3.5.1 patched
+* ubuntu 14.04 (on travis-ci), R 3.5.1
 * win-builder (devel and release)
 
 ## R CMD check results
@@ -10,14 +10,11 @@
 
 ## Reverse dependencies
 
-We've checked the 1 reverse dependency, and no problems resulted.
+* I have run R CMD check on the xxx downstream dependencies. No errors were found. Summary at <https://github.com/ropensci/jqr/blob/master/revdep/README.md>. No problems were found.
 
 ---
 
-This version unbundles `jq` as `libjq` library and headers are now 
-available on all major platforms, and includes the mandatory 
-addition of R_registerRoutines and R_useDynamicSymbols for 
-packages with compiled code.
+This version xxx
 
 Thanks!
 Scott Chamberlain
