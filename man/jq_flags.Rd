@@ -5,8 +5,8 @@
 \alias{flags}
 \title{Flags for use with jq}
 \usage{
-jq_flags(pretty = FALSE, ascii = FALSE, color = FALSE, sorted = FALSE,
-  stream = FALSE, seq = FALSE)
+jq_flags(pretty = FALSE, ascii = FALSE, color = FALSE,
+  sorted = FALSE, stream = FALSE, seq = FALSE)
 
 flags(.data, pretty = FALSE, ascii = FALSE, color = FALSE,
   sorted = FALSE, stream = FALSE, seq = FALSE)
