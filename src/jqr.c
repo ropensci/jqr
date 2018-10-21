@@ -16,7 +16,7 @@ typedef struct {
 
 static void error_cb(void * data, jv x) {
   char buf[1000];
-  strncpy(buf, jv_string_value(x), 1000);
+  strncpy(buf, jv_string_value(x), 999);
   jv_free(x);
   Rf_errorcall(R_NilValue, buf);
 }
