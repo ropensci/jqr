@@ -29,24 +29,24 @@ curl('https://api.github.com/repos/ropensci/jqr/commits?per_page=5') %>%
   jq('.[] | {message: .commit.message, name: .commit.committer.name}')
 #> [
 #>     {
-#>         "message": "Try to make things a bit faster",
-#>         "name": "Jeroen"
-#>     },
-#>     {
-#>         "message": "Also force input as UTF-8, fixes #71 for realz",
+#>         "message": "Bump Travis",
 #>         "name": "Jeroen Ooms"
 #>     },
 #>     {
-#>         "message": "Set encoding to UTF-8, fixes #71",
-#>         "name": "Jeroen"
+#>         "message": "Fix for GCC-8 stringop-truncation warning",
+#>         "name": "Jeroen Ooms"
 #>     },
 #>     {
-#>         "message": "Protect input string",
-#>         "name": "Jeroen"
-#>     },
-#>     {
-#>         "message": "add a few examples for streaming from a file or url in addition to string #51",
+#>         "message": "update cran comments",
 #>         "name": "Scott Chamberlain"
+#>     },
+#>     {
+#>         "message": "tweaks to man files",
+#>         "name": "Scott Chamberlain"
+#>     },
+#>     {
+#>         "message": "Fix travis file?",
+#>         "name": "Jeroen"
 #>     }
 #> ]
 ```
@@ -934,6 +934,6 @@ combine(x)
 * Please [report any issues or bugs](https://github.com/ropensci/jqr/issues).
 * License: MIT
 * Get citation information for `jqr` in R doing `citation(package = 'jqr')`
-* Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
+* Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 [![rofooter](http://www.ropensci.org/public_images/github_footer.png)](http://ropensci.org)

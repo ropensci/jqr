@@ -10,7 +10,7 @@ man-roxygen
 ^notes\.md$
 ^appveyor.yml$
 ^patch\.R$
-^CONDUCT\.md$
+^CODE_OF_CONDUCT\.md$
 cran-comments.md
 ^src/jq/.*\.o$
 ^src/.*\.a$
