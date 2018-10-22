@@ -25,5 +25,6 @@ Suggests:
     roxygen2 (>= 6.1.0),
     jsonlite,
     testthat,
-    knitr
+    knitr,
+    rmarkdown
 RoxygenNote: 6.1.0

@@ -16,7 +16,7 @@
 
 ## Reverse dependencies
 
-* I have run R CMD check on the xxx downstream dependencies. No errors were found. Summary at <https://github.com/ropensci/jqr/blob/master/revdep/README.md>. No problems were found.
+* I have run R CMD check on the 4 downstream dependencies. No errors were found. Summary at <https://github.com/ropensci/jqr/blob/master/revdep/README.md>. No problems were found.
 
 ---
 

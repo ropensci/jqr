@@ -19,3 +19,4 @@ cran-comments.md
 $src/Makevars$
 ^cran-comments\.md$
 ^codemeta\.json$
+^revdep$

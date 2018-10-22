@@ -1,8 +1,17 @@
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{jqr introduction}
-%\VignetteEncoding{UTF-8}
--->
+---
+title: "jqr introduction"
+author: "Scott Chamberlain, Rich FitzJohn, Jeroen Ooms, Stefan Milton Bache"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: readable
+vignette: >
+  %\VignetteIndexEntry{jqr introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 ```{r echo=FALSE}
 knitr::opts_chunk$set(
@@ -246,7 +255,7 @@ More complicated `select()`, using the included dataset `commits`
 ```{r}
 commits %>%
   index() %>%
-  select(sha = .sha, name = .commit.committer.name)
+  build_object(sha = .sha, name = .commit.committer.name)
 ```
 
 ## maths 
@@ -290,4 +299,21 @@ Maths comparisons
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(foo)
 '[{"foo":1, "bar":14}, {"foo":2, "bar":3}]' %>% maxj(bar)
+```
+
+## connections
+
+### files
+
+```{r}
+tmp <- tempfile()
+writeLines(c("[123, 456]", "[77, 88, 99]", "[41]"), tmp)
+jq(file(tmp), ".[]")
+```
+
+### urls
+
+```{r eval=FALSE}
+x <- 'http://jeroen.github.io/data/diamonds.json'
+jq(url(x), "select(.carat > 3.5)")
 ```

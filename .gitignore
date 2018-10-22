@@ -10,3 +10,6 @@ jqr_*.tar.gz
 notes.md
 src/*.dll
 src/Makevars
+revdep/checks.noindex
+revdep/data.sqlite
+revdep/library.noindex
