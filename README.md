@@ -6,6 +6,7 @@ jqr
 [![Build Status](https://travis-ci.org/ropensci/jqr.svg?branch=master)](https://travis-ci.org/ropensci/jqr)
 [![Build status](https://ci.appveyor.com/api/projects/status/tfwpiaotu24sotxg?svg=true)](https://ci.appveyor.com/project/sckott/jqr)
 [![Coverage Status](https://coveralls.io/repos/ropensci/jqr/badge.svg?branch=master)](https://coveralls.io/r/ropensci/jqr?branch=master)
+[![cran checks](https://cranchecks.info/badges/worst/jqr)](https://cranchecks.info/pkgs/jqr)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/jqr?color=0DA6CD)](https://github.com/metacran/cranlogs.app)
 [![cran version](http://www.r-pkg.org/badges/version/jqr)](https://cran.r-project.org/package=jqr)
 
