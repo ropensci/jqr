@@ -49,7 +49,7 @@ if [ $? -ne 0 ]; then
   echo "------------------------- ANTICONF ERROR ---------------------------"
   echo "Configuration failed because libjq was not found."
   echo "On Ubuntu 14.04 or 16.04 you can use the PPA:"
-  echo "  sudo add-apt-repository -y ppa:opencpu/jq"
+  echo "  sudo add-apt-repository -y ppa:jeroen/jq"
   echo "  sudo apt-get update"
   echo "  sudo apt-get install libjq-dev"
   echo "On other sytems try installing:"

@@ -62,10 +62,10 @@ Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
 install.packages("jqr")
 ```
 
-Installation from source on Linux or OSX requires [`libjq`](https://stedolan.github.io/jq/). On __Ubuntu 14.04 and 16.04 lower__ use [libjq-dev](https://launchpad.net/~opencpu/+archive/ubuntu/jq) from Launchpad:
+Installation from source on Linux or OSX requires [`libjq`](https://stedolan.github.io/jq/). On __Ubuntu 14.04 and 16.04 lower__ use [libjq-dev](https://launchpad.net/~jeroen/+archive/ubuntu/jq) from Launchpad:
 
 ```
-sudo add-apt-repository -y ppa:opencpu/jq
+sudo add-apt-repository -y ppa:jeroen/jq
 sudo apt-get update -q
 sudo apt-get install -y libjq-dev
 ```
