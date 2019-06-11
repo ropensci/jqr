@@ -18,7 +18,7 @@ matrix:
 addons:
   apt:
     sources:
-      - sourceline: 'ppa:jeroen/jq'
+      - sourceline: 'ppa:cran/jq'
     packages:
       - libjq-dev
 
