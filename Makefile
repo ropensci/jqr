@@ -10,12 +10,15 @@ test:
 test_all:
 	REMAKE_TEST_INSTALL_PACKAGES=true make test
 
-roxygen:
+doc:
 	@mkdir -p man
 	${RSCRIPT} -e "library(methods); devtools::document()"
 
-install:
-	R CMD INSTALL .
+eg:
+	${RSCRIPT} -e "devtools::run_examples()"
+
+install: doc build
+	R CMD INSTALL . && rm *.tar.gz
 
 build:
 	R CMD build .
