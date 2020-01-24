@@ -117,3 +117,12 @@ test_that("query for array", {
   expect_that(jqr(jsonlite::toJSON(src), ".[3][]", 0),
               equals(c("200", "200")))
 })
+
+test_that("NA handling", {
+  expect_error(jq(NA), "jq method not implemented for logical")
+  expect_error(jq(NA_integer_), "jq method not implemented for integer")
+  expect_error(jq(NA_real_), "jq method not implemented for numeric")
+  expect_error(jq(NA_complex_), "jq method not implemented for complex")
+
+  expect_error(jq(NA_character_), "!is.na\\(json\\) is not TRUE")
+})
