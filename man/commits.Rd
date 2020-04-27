@@ -4,7 +4,9 @@
 \name{commits}
 \alias{commits}
 \title{GitHub Commits Data}
-\format{A character string of json github commits data for the jq repo.}
+\format{
+A character string of json github commits data for the jq repo.
+}
 \description{
 GitHub Commits Data
 }
