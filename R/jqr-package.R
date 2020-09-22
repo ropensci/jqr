@@ -1,4 +1,5 @@
-#' jqr: An R client for the C library jq
+#' @title jqr
+#' @description An R client for the C library jq
 #'
 #' @section Low-level:
 #' Low level interface, in which you can execute `jq` code just as you
