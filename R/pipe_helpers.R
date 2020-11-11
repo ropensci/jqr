@@ -57,14 +57,11 @@ pipe_autoexec <- function(toggle) {
 
 #' Setup On-Exit Action for a Pipeline
 #'
-#' A call to \code{pipeline_on_exit} will setup the pipeline for auto execution by
-#' making \code{result} inside \code{\%>\%} an active binding. The initial
-#' call will register the \code{identity} function as the exit action,
-#' but this can be changed to \code{jq} with a call to \code{pipe_autoexec}.
-#' Subsequent calls to \code{pipeline_on_exit} has no effect.
+#' A call to \code{pipeline_on_exit} will setup the pipeline for auto
+#' execution by overriding the return value from an \code{on.exit}
+#' expression pushed in the magrittr frame.
 #'
-#' @param env A reference to the \code{\%>\%} environment, in which
-#'   \code{result} is to be bound.
+#' @param env A reference to the \code{\%>\%} environment.
 #'
 #' @noRd
 pipeline_on_exit <- function(env) {
@@ -74,17 +71,21 @@ pipeline_on_exit <- function(env) {
   }
   env$.jq_exitfun <- identity
 
-  res <- NULL
+  # Need to be a bit careful with scoping since `env` is foreign. We
+  # inline closures in calls with `do.call()` and `as.call()`. Usage
+  # of `do.call()` instead of `eval()` is necessary so that
+  # `on.exit()`, `return()`, and `returnValue()` are evaluated in the
+  # correct environment upstack and not in the duplicate call frame
+  # that `eval()` pushes on the stack.
+  exit_clo <- function() {
+    out <- do.call(returnValue, list(), envir = env)
 
-  jq_result <- function(v)
-  {
-    if (missing(v)) {
-      res
-    }
-    else {
-      res <<- `$<-`(v, value, env$.jq_exitfun(v$value))
+    # Will be `NULL` in case of error. This doesn't matter here since
+    # we only modify return values that inherit from `"jqr"`.
+    if (!is.null(out)) {
+      do.call(return, alist(.jq_exitfun(returnValue())), envir = env)
     }
   }
 
-  makeActiveBinding("result", jq_result, env)
+  do.call(on.exit, list(as.call(list(exit_clo)), add = TRUE), envir = env)
 }
