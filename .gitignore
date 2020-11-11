@@ -13,3 +13,5 @@ src/Makevars
 revdep/checks.noindex
 revdep/data.sqlite
 revdep/library.noindex
+windows
+configure.log

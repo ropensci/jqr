@@ -21,3 +21,5 @@ $src/Makevars$
 ^cran-comments\.md$
 ^codemeta\.json$
 ^revdep$
+^windows$
+^configure.log$
