@@ -89,3 +89,5 @@ pipeline_on_exit <- function(env) {
 
   do.call(on.exit, list(as.call(list(exit_clo)), add = TRUE), envir = env)
 }
+
+utils::globalVariables(".jq_exitfun")
