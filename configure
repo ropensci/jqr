@@ -20,11 +20,12 @@ if [ "$INCLUDE_DIR" ] || [ "$LIB_DIR" ]; then
   PKG_CFLAGS="-I$INCLUDE_DIR $PKG_CFLAGS"
   PKG_LIBS="-L$LIB_DIR $PKG_LIBS"
 elif [ `uname` = "Darwin" ]; then
-  if [ `command -v brew` ]; then
+  brew --version 2>/dev/null
+  if [ $? -eq 0 ]; then
     BREWDIR=`brew --prefix`
   else
     # autobrew in /tmp
-    curl -sfL "https://autobrew.github.io/autobrew/$PKG_BREW_NAME" > autobrew
+    curl -sfL "https://autobrew.github.io/scripts/$PKG_BREW_NAME" > autobrew
     . autobrew
   fi
   PKG_CFLAGS="-I$BREWDIR/opt/$PKG_BREW_NAME/include"
@@ -46,13 +47,8 @@ echo "#include $PKG_TEST_HEADER" | ${CC} ${CPPFLAGS} ${PKG_CFLAGS} ${CFLAGS} -E 
 # Customize the error
 if [ $? -ne 0 ]; then
   echo "--------------------------- [ANTICONF] --------------------------------"
-  echo "Configuration failed because libjq was not found."
-  echo "On Ubuntu 14.04 or 16.04 you can use the PPA:"
-  echo "  sudo add-apt-repository -y ppa:jeroen/jq"
-  echo "  sudo apt-get update"
-  echo "  sudo apt-get install libjq-dev"
-  echo "On other sytems try installing:"
-  echo " * deb: $PKG_DEB_NAME (Debian, Ubuntu 16.10 and up)".
+  echo "Configuration failed because libjq was not found. Try installing:"
+  echo " * deb: $PKG_DEB_NAME (Debian, Ubuntu)".
   echo " * rpm: $PKG_RPM_NAME (Fedora, EPEL)"
   echo " * csw: $PKG_CSW_NAME (Solaris)"
   echo " * brew: $PKG_BREW_NAME (OSX)"
