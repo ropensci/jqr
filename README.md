@@ -3,11 +3,12 @@ jqr
 
 
 
+
 [![R-CMD-check](https://github.com/ropensci/jqr/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/jqr/actions?query=workflow%3AR-CMD-check)
 [![codecov](https://codecov.io/gh/ropensci/jqr/branch/master/graph/badge.svg)](https://codecov.io/gh/ropensci/jqr)
 [![cran checks](https://cranchecks.info/badges/worst/jqr)](https://cranchecks.info/pkgs/jqr)
-[![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/jqr?color=0DA6CD)](https://github.com/metacran/cranlogs.app)
-[![cran version](http://www.r-pkg.org/badges/version/jqr)](https://cran.r-project.org/package=jqr)
+[![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/jqr?color=0DA6CD)](https://github.com/r-hub/cranlogs.app)
+[![cran version](https://www.r-pkg.org/badges/version/jqr)](https://cran.r-project.org/package=jqr)
 
 R interface to jq, a JSON processor http://stedolan.github.io/jq/
 
@@ -19,7 +20,7 @@ means that the eventual loading into R can be quicker.
 
 ## Quickstart Tutorial
 
-The `jq` command line examples from the [jq tutorial](https://stedolan.github.io/jq/tutorial/) work exactly the same in R! 
+The `jq` command line examples from the [jq tutorial](https://stedolan.github.io/jq/tutorial/) work exactly the same in R!
 
 
 ```r
@@ -29,24 +30,24 @@ curl('https://api.github.com/repos/ropensci/jqr/commits?per_page=5') %>%
   jq('.[] | {message: .commit.message, name: .commit.committer.name}')
 #> [
 #>     {
-#>         "message": "Bump Travis",
-#>         "name": "Jeroen Ooms"
-#>     },
-#>     {
-#>         "message": "Fix for GCC-8 stringop-truncation warning",
-#>         "name": "Jeroen Ooms"
-#>     },
-#>     {
-#>         "message": "update cran comments",
+#>         "message": "undo last change to Makevars.win - didnt help in cleaning up files on windows check",
 #>         "name": "Scott Chamberlain"
 #>     },
 #>     {
-#>         "message": "tweaks to man files",
+#>         "message": "edit src/Makevars.win to clean up additional files on windows",
 #>         "name": "Scott Chamberlain"
 #>     },
 #>     {
-#>         "message": "Fix travis file?",
-#>         "name": "Jeroen"
+#>         "message": "add gh actions badge to readme; replace coveralls badge with codecov badge in readme",
+#>         "name": "Scott Chamberlain"
+#>     },
+#>     {
+#>         "message": "add gh actions file [skip travis] [skip appveyor]",
+#>         "name": "Scott Chamberlain"
+#>     },
+#>     {
+#>         "message": "trying fixes for configure file after running check with checkbasihisms installed (via homebrew)",
+#>         "name": "Scott Chamberlain"
 #>     }
 #> ]
 ```
@@ -492,8 +493,8 @@ unique
 
 #### filter
 
-With filtering via `select()` you can use various operators, like `==`, 
-`&&`, `||`. We translate these internally for you to what `jq` wants 
+With filtering via `select()` you can use various operators, like `==`,
+`&&`, `||`. We translate these internally for you to what `jq` wants
 to see (`==`, `and`, `or`).
 
 Simple, one condition
@@ -934,6 +935,6 @@ combine(x)
 * Please [report any issues or bugs](https://github.com/ropensci/jqr/issues).
 * License: MIT
 * Get citation information for `jqr` in R doing `citation(package = 'jqr')`
-* Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+* Please note that this package is released with a [Contributor Code of Conduct](https://ropensci.org/code-of-conduct/). By contributing to this project, you agree to abide by its terms.
 
-[![rofooter](http://www.ropensci.org/public_images/github_footer.png)](http://ropensci.org)
+[![rofooter](https://www.ropensci.org/public_images/github_footer.png)](https://ropensci.org)
