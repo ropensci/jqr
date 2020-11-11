@@ -7,6 +7,6 @@ winlibs:
 	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
 
 clean:
-	rm -f $(OBJECTS) jqr.dll
+	rm -f $(OBJECTS) jqr.dll libonig.a libjq.a
 
 .PHONY: all clean winlibs
