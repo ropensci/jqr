@@ -83,7 +83,7 @@ pipeline_on_exit <- function(env) {
     # Will be `NULL` in case of error. This doesn't matter here since
     # we only modify return values that inherit from `"jqr"`.
     if (!is.null(out)) {
-      do.call(return, alist(.jq_exitfun(returnValue())), envir = env)
+      do.call("return", alist(.jq_exitfun(returnValue())), envir = env)
     }
   }
 
