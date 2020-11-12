@@ -10,14 +10,13 @@
   "codeRepository": "https://github.com/ropensci/jqr",
   "issueTracker": "https://github.com/ropensci/jqr/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
-    "version": "3.5.1",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 3.5.1 Patched (2018-08-12 r75119)",
+  "runtimePlatform": "R version 4.0.3 Patched (2020-11-02 r79396)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -58,19 +57,6 @@
     }
   ],
   "softwareSuggestions": [
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "roxygen2",
-      "name": "roxygen2",
-      "version": ">= 6.1.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=roxygen2"
-    },
     {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
@@ -156,9 +142,19 @@
       "identifier": "https://sysreqs.r-hub.io/get/libjq"
     }
   ],
-  "contIntegration": "https://travis-ci.org/ropensci/jqr",
+  "contIntegration": "https://codecov.io/gh/ropensci/jqr",
   "releaseNotes": "https://github.com/ropensci/jqr/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/jqr/blob/master/README.md",
-  "fileSize": "41.962KB",
-  "keywords": ["json", "rstats", "jq", "r", "r-package"]
+  "fileSize": "0KB",
+  "keywords": [
+    "json",
+    "rstats",
+    "jq",
+    "r",
+    "r-package"
+  ],
+  "relatedLink": "https://docs.ropensci.org/jqr",
+  "contributor": {},
+  "copyrightHolder": {},
+  "funder": {}
 }

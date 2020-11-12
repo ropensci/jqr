@@ -1,3 +1,11 @@
+jqr 1.2.0
+=========
+
+### MINOR IMPROVEMENTS
+
+* fix to internal method `pipeline_on_exit()` for compatibility with the upcoming magrittr v2.0 (#82) thanks @lionel- !
+* `jq()` errors better now when any NA class passed to it (#78)
+
 jqr 1.1.0
 =========
 
