@@ -6,7 +6,8 @@
 ^\.travis\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^README\.Rmd$
+README.Rmd
+README.md
 man-roxygen
 ^notes\.md$
 ^appveyor.yml$
