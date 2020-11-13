@@ -14,7 +14,9 @@
 
 ---
 
-This version makes a fix for the forthcoming version of magrittr, which this package depends on.
+This version makes a fix for the forthcoming version of magrittr, which this package depends on. 
+
+This is a re-submission of this version, fixing a problem.
 
 Thanks!
 Scott Chamberlain
