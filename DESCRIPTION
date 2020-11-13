@@ -15,7 +15,6 @@ Authors@R: c(person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gma
     person("Jeroen", "Ooms", role = "aut", email = "jeroen@berkeley.edu"),
     person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com"),
     person("Stefan Milton Bache", role = "aut", email = "stefan@stefanbache.dk"))
-VignetteBuilder: knitr
 URL: https://docs.ropensci.org/jqr/ (docs), https://github.com/ropensci/jqr (devel)
 BugReports: https://github.com/ropensci/jqr/issues
 SystemRequirements: libjq: jq-devel (rpm) or libjq-dev (deb)
