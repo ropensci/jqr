@@ -24,3 +24,4 @@ $src/Makevars$
 ^revdep$
 ^windows$
 ^configure.log$
+vignettes

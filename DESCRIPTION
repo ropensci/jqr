@@ -24,7 +24,5 @@ Imports:
     lazyeval
 Suggests:
     jsonlite,
-    testthat,
-    knitr,
-    rmarkdown
+    testthat
 RoxygenNote: 7.1.1
