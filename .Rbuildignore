@@ -25,3 +25,4 @@ $src/Makevars$
 ^windows$
 ^configure.log$
 vignettes
+^LICENSE\.md$
