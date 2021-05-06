@@ -1,7 +1,7 @@
 ## Test environments
 
-* local OS X install, R 4.0.3 patched
-* ubuntu 16.04 (on travis-ci), R 4.0.3
+* local OS X install, R 4.0.5 patched
+* ubuntu 16.04 (on Github Actions), R 4.0.5
 * win-builder (devel and release)
 
 ## R CMD check results
@@ -14,9 +14,7 @@
 
 ---
 
-This version makes a fix for the forthcoming version of magrittr, which this package depends on. 
-
-This is a re-submission of this version, fixing a problem.
+This version updates the libjq version for Windows.
 
 Thanks!
 Scott Chamberlain

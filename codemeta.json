@@ -10,13 +10,13 @@
   "codeRepository": "https://github.com/ropensci/jqr",
   "issueTracker": "https://github.com/ropensci/jqr/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.0.3 Patched (2020-11-02 r79396)",
+  "runtimePlatform": "R version 4.0.5 Patched (2021-03-31 r80136)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -80,30 +80,6 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=testthat"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "knitr",
-      "name": "knitr",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=knitr"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "rmarkdown",
-      "name": "rmarkdown",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
     }
   ],
   "softwareRequirements": [
@@ -145,7 +121,7 @@
   "contIntegration": "https://codecov.io/gh/ropensci/jqr",
   "releaseNotes": "https://github.com/ropensci/jqr/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/jqr/blob/master/README.md",
-  "fileSize": "0KB",
+  "fileSize": "160.711KB",
   "keywords": [
     "json",
     "rstats",
@@ -153,7 +129,7 @@
     "r",
     "r-package"
   ],
-  "relatedLink": "https://docs.ropensci.org/jqr",
+  "relatedLink": ["https://docs.ropensci.org/jqr", "https://docs.ropensci.org/jqr/"],
   "contributor": {},
   "copyrightHolder": {},
   "funder": {}
