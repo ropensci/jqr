@@ -1,3 +1,8 @@
+jqr 1.2.1
+=========
+
+* Windows: update to libjq 1.6
+
 jqr 1.2.0
 =========
 
