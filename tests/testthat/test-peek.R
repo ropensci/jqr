@@ -1,5 +1,7 @@
 context("peek")
 
+str <- '{"foo": 12, "bar":[1,2,{"barp":12, "blip":13}]}'
+
 test_that("peek works as expected", {
   a <- '[1,2,5,3,5,3,1,3]' %>% uniquej %>% peek
   expect_is(a, "jq_query")
@@ -26,7 +28,6 @@ test_that("peek works as expected", {
   expect_is(g, 'jq_query')
   expect_equal(g[[1]], 'map(has(1,2))')
 
-  str <- '{"foo": 12, "bar":[1,2,{"barp":12, "blip":13}]}'
   h <- str %>% contains(`{foo: 12, bar: [{barp: 12}]}`) %>% peek
   expect_is(h, 'jq_query')
   expect_is(unclass(h), 'character')
