@@ -30,24 +30,24 @@ curl('https://api.github.com/repos/ropensci/jqr/commits?per_page=5') %>%
   jq('.[] | {message: .commit.message, name: .commit.committer.name}')
 #> [
 #>     {
-#>         "message": "undo last change to Makevars.win - didnt help in cleaning up files on windows check",
+#>         "message": "update cran comments and codemeta.json",
 #>         "name": "Scott Chamberlain"
 #>     },
 #>     {
-#>         "message": "edit src/Makevars.win to clean up additional files on windows",
+#>         "message": "change license to \"jqr authors\"",
 #>         "name": "Scott Chamberlain"
 #>     },
 #>     {
-#>         "message": "add gh actions badge to readme; replace coveralls badge with codecov badge in readme",
-#>         "name": "Scott Chamberlain"
+#>         "message": "fix ci",
+#>         "name": "Jeroen Ooms"
 #>     },
 #>     {
-#>         "message": "add gh actions file [skip travis] [skip appveyor]",
-#>         "name": "Scott Chamberlain"
+#>         "message": "Windows: update to libjq 1.6",
+#>         "name": "Jeroen Ooms"
 #>     },
 #>     {
-#>         "message": "trying fixes for configure file after running check with checkbasihisms installed (via homebrew)",
-#>         "name": "Scott Chamberlain"
+#>         "message": "Small tweak for autobrew",
+#>         "name": "Jeroen Ooms"
 #>     }
 #> ]
 ```
