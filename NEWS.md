@@ -1,3 +1,8 @@
+jqr 1.2.2
+=========
+
+* fix a failing test
+
 jqr 1.2.1
 =========
 
