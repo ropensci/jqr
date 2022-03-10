@@ -4,7 +4,7 @@ Description: Client for 'jq', a 'JSON' processor (<https://stedolan.github.io/jq
     written in C. 'jq' allows the following with 'JSON' data: index into, parse, 
     do calculations, cut up and filter, change key names and values, perform 
     conditionals and comparisons, and more.
-Version: 1.2.2
+Version: 1.2.3
 Depends:
     R (>= 3.1.2)
 License: MIT + file LICENSE
@@ -12,8 +12,8 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 Authors@R: c(person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gmail.com"),
-    person("Jeroen", "Ooms", role = "aut", email = "jeroen@berkeley.edu"),
-    person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com"),
+    person("Jeroen", "Ooms", role = c("aut", "cre"), email = "jeroen@berkeley.edu"),
+    person("Scott", "Chamberlain", role = "aut", email = "myrmecocystus@gmail.com"),
     person("Stefan Milton Bache", role = "aut", email = "stefan@stefanbache.dk"))
 URL: https://docs.ropensci.org/jqr/ (docs), https://github.com/ropensci/jqr (devel)
 BugReports: https://github.com/ropensci/jqr/issues

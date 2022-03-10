@@ -26,3 +26,4 @@ $src/Makevars$
 ^configure.log$
 vignettes
 ^LICENSE\.md$
+^\.github$
