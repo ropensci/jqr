@@ -1,6 +1,6 @@
 Package: jqr
 Title: Client for 'jq', a 'JSON' Processor
-Description: Client for 'jq', a 'JSON' processor (<https://stedolan.github.io/jq/>), 
+Description: Client for 'jq', a 'JSON' processor (<https://jqlang.github.io/jq/>), 
     written in C. 'jq' allows the following with 'JSON' data: index into, parse, 
     do calculations, cut up and filter, change key names and values, perform 
     conditionals and comparisons, and more.
