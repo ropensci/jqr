@@ -3,7 +3,7 @@
 #' @export
 #' @template args
 #' @examples
-#' x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
+#' x <- '{"user":"jqlang","titles":["JQ Primer", "More JQ"]}'
 #' x %>% at(base64) %>% peek
 #' x %>% at(base64)
 #' x %>% index() %>% at(base64)

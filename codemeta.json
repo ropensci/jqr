@@ -5,7 +5,7 @@
   ],
   "@type": "SoftwareSourceCode",
   "identifier": "jqr",
-  "description": "Client for 'jq', a 'JSON' processor (<https://stedolan.github.io/jq/>), \n    written in C. 'jq' allows the following with 'JSON' data: index into, parse, \n    do calculations, cut up and filter, change key names and values, perform \n    conditionals and comparisons, and more.",
+  "description": "Client for 'jq', a 'JSON' processor (<https://jqlang.github.io/jq/>), \n    written in C. 'jq' allows the following with 'JSON' data: index into, parse, \n    do calculations, cut up and filter, change key names and values, perform \n    conditionals and comparisons, and more.",
   "name": "jqr: Client for 'jq', a 'JSON' Processor",
   "codeRepository": "https://github.com/ropensci/jqr",
   "issueTracker": "https://github.com/ropensci/jqr/issues",

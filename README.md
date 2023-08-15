@@ -10,7 +10,7 @@ jqr
 [![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/jqr?color=0DA6CD)](https://github.com/r-hub/cranlogs.app)
 [![cran version](https://www.r-pkg.org/badges/version/jqr)](https://cran.r-project.org/package=jqr)
 
-R interface to jq, a JSON processor http://stedolan.github.io/jq/
+R interface to jq, a JSON processor http://jqlang.github.io/jq/
 
 `jqr` makes it easy to process large amounts of json without having to
 convert from json to R, or without using regular expressions.  This
@@ -20,7 +20,7 @@ means that the eventual loading into R can be quicker.
 
 ## Quickstart Tutorial
 
-The `jq` command line examples from the [jq tutorial](https://stedolan.github.io/jq/tutorial/) work exactly the same in R!
+The `jq` command line examples from the [jq tutorial](https://jqlang.github.io/jq/tutorial/) work exactly the same in R!
 
 
 ```r
@@ -52,7 +52,7 @@ curl('https://api.github.com/repos/ropensci/jqr/commits?per_page=5') %>%
 #> ]
 ```
 
-Try running some of the [other examples](https://stedolan.github.io/jq/tutorial/).
+Try running some of the [other examples](https://jqlang.github.io/jq/tutorial/).
 
 ## Installation
 
@@ -62,7 +62,7 @@ Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
 install.packages("jqr")
 ```
 
-Installation from source on Linux or OSX requires [`libjq`](https://stedolan.github.io/jq/). On __Ubuntu 14.04 and 16.04 lower__ use [libjq-dev](https://launchpad.net/~cran/+archive/ubuntu/jq) from Launchpad:
+Installation from source on Linux or OSX requires [`libjq`](https://jqlang.github.io/jq/). On __Ubuntu 14.04 and 16.04 lower__ use [libjq-dev](https://launchpad.net/~cran/+archive/ubuntu/jq) from Launchpad:
 
 ```
 sudo add-apt-repository -y ppa:cran/jq
@@ -324,21 +324,21 @@ Show the query to be used using `peek()`
 
 
 ```r
-x <- '{"user":"stedolan","titles":["JQ Primer", "More JQ"]}'
+x <- '{"user":"jqlang","titles":["JQ Primer", "More JQ"]}'
 jq(x, '{user, title: .titles[]}')
 #> [
 #>     {
-#>         "user": "stedolan",
+#>         "user": "jqlang",
 #>         "title": "JQ Primer"
 #>     },
 #>     {
-#>         "user": "stedolan",
+#>         "user": "jqlang",
 #>         "title": "More JQ"
 #>     }
 #> ]
 x %>% index()
 #> [
-#>     "stedolan",
+#>     "jqlang",
 #>     [
 #>         "JQ Primer",
 #>         "More JQ"
@@ -347,11 +347,11 @@ x %>% index()
 x %>% build_object(user, title = `.titles[]`)
 #> [
 #>     {
-#>         "user": "stedolan",
+#>         "user": "jqlang",
 #>         "title": "JQ Primer"
 #>     },
 #>     {
-#>         "user": "stedolan",
+#>         "user": "jqlang",
 #>         "title": "More JQ"
 #>     }
 #> ]
