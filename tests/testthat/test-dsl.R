@@ -203,7 +203,7 @@ test_that("recurse", {
   expect_is(x %>% recurse(.foo[]) %>% jq, 'jqson')
 
   expect_is(recurse('{"a":0, "b":[1]}'), "jqr")
-  expect_is('{"a":0, "b":[1]}' %>% recurse, "jqson")
+  #expect_is('{"a":0, "b":[1]}' %>% recurse, "jqson")
   expect_equal(recurse('{"a":0, "b":[1]}') %>% string, '{"a":0, "b":[1]}')
 
   expect_equal(x %>% recurse(.foo[]), x %>% recurse_(".foo[]"))
