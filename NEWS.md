@@ -1,3 +1,9 @@
+jqr 1.3.0
+=========
+
+* Windows: update to libjq 1.7
+* Fix test for libjq 1.7 on Debian
+
 jqr 1.2.3
 =========
 
