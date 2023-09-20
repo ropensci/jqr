@@ -41,18 +41,21 @@ jqr_feed <- function(jqr_program, json, unlist = TRUE, finalize = FALSE){
   return(out)
 }
 
+#' @export
 jqr <- function(x, ...) {
   UseMethod("jqr", x)
 }
 
-jqr.default <- function(x, query, flags){
+#' @export
+jqr.default <- function(x, query, flags, ...){
   stopifnot(is.character(query))
   stopifnot(is.numeric(flags))
   program <- jqr_new(query, flags = flags)
   jqr_feed(program, json = x, unlist = TRUE, finalize = TRUE)
 }
 
-jqr.connection <- function(x, query, flags, out = NULL){
+#' @export
+jqr.connection <- function(x, query, flags, out = NULL, ...){
   con <- x
   val <- invisible()
   stopifnot(inherits(con, 'connection'))
