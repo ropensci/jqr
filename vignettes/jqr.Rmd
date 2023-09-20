@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 Introduction to jqr
 ===================
 
-[jq](https://stedolan.github.io/jq/) is a _lightweight and flexible command-line JSON processor_, written in C. It's super fast, and very flexible. `jq` gives you the ability to index into, parse, and do calculations on JSON data. You can cut up and filter JSON data. You can change JSON key names and values. `jq` lets you do conditionals and comparisons, and write your own custom functions to operate on JSON data.
+[jq](https://jqlang.github.io/jq/) is a _lightweight and flexible command-line JSON processor_, written in C. It's super fast, and very flexible. `jq` gives you the ability to index into, parse, and do calculations on JSON data. You can cut up and filter JSON data. You can change JSON key names and values. `jq` lets you do conditionals and comparisons, and write your own custom functions to operate on JSON data.
 
 You can convert JSON into an R list or other R data structure, and proceed with data parsing, but why not do your JSON parsing on the actual JSON if it's easy enough?  That's where `jq` comes in. Doing your data manipulations on the actual JSON makes it easy to pass data to downstream processes that expect JSON.
 
@@ -45,7 +45,7 @@ There's low and high level (or DSL [domain specific language]) interfaces in `jq
 
 ### jqr low level interface
 
-The low level and high level interfaces are unified via the function `jq()`. You can access the low leve interface by using `jq()` directly, passing a JSON string as the first parameter, the program (query) as the second, and [the flags](https://stedolan.github.io/jq/manual/#Invokingjq) as the third (by default no flags are passed).
+The low level and high level interfaces are unified via the function `jq()`. You can access the low leve interface by using `jq()` directly, passing a JSON string as the first parameter, the program (query) as the second, and [the flags](https://jqlang.github.io/jq/manual/#Invokingjq) as the third (by default no flags are passed).
 
 For example, a JSON string could be `'{"a": 7, "b": 4}'`, and the program could be `.`, resulting in
 

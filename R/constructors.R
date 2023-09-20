@@ -4,7 +4,7 @@
 #' @template args
 #' @examples
 #' ## BUILD ARRAYS
-#' x <- '{"user":"stedolan", "projects": ["jq", "wikiflow"]}' 
+#' x <- '{"user":"jqlang", "projects": ["jq", "wikiflow"]}' 
 #' jq(x, "[.user, .projects[]]")
 #' x %>% build_array(.user, .projects[])
 #' 
