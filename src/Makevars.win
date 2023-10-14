@@ -1,7 +1,7 @@
 RWINLIB = ../windows/jq
 PKG_CPPFLAGS = -I$(RWINLIB)/include
 PKG_LIBS = -L$(RWINLIB)/lib$(R_ARCH) \
-  -L$(RWINLIB)/lib -ljq -lonig -lshlwapi
+  -L$(RWINLIB)/lib -ljq -lonig -lpthread -lshlwapi
 
 all: clean winlibs
 
