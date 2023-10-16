@@ -22,7 +22,7 @@ jq(x, ...)
 \item{x}{\code{json} object or character string with json data. this can
 be one or more valid json objects}
 
-\item{...}{character specification of jq query. Each element in code{...}
+\item{...}{character specification of jq query. Each element in \code{...}
 will be combined with " | ", which is convenient for long queries.}
 
 \item{flags}{See \code{\link{jq_flags}}}

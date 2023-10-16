@@ -9,7 +9,7 @@
 #' @export
 #' @param x \code{json} object or character string with json data. this can
 #' be one or more valid json objects
-#' @param ... character specification of jq query. Each element in code{...}
+#' @param ... character specification of jq query. Each element in \code{...}
 #'   will be combined with " | ", which is convenient for long queries.
 #' @param flags See \code{\link{jq_flags}}
 #' @seealso \code{\link{peek}}
@@ -87,12 +87,12 @@ query_from_dots <- function(...)
 #' tmp <- tempfile()
 #' writeLines(c("[123, 456]", "[77, 88, 99]", "[41]"), tmp)
 #' jq(file(tmp), ".[]")
-#' 
+#'
 #' \dontrun{
 #' # from a url
 #' x <- 'http://jeroen.github.io/data/diamonds.json'
 #' jq(url(x), ".[]")
-#' 
+#'
 #' # from a file
 #' file <- file.path(tempdir(), "diamonds_nd.json")
 #' download.file(x, destfile = file)
