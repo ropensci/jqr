@@ -1,3 +1,8 @@
+jqr 1.3.2
+=========
+
+* Fix shell script for cross compilation
+
 jqr 1.3.0
 =========
 
