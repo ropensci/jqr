@@ -18,7 +18,7 @@ static void error_cb(void * data, jv x) {
   char buf[1000];
   strncpy(buf, jv_string_value(x), 999);
   jv_free(x);
-  Rf_errorcall(R_NilValue, buf);
+  Rf_errorcall(R_NilValue, "%s", buf);
 }
 
 static SEXP make_string(const char * str){

@@ -1,3 +1,8 @@
+jqr 1.3.3
+=========
+
+* Fix printf warning for cran
+
 jqr 1.3.2
 =========
 
