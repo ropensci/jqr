@@ -1,3 +1,8 @@
+jqr 1.3.4
+=========
+
+* Remove problematic link anchor
+
 jqr 1.3.3
 =========
 

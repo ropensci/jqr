@@ -174,6 +174,3 @@ x <- '[{"foo":1, "bar":10}, {"foo":3, "bar":100}, {"foo":1, "bar":1}]'
 x \%>\% group(foo)
 x \%>\% group_("foo")
 }
-\seealso{
-\code{\link{add}}
-}

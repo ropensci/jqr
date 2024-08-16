@@ -5,7 +5,7 @@ jqr
 
 
 [![R-CMD-check](https://github.com/ropensci/jqr/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/jqr/actions?query=workflow%3AR-CMD-check)
-[![codecov](http://app.codecov.io/gh/ropensci/jqr/branch/master/graph/badge.svg)](http://app.codecov.io/gh/ropensci/jqr)
+[![codecov](https://app.codecov.io/gh/ropensci/jqr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ropensci/jqr)
 [![cran checks](https://cranchecks.info/badges/worst/jqr)](https://cranchecks.info/pkgs/jqr)
 [![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/jqr?color=0DA6CD)](https://github.com/r-hub/cranlogs.app)
 [![cran version](https://www.r-pkg.org/badges/version/jqr)](https://cran.r-project.org/package=jqr)

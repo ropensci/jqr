@@ -63,3 +63,23 @@ with the high level DSL to get back a character string instead of
 pretty printed version
 }
 
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://docs.ropensci.org/jqr/ (docs)}
+  \item \url{https://github.com/ropensci/jqr (devel)}
+  \item Report bugs at \url{https://github.com/ropensci/jqr/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Jeroen Ooms \email{jeroen@berkeley.edu}
+
+Authors:
+\itemize{
+  \item Rich FitzJohn \email{rich.fitzjohn@gmail.com}
+  \item Scott Chamberlain \email{myrmecocystus@gmail.com}
+  \item Stefan Milton Bache \email{stefan@stefanbache.dk}
+}
+
+}

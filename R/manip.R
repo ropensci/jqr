@@ -3,7 +3,6 @@
 #' @name manip
 #' @template args
 #' @export
-#' @seealso \code{\link{add}}
 #' @examples
 #' # join
 #' str <- '["a","b,c,d","e"]'
