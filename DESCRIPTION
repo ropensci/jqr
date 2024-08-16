@@ -15,7 +15,7 @@ Authors@R: c(person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gma
     person("Jeroen", "Ooms", role = c("aut", "cre"), email = "jeroen@berkeley.edu"),
     person("Scott", "Chamberlain", role = "aut", email = "myrmecocystus@gmail.com"),
     person("Stefan Milton Bache", role = "aut", email = "stefan@stefanbache.dk"))
-URL: https://docs.ropensci.org/jqr/ (docs), https://github.com/ropensci/jqr (devel)
+URL: https://docs.ropensci.org/jqr/, https://ropensci.r-universe.dev/jqr
 BugReports: https://github.com/ropensci/jqr/issues
 SystemRequirements: libjq: jq-devel (rpm) or libjq-dev (deb)
 Imports:

@@ -66,8 +66,8 @@ pretty printed version
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://docs.ropensci.org/jqr/ (docs)}
-  \item \url{https://github.com/ropensci/jqr (devel)}
+  \item \url{https://docs.ropensci.org/jqr/}
+  \item \url{https://ropensci.r-universe.dev/jqr}
   \item Report bugs at \url{https://github.com/ropensci/jqr/issues}
 }
 
