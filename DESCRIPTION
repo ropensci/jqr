@@ -12,7 +12,7 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 Authors@R: c(person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gmail.com"),
-    person("Jeroen", "Ooms", role = c("aut", "cre"), email = "jeroen@berkeley.edu"),
+    person("Jeroen", "Ooms", role = c("aut", "cre"), email = "jeroenooms@gmail.com"),
     person("Scott", "Chamberlain", role = "aut", email = "myrmecocystus@gmail.com"),
     person("Stefan Milton Bache", role = "aut", email = "stefan@stefanbache.dk"))
 URL: https://docs.ropensci.org/jqr/, https://ropensci.r-universe.dev/jqr
