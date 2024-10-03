@@ -73,7 +73,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jeroen Ooms \email{jeroen@berkeley.edu}
+\strong{Maintainer}: Jeroen Ooms \email{jeroen@gmail.com}
 
 Authors:
 \itemize{
