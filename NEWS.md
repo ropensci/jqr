@@ -1,3 +1,8 @@
+jqr 1.4.0
+=========
+
+* Windows: use libjq from Rtools if found
+
 jqr 1.3.4
 =========
 
